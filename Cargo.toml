@@ -1,0 +1,6 @@
+[package]
+name = "z-buffer-game"
+version = "0.1.0"
+authors = ["Atamert Ölçgen <muhuk@muhuk.com>"]
+
+[dependencies]
