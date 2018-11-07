@@ -1,0 +1,13 @@
+* Development Setup
+1. Checkout [[https://github.com/muhuk/z-buffer-game/][git repository]].
+1. Install dev packages required for libtcod:
+
+   #+BEGIN_SRC sh
+   sudo apt-get install gcc g++ make libsdl1.2-dev
+   #+END_SRC
+
+1. Build:
+
+   #+BEGIN_SRC sh
+   cargo build
+   #+END_SRC
