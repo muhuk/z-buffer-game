@@ -4,16 +4,15 @@ use tcod::console::{self, Console};
 
 const SCREEN_WIDTH_CHAR: i32 = 80;
 const SCREEN_HEIGHT_CHAR: i32 = 50;
+const FONT_FILE: &str = "assets/terminal16x16_gs_ro.png";
 const FPS: i32 = 30;
 
 fn main() {
     let mut root = console::Root::initializer()
         .title("z-buffer")
         .size(SCREEN_WIDTH_CHAR, SCREEN_HEIGHT_CHAR)
-        .font(
-            "assets/terminal16x16_gs_ro.png",
-            console::FontLayout::AsciiInRow,
-        ).init();
+        .font(FONT_FILE, console::FontLayout::AsciiInRow)
+        .init();
 
     tcod::system::set_fps(FPS);
 
