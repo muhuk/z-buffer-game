@@ -5,10 +5,14 @@ const SCREEN_HEIGHT_CHAR: i32 = 50;
 const FONT_FILE: &str = "assets/terminal16x16_gs_ro.png";
 const FPS: i32 = 30;
 
+/// User interface related data
 pub struct UI {
     pub root_console: Root,
 }
 
+/// Render a smiley & write "Hello, World!" on the center.
+///
+/// Remove this after proper stages are implemented.
 pub fn draw_hello_world<T: Console>(con: &mut T) {
     con.clear();
     con.set_char(SCREEN_WIDTH_CHAR / 2, SCREEN_HEIGHT_CHAR / 2 - 2, '');

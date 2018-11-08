@@ -1,10 +1,13 @@
+//! z-buffer game
+
 extern crate tcod;
 
-mod ui;
+pub mod ui;
 
 use ui::UI;
 
-struct State {
+/// Application state.
+pub struct State {
     ui: UI,
 }
 
