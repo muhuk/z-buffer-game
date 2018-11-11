@@ -4,5 +4,6 @@ version = "0.1.0"
 authors = ["Atamert Ölçgen <muhuk@muhuk.com>"]
 
 [dependencies]
+dirs = "1.0"
 specs = "0.14.0"
 tcod = "0.12"

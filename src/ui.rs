@@ -1,8 +1,8 @@
+use asset;
 use tcod::console::{self, Console, Root};
 
 const SCREEN_WIDTH_CHAR: i32 = 80;
 const SCREEN_HEIGHT_CHAR: i32 = 50;
-const FONT_FILE: &str = "assets/terminal16x16_gs_ro.png";
 const FPS: i32 = 30;
 
 /// User interface related data
@@ -27,10 +27,12 @@ pub fn draw_hello_world<T: Console>(con: &mut T) {
 }
 
 pub fn initialize() -> UI {
+    let font_file = asset::Assets::FontTerminal16x16GsRo.extract().unwrap();
+
     let root = console::Root::initializer()
         .title("z-buffer")
         .size(SCREEN_WIDTH_CHAR, SCREEN_HEIGHT_CHAR)
-        .font(FONT_FILE, console::FontLayout::AsciiInRow)
+        .font(font_file, console::FontLayout::AsciiInRow)
         .init();
 
     tcod::system::set_fps(FPS);

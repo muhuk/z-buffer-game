@@ -1,8 +1,10 @@
 //! z-buffer game
 
+extern crate dirs;
 extern crate tcod;
 
-pub mod ui;
+mod asset;
+mod ui;
 
 use ui::UI;
 
