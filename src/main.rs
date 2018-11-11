@@ -4,6 +4,7 @@ extern crate dirs;
 extern crate tcod;
 
 mod asset;
+mod stage;
 mod state;
 mod ui;
 
