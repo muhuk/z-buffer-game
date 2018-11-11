@@ -1,9 +1,10 @@
 use asset;
 use tcod::console::{self, Console, Root};
 
+const FPS: i32 = 30;
 const SCREEN_WIDTH_CHAR: i32 = 80;
 const SCREEN_HEIGHT_CHAR: i32 = 50;
-const FPS: i32 = 30;
+const TITLE: &str = "z-buffer";
 
 /// User interface related data
 pub struct UI {
@@ -30,7 +31,7 @@ pub fn initialize() -> UI {
     let font_file = asset::Assets::FontTerminal16x16GsRo.extract().unwrap();
 
     let root = console::Root::initializer()
-        .title("z-buffer")
+        .title(TITLE)
         .size(SCREEN_WIDTH_CHAR, SCREEN_HEIGHT_CHAR)
         .font(font_file, console::FontLayout::AsciiInRow)
         .init();
