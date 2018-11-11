@@ -25,7 +25,7 @@ impl Assets {
         };
         let mut path = get_data_dir();
         path.push(&file_name);
-        println!("Writing file: {:?}", &path);
+        println!("Extracting file: {:?}", &path);
         fs::write(&path, &data)?;
         Ok(path.into_boxed_path())
     }
