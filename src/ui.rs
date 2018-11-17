@@ -1,6 +1,9 @@
 use asset;
 use stage::Stage;
+use std::time::Duration;
 use tcod::console::{self, Console, Root};
+
+use game::Game;
 
 const FPS: i32 = 30;
 const SCREEN_WIDTH_CHAR: i32 = 80;
@@ -15,9 +18,10 @@ pub struct UI {
 }
 
 /// Render UI based on the current stage.
-pub fn draw(stage: &Stage, root: &mut Root) {
-    match stage {
+pub fn draw(game: &mut Game) {
+    match game.stage {
         Stage::Menu => {
+            let root: &mut Root = &mut game.ui.root_console;
             root.clear();
             root.set_char(SCREEN_WIDTH_CHAR / 2, SCREEN_HEIGHT_CHAR / 2 - 2, '');
             root.set_alignment(console::TextAlignment::Center);
@@ -28,9 +32,24 @@ pub fn draw(stage: &Stage, root: &mut Root) {
                 1,
                 "Hello, World!",
             );
+            root.print_rect(
+                SCREEN_WIDTH_CHAR / 2,
+                SCREEN_HEIGHT_CHAR / 2,
+                SCREEN_WIDTH_CHAR,
+                1,
+                format!(
+                    "t = {}, dt = {}",
+                    duration_to_millis(&game.time),
+                    duration_to_millis(&game.dt)
+                ),
+            );
             root.flush();
         }
     }
+}
+
+fn duration_to_millis(t: &Duration) -> u64 {
+    t.as_secs() * 1000 + t.subsec_millis() as u64
 }
 
 pub fn initialize() -> UI {
