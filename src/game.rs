@@ -1,13 +1,12 @@
 use stage::{Stage, StageTransition};
-use std::time::Duration;
 use ui::{self, UI};
 
 /// Game state.
 pub struct Game {
     pub ui: UI,
     pub stage: Stage,
-    pub dt: Duration,
-    pub time: Duration,
+    pub dt: u64,
+    pub time: u64,
 }
 
 impl Game {
@@ -15,14 +14,14 @@ impl Game {
         Game {
             ui: ui::initialize(),
             stage: Stage::Menu,
-            dt: Duration::from_millis(0),
-            time: Duration::from_millis(0),
+            dt: 0,
+            time: 0,
         }
     }
 
     pub fn main_loop(&mut self) {
         while !self.ui.root_console.window_closed() {
-            self.dt = Duration::from_millis(10);
+            self.dt = 10;
             self.time += self.dt;
             match self.stage.tick(self.dt) {
                 StageTransition::Continue => (),
