@@ -3,13 +3,13 @@ pub enum Stage {
 }
 
 impl Stage {
-    pub fn tick(&self, dt_millis: u64) -> StageTransition {
+    pub fn tick(&self, dt_millis: u32) -> StageTransition {
         match self {
             Stage::Menu => Stage::tick_menu(dt_millis),
         }
     }
 
-    fn tick_menu(dt_millis: u64) -> StageTransition {
+    fn tick_menu(dt_millis: u32) -> StageTransition {
         StageTransition::Continue
     }
 }

@@ -1,10 +1,11 @@
 use asset;
 use stage::Stage;
 use tcod::console::{self, Console, Root};
+use tcod::system::get_fps;
 
 use game::Game;
 
-const FPS: i32 = 30;
+const MAX_FPS: u32 = 30;
 const SCREEN_WIDTH_CHAR: i32 = 80;
 const SCREEN_HEIGHT_CHAR: i32 = 50;
 const TITLE: &str = "z-buffer";
@@ -14,10 +15,13 @@ pub struct UI {
     pub root_console: Root,
     pub screen_width_char: i32,
     pub screen_height_char: i32,
+    pub fps: u32,
 }
 
 /// Render UI based on the current stage.
 pub fn draw(game: &mut Game) {
+    game.ui.fps = get_fps() as u32;
+
     match game.stage {
         Stage::Menu => {
             let root: &mut Root = &mut game.ui.root_console;
@@ -36,7 +40,10 @@ pub fn draw(game: &mut Game) {
                 SCREEN_HEIGHT_CHAR / 2,
                 SCREEN_WIDTH_CHAR,
                 1,
-                format!("t = {}, dt = {}", &game.time, &game.dt),
+                format!(
+                    "t = {}, dt = {}, fps = {}",
+                    &game.time, &game.dt, &game.ui.fps
+                ),
             );
             root.flush();
         }
@@ -52,11 +59,12 @@ pub fn initialize() -> UI {
         .font(font_file, console::FontLayout::AsciiInRow)
         .init();
 
-    tcod::system::set_fps(FPS);
+    tcod::system::set_fps(MAX_FPS as i32);
 
     UI {
         root_console: root,
         screen_width_char: SCREEN_WIDTH_CHAR,
         screen_height_char: SCREEN_HEIGHT_CHAR,
+        fps: 0,
     }
 }
