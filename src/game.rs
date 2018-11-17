@@ -3,14 +3,14 @@ use std::time::Duration;
 use ui::{self, UI};
 
 /// Application state.
-pub struct State {
+pub struct Game {
     pub ui: UI,
     pub stage: Stage,
 }
 
-impl State {
-    pub fn init() -> State {
-        State {
+impl Game {
+    pub fn init() -> Game {
+        Game {
             ui: ui::initialize(),
             stage: Stage::Menu,
         }
