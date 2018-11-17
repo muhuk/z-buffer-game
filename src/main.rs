@@ -8,12 +8,9 @@ mod stage;
 mod state;
 mod ui;
 
-fn main() {
-    let mut root = state::initialize().ui.root_console;
+use state::State;
 
-    while !root.window_closed() {
-        ui::draw_hello_world(&mut root);
-        root.flush();
-        root.wait_for_keypress(true);
-    }
+fn main() {
+    let mut st = State::init();
+    st.main_loop();
 }

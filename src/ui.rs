@@ -9,6 +9,8 @@ const TITLE: &str = "z-buffer";
 /// User interface related data
 pub struct UI {
     pub root_console: Root,
+    pub screen_width_char: i32,
+    pub screen_height_char: i32,
 }
 
 /// Render a smiley & write "Hello, World!" on the center.
@@ -38,5 +40,9 @@ pub fn initialize() -> UI {
 
     tcod::system::set_fps(FPS);
 
-    UI { root_console: root }
+    UI {
+        root_console: root,
+        screen_width_char: SCREEN_WIDTH_CHAR,
+        screen_height_char: SCREEN_HEIGHT_CHAR,
+    }
 }
