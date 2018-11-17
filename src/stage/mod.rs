@@ -1,21 +1,17 @@
 use std::time::Duration;
-use ui::{self, UI};
 
 pub enum Stage {
     Menu,
 }
 
 impl Stage {
-    pub fn tick(&self, dt: Duration, ui: &mut UI) -> StageTransition {
+    pub fn tick(&self, dt: Duration) -> StageTransition {
         match self {
-            Stage::Menu => Stage::tick_menu(dt, ui),
+            Stage::Menu => Stage::tick_menu(dt),
         }
     }
 
-    fn tick_menu(dt: Duration, ui: &mut UI) -> StageTransition {
-        ui::draw_hello_world(&mut ui.root_console);
-        ui.root_console.flush();
-        ui.root_console.wait_for_keypress(true);
+    fn tick_menu(dt: Duration) -> StageTransition {
         StageTransition::Continue
     }
 }

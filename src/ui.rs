@@ -1,4 +1,5 @@
 use asset;
+use stage::Stage;
 use tcod::console::{self, Console, Root};
 
 const FPS: i32 = 30;
@@ -13,20 +14,23 @@ pub struct UI {
     pub screen_height_char: i32,
 }
 
-/// Render a smiley & write "Hello, World!" on the center.
-///
-/// Remove this after proper stages are implemented.
-pub fn draw_hello_world<T: Console>(con: &mut T) {
-    con.clear();
-    con.set_char(SCREEN_WIDTH_CHAR / 2, SCREEN_HEIGHT_CHAR / 2 - 2, '');
-    con.set_alignment(console::TextAlignment::Center);
-    con.print_rect(
-        SCREEN_WIDTH_CHAR / 2,
-        SCREEN_HEIGHT_CHAR / 2 + 2,
-        SCREEN_WIDTH_CHAR,
-        1,
-        "Hello, World!",
-    );
+/// Render UI based on the current stage.
+pub fn draw(stage: &Stage, root: &mut Root) {
+    match stage {
+        Stage::Menu => {
+            root.clear();
+            root.set_char(SCREEN_WIDTH_CHAR / 2, SCREEN_HEIGHT_CHAR / 2 - 2, '');
+            root.set_alignment(console::TextAlignment::Center);
+            root.print_rect(
+                SCREEN_WIDTH_CHAR / 2,
+                SCREEN_HEIGHT_CHAR / 2 + 2,
+                SCREEN_WIDTH_CHAR,
+                1,
+                "Hello, World!",
+            );
+            root.flush();
+        }
+    }
 }
 
 pub fn initialize() -> UI {
