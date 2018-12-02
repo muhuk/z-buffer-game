@@ -24,6 +24,8 @@ pub fn draw(game: &mut Game) {
 
     match game.stage {
         Stage::Menu => {
+            let dt = game.dt();
+            let time = game.time();
             let root: &mut Root = &mut game.ui.root_console;
             root.clear();
             root.set_char(SCREEN_WIDTH_CHAR / 2, SCREEN_HEIGHT_CHAR / 2 - 2, '');
@@ -40,10 +42,7 @@ pub fn draw(game: &mut Game) {
                 SCREEN_HEIGHT_CHAR / 2,
                 SCREEN_WIDTH_CHAR,
                 1,
-                format!(
-                    "t = {}, dt = {}, fps = {}",
-                    &game.time, &game.dt, &game.ui.fps
-                ),
+                format!("t = {}, dt = {}, fps = {}", time, dt, &game.ui.fps),
             );
             root.flush();
         }

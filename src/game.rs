@@ -7,11 +7,11 @@ use ui::{self, UI};
 
 /// Game state.
 pub struct Game {
-    pub dt: u32,
     pub stage: Stage,
-    pub time: u64,
     pub ui: UI,
+    dt: u32,
     input: Input,
+    time: u64,
 }
 
 impl Game {
@@ -25,6 +25,10 @@ impl Game {
         }
     }
 
+    pub fn dt(&self) -> u32 {
+        self.dt
+    }
+
     pub fn main_loop(&mut self) {
         self.ui.root_console.flush();
         while !self.ui.root_console.window_closed() {
@@ -36,6 +40,10 @@ impl Game {
             }
             ui::draw(self);
         }
+    }
+
+    pub fn time(&self) -> u64 {
+        self.time
     }
 
     fn to_millis(t: &Duration) -> u64 {
