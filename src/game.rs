@@ -1,19 +1,14 @@
+use event::read_events;
 use stage::{Stage, StageTransition};
-use std::collections::VecDeque;
+
 use std::time::Duration;
-use tcod::input::{self as tcod_input, Event as TcodEvent};
-use tcod::system::{get_elapsed_time, sleep};
+use tcod::system::get_elapsed_time;
 use ui::{self, UI};
-
-const DEFAULT_EVENT_QUEUE_SIZE: usize = 20;
-
-type Event = TcodEvent;
 
 /// Game state.
 pub struct Game {
     pub ui: UI,
     pub stage: Stage,
-    pub events: VecDeque<Event>,
     pub dt: u32,
     pub time: u64,
 }
@@ -23,7 +18,6 @@ impl Game {
         Game {
             ui: ui::initialize(),
             stage: Stage::Menu,
-            events: VecDeque::with_capacity(DEFAULT_EVENT_QUEUE_SIZE),
             dt: 0,
             time: 0,
         }
@@ -33,26 +27,12 @@ impl Game {
         self.ui.root_console.flush();
         while !self.ui.root_console.window_closed() {
             self.update_time();
-            self.queue_events();
-            match self.stage.tick(self.dt) {
+            let events = read_events();
+            match self.stage.tick(self.dt, events) {
                 StageTransition::Continue => (),
                 StageTransition::SwitchTo(_) => unimplemented!(),
             }
             ui::draw(self);
-        }
-    }
-
-    fn push_event(&mut self, e: Event) {
-        self.events.push_back(e);
-    }
-
-    fn pop_event(&mut self) -> Option<Event> {
-        self.events.pop_front()
-    }
-
-    fn queue_events(&mut self) {
-        for (_, e) in tcod_input::events() {
-            self.push_event(e);
         }
     }
 
