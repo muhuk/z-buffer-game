@@ -1,4 +1,4 @@
-use input::read_events;
+use input::Input;
 use stage::{Stage, StageTransition};
 
 use std::time::Duration;
@@ -7,10 +7,11 @@ use ui::{self, UI};
 
 /// Game state.
 pub struct Game {
-    pub ui: UI,
-    pub stage: Stage,
     pub dt: u32,
+    pub stage: Stage,
     pub time: u64,
+    pub ui: UI,
+    input: Input,
 }
 
 impl Game {
@@ -20,6 +21,7 @@ impl Game {
             stage: Stage::Menu,
             dt: 0,
             time: 0,
+            input: Input::new(),
         }
     }
 
@@ -27,7 +29,7 @@ impl Game {
         self.ui.root_console.flush();
         while !self.ui.root_console.window_closed() {
             self.update_time();
-            let events = read_events();
+            let events = self.input.events();
             match self.stage.tick(self.dt, events) {
                 StageTransition::Continue => (),
                 StageTransition::SwitchTo(_) => unimplemented!(),

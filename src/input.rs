@@ -1,6 +1,8 @@
 use std::collections::VecDeque;
 use tcod::input::{self as tcod_input, Event as TcodEvent, KeyCode};
 
+const DEFAULT_EVENT_QUEUE_SIZE: usize = 20;
+
 #[derive(Debug)]
 pub struct Modifiers {
     pub shift: bool,
@@ -16,27 +18,33 @@ pub enum Event {
     Mouse,
 }
 
-const DEFAULT_EVENT_QUEUE_SIZE: usize = 20;
+pub struct Input {}
 
-pub fn read_events() -> VecDeque<Event> {
-    let mut events = VecDeque::with_capacity(DEFAULT_EVENT_QUEUE_SIZE);
-    for (_, e) in tcod_input::events() {
-        match e {
-            TcodEvent::Key(k) => {
-                let modifiers = Modifiers {
-                    shift: k.shift,
-                    alt: k.alt,
-                    ctrl: k.ctrl,
-                };
-                let e = if k.pressed {
-                    Event::KeyDown(k.code, modifiers)
-                } else {
-                    Event::KeyUp(k.code, modifiers)
-                };
-                events.push_back(e)
-            }
-            TcodEvent::Mouse(_) => events.push_back(Event::Mouse),
-        }
+impl Input {
+    pub fn new() -> Input {
+        Input {}
     }
-    events
+
+    pub fn events(&self) -> VecDeque<Event> {
+        let mut events = VecDeque::with_capacity(DEFAULT_EVENT_QUEUE_SIZE);
+        for (_, e) in tcod_input::events() {
+            match e {
+                TcodEvent::Key(k) => {
+                    let modifiers = Modifiers {
+                        shift: k.shift,
+                        alt: k.alt,
+                        ctrl: k.ctrl,
+                    };
+                    let e = if k.pressed {
+                        Event::KeyDown(k.code, modifiers)
+                    } else {
+                        Event::KeyUp(k.code, modifiers)
+                    };
+                    events.push_back(e)
+                }
+                TcodEvent::Mouse(_) => events.push_back(Event::Mouse),
+            }
+        }
+        events
+    }
 }
