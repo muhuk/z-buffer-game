@@ -15,7 +15,7 @@ pub struct Game {
 }
 
 impl Game {
-    pub fn init() -> Game {
+    pub fn new() -> Game {
         Game {
             ui: ui::initialize(),
             stage: Stage::Menu,

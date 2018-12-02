@@ -12,6 +12,6 @@ mod ui;
 use game::Game;
 
 fn main() {
-    let mut game_state = Game::init();
+    let mut game_state = Game::new();
     game_state.main_loop();
 }
