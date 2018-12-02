@@ -1,11 +1,15 @@
-use event::Event;
+use input::Event;
 
 pub enum Stage {
     Menu,
 }
 
 impl Stage {
-    pub fn tick<T: IntoIterator<Item = Event>>(&self, dt_millis: u32, events: T) -> StageTransition {
+    pub fn tick<T: IntoIterator<Item = Event>>(
+        &self,
+        dt_millis: u32,
+        events: T,
+    ) -> StageTransition {
         for e in events {
             println!("{:?}", e);
         }

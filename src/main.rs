@@ -4,8 +4,8 @@ extern crate dirs;
 extern crate tcod;
 
 mod asset;
-mod event;
 mod game;
+mod input;
 mod stage;
 mod ui;
 

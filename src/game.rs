@@ -1,4 +1,4 @@
-use event::read_events;
+use input::read_events;
 use stage::{Stage, StageTransition};
 
 use std::time::Duration;
