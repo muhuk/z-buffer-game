@@ -46,13 +46,13 @@ impl Game {
         self.time
     }
 
-    fn to_millis(t: &Duration) -> u64 {
-        t.as_secs() * 1000 + t.subsec_millis() as u64
-    }
-
     fn update_time(&mut self) {
         let old_time = self.time;
-        self.time = Self::to_millis(&get_elapsed_time());
+        self.time = duration_to_millis(&get_elapsed_time());
         self.dt = (self.time - old_time) as u32;
     }
+}
+
+fn duration_to_millis(t: &Duration) -> u64 {
+    t.as_secs() * 1000 + u64::from(t.subsec_millis())
 }
