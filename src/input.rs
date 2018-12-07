@@ -13,9 +13,9 @@ pub struct Modifiers {
 
 #[derive(Debug, Clone)]
 pub enum Event {
-    KeyPress(KeyCode, Modifiers),
-    KeyDown(KeyCode, Modifiers),
-    KeyUp(KeyCode, Modifiers),
+    KeyPress(KeyCode, Option<char>, Modifiers),
+    KeyDown(KeyCode, Option<char>, Modifiers),
+    KeyUp(KeyCode, Option<char>, Modifiers),
     Mouse,
 }
 
@@ -43,10 +43,15 @@ impl Input {
                         alt: k.alt,
                         ctrl: k.ctrl,
                     };
-                    let e = if k.pressed {
-                        Event::KeyDown(k.code, modifiers)
+                    let character: Option<char> = if k.code == KeyCode::Char {
+                        Some(k.printable)
                     } else {
-                        Event::KeyUp(k.code, modifiers)
+                        None
+                    };
+                    let e = if k.pressed {
+                        Event::KeyDown(k.code, character, modifiers)
+                    } else {
+                        Event::KeyUp(k.code, character, modifiers)
                     };
                     let e2_option = self.detect_keypress(&e);
                     events.push_back(e);
@@ -62,8 +67,8 @@ impl Input {
 
     fn detect_keypress(&mut self, e: &Event) -> Option<Event> {
         let key_code: &KeyCode = match e {
-            Event::KeyDown(key_code, _) => key_code,
-            Event::KeyUp(key_code, _) => key_code,
+            Event::KeyDown(key_code, ..) => key_code,
+            Event::KeyUp(key_code, ..) => key_code,
             _ => panic!(),
         };
         let key_state: bool = self
@@ -72,16 +77,16 @@ impl Input {
             .unwrap_or(&false)
             .clone();
         match (e, key_state) {
-            (Event::KeyDown(_, modifiers), true) => {
-                Some(Event::KeyPress(*key_code, (*modifiers).clone()))
+            (Event::KeyDown(_, character, modifiers), true) => {
+                Some(Event::KeyPress(*key_code, *character, (*modifiers).clone()))
             }
-            (Event::KeyDown(_, _), false) => {
+            (Event::KeyDown(..), false) => {
                 self.key_states.insert(*key_code as isize, true);
                 None
             }
-            (Event::KeyUp(_, modifiers), _) => {
+            (Event::KeyUp(_, character, modifiers), _) => {
                 self.key_states.remove(&(*key_code as isize));
-                Some(Event::KeyPress(*key_code, (*modifiers).clone()))
+                Some(Event::KeyPress(*key_code, *character, (*modifiers).clone()))
             }
             _ => None,
         }
