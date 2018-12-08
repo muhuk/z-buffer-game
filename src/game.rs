@@ -1,9 +1,9 @@
-use input::Input;
-use stage::{Stage, StageTransition};
+use crate::input::Input;
+use crate::stage::{Stage, StageTransition};
 
 use std::time::Duration;
 use tcod::system::get_elapsed_time;
-use ui::{self, UI};
+use crate::ui::{self, UI};
 
 /// Game state.
 pub struct Game {

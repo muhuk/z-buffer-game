@@ -9,7 +9,7 @@ mod input;
 mod stage;
 mod ui;
 
-use game::Game;
+use crate::game::Game;
 
 fn main() {
     let mut game_state = Game::new();

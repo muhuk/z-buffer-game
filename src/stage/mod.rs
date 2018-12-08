@@ -1,4 +1,4 @@
-use input::Event;
+use crate::input::Event;
 
 pub enum Stage {
     Menu,

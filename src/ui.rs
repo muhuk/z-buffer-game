@@ -1,9 +1,9 @@
-use asset;
-use stage::Stage;
+use crate::asset;
+use crate::stage::Stage;
 use tcod::console::{self, Console, Root};
 use tcod::system::get_fps;
 
-use game::Game;
+use crate::game::Game;
 
 const MAX_FPS: u32 = 30;
 const SCREEN_WIDTH_CHAR: i32 = 80;
