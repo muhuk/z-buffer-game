@@ -20,10 +20,14 @@ pub enum Event {
 }
 
 pub struct Input {
-    // TODO: Key type should be a KeyCode, but since it
-    //       does not satisfy the constrains we will be
-    //       casting to isize.
-    key_states: BTreeSet<isize>,
+    // Key type should be a KeyCode, but since it does not
+    // satisfy Ord constraint we will be casting to u32.
+    //
+    // In this scheme we are just storing the KeyCode::Char
+    // but not the printable char. Practically this seems
+    // to make no difference as when multiple printable chars
+    // are pressed only the last one repeat.
+    key_states: BTreeSet<u32>,
 }
 
 impl Input {
@@ -58,17 +62,17 @@ impl Input {
             Event::KeyUp(key_code, ..) => key_code,
             _ => panic!(),
         };
-        let code_isize: isize = *key_code as isize;
-        match (e, self.key_states.contains(&code_isize)) {
+        let key_code_num: u32 = *key_code as u32;
+        match (e, self.key_states.contains(&key_code_num)) {
             (Event::KeyDown(_, character, modifiers), true) => {
                 Some(Event::KeyPress(*key_code, *character, (*modifiers).clone()))
             }
             (Event::KeyDown(..), false) => {
-                self.key_states.insert(code_isize);
+                self.key_states.insert(key_code_num);
                 None
             }
             (Event::KeyUp(_, character, modifiers), _) => {
-                self.key_states.remove(&code_isize);
+                self.key_states.remove(&key_code_num);
                 Some(Event::KeyPress(*key_code, *character, (*modifiers).clone()))
             }
             _ => None,
