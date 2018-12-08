@@ -1,8 +1,5 @@
 //! z-buffer game
 
-extern crate dirs;
-extern crate tcod;
-
 mod asset;
 mod game;
 mod input;
