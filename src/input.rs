@@ -46,9 +46,9 @@ impl Input {
                     let maybe_key_press = self.detect_keypress(&key_up_or_key_down);
                     // Emit up|down event before press event.
                     events.push_back(key_up_or_key_down);
-                    maybe_key_press.map(|e| {
-                        events.push_back(e);
-                    });
+                    if let Some(e2) = maybe_key_press {
+                        events.push_back(e2);
+                    }
                 }
                 TcodEvent::Mouse(_) => events.push_back(Event::Mouse),
             }
