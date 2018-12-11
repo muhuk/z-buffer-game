@@ -1,4 +1,4 @@
-use crate::input::EventIterator;
+use crate::input::{Event, EventIterator, KeyCode};
 
 pub enum Stage {
     Menu,
@@ -13,7 +13,9 @@ impl Stage {
 
     fn tick_menu(_dt_millis: u32, events: impl EventIterator) -> StageTransition {
         for e in events {
-            println!("{:?}", e);
+            if let Event::KeyPress(KeyCode::Char, Some(chr), ..) = e {
+                println!("key press {:?}", chr);
+            }
         }
         StageTransition::Continue
     }

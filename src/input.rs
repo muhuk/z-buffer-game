@@ -1,6 +1,7 @@
 use std::collections::BTreeSet;
 use std::collections::VecDeque;
-use tcod::input::{self as tcod_input, Event as TcodEvent, KeyCode};
+pub use tcod::input::KeyCode;
+use tcod::input::{self as tcod_input, Event as TcodEvent};
 
 const DEFAULT_EVENT_QUEUE_SIZE: usize = 20;
 
