@@ -1,24 +1,20 @@
-use crate::input::Event;
+use crate::input::EventIterator;
 
 pub enum Stage {
     Menu,
 }
 
 impl Stage {
-    pub fn tick<T: IntoIterator<Item = Event>>(
-        &self,
-        dt_millis: u32,
-        events: T,
-    ) -> StageTransition {
-        for e in events {
-            println!("{:?}", e);
-        }
+    pub fn tick(&self, dt_millis: u32, events: impl EventIterator) -> StageTransition {
         match self {
-            Stage::Menu => Stage::tick_menu(dt_millis),
+            Stage::Menu => Stage::tick_menu(dt_millis, events),
         }
     }
 
-    fn tick_menu(dt_millis: u32) -> StageTransition {
+    fn tick_menu(_dt_millis: u32, events: impl EventIterator) -> StageTransition {
+        for e in events {
+            println!("{:?}", e);
+        }
         StageTransition::Continue
     }
 }

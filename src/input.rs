@@ -19,6 +19,9 @@ pub enum Event {
     Mouse,
 }
 
+pub trait EventIterator: IntoIterator<Item = Event> {}
+impl EventIterator for VecDeque<Event> {}
+
 pub struct Input {
     // Key type should be a KeyCode, but since it does not
     // satisfy Ord constraint we will be casting to u32.
