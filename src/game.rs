@@ -1,9 +1,9 @@
 use crate::input::Input;
 use crate::stage::{Stage, StageTransition};
 
+use crate::ui::{self, UI};
 use std::time::Duration;
 use tcod::system::get_elapsed_time;
-use crate::ui::{self, UI};
 
 /// Game state.
 pub struct Game {
@@ -18,7 +18,7 @@ impl Game {
     pub fn new() -> Game {
         Game {
             ui: ui::initialize(),
-            stage: Stage::Menu,
+            stage: Stage::new(),
             dt: 0,
             time: 0,
             input: Input::new(),

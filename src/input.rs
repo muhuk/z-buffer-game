@@ -1,5 +1,5 @@
 use std::collections::BTreeSet;
-use std::collections::VecDeque;
+use std::collections::{vec_deque::IntoIter, VecDeque};
 pub use tcod::input::KeyCode;
 use tcod::input::{self as tcod_input, Event as TcodEvent};
 
@@ -20,8 +20,7 @@ pub enum Event {
     Mouse,
 }
 
-pub trait EventIterator: IntoIterator<Item = Event> {}
-impl EventIterator for VecDeque<Event> {}
+pub type EventIterator = IntoIter<Event>;
 
 pub struct Input {
     // Key type should be a KeyCode, but since it does not
@@ -41,7 +40,7 @@ impl Input {
         }
     }
 
-    pub fn events(&mut self) -> VecDeque<Event> {
+    pub fn events(&mut self) -> EventIterator {
         let mut events = VecDeque::with_capacity(DEFAULT_EVENT_QUEUE_SIZE);
         for (_, e) in tcod_input::events() {
             match e {
@@ -57,7 +56,7 @@ impl Input {
                 TcodEvent::Mouse(_) => events.push_back(Event::Mouse),
             }
         }
-        events
+        events.into_iter()
     }
 
     fn detect_keypress(&mut self, e: &Event) -> Option<Event> {

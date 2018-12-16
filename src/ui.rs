@@ -22,8 +22,8 @@ pub struct UI {
 pub fn draw(game: &mut Game) {
     game.ui.fps = get_fps() as u32;
 
-    match game.stage {
-        Stage::Menu => {
+    match &game.stage {
+        Stage::MainMenu(m) => {
             let dt = game.dt();
             let time = game.time();
             let root: &mut Root = &mut game.ui.root_console;
@@ -35,7 +35,7 @@ pub fn draw(game: &mut Game) {
                 SCREEN_HEIGHT_CHAR / 2 + 2,
                 SCREEN_WIDTH_CHAR,
                 1,
-                "Hello, World!",
+                format!("{}", &m.selected),
             );
             root.print_rect(
                 SCREEN_WIDTH_CHAR / 2,
