@@ -3,6 +3,7 @@
 mod asset;
 mod game;
 mod input;
+mod menu;
 mod stage;
 mod ui;
 

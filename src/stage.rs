@@ -1,4 +1,5 @@
 use crate::input::{Event, EventIterator, KeyCode};
+use crate::menu::Menu;
 use crate::stage::main_menu::MainMenu;
 
 pub enum Stage {
@@ -20,8 +21,8 @@ impl Stage {
         let Stage::MainMenu(m) = self;
         for e in events {
             match e {
-                Event::KeyPress(KeyCode::Up, ..) => m.previous(),
-                Event::KeyPress(KeyCode::Down, ..) => m.next(),
+                Event::KeyPress(KeyCode::Up, ..) => m.select_previous(),
+                Event::KeyPress(KeyCode::Down, ..) => m.select_next(),
                 _ => (),
             }
         }
@@ -35,41 +36,19 @@ pub enum StageTransition {
 }
 
 mod main_menu {
+    use crate::menu::Menu;
     use std::fmt::{Display, Formatter, Result};
 
-    pub struct MainMenu {
-        pub selected: Choice,
-    }
-
-    impl MainMenu {
-        pub fn new() -> MainMenu {
-            MainMenu {
-                selected: Choice::NewGame,
-            }
-        }
-
-        pub fn next(&mut self) {
-            if let Some(choice) = self.selected.next() {
-                self.selected = choice
-            }
-        }
-
-        pub fn previous(&mut self) {
-            if let Some(choice) = self.selected.previous() {
-                self.selected = choice
-            }
-        }
-    }
-
-    #[derive(Debug)]
+    #[derive(Clone, Debug, PartialEq)]
     pub enum Choice {
         NewGame,
         Credits,
         Exit,
     }
 
+    // TODO: Try to remive these two; next & previous.
     impl Choice {
-        fn next(&self) -> Option<Choice> {
+        pub fn next(&self) -> Option<Choice> {
             match self {
                 Choice::NewGame => Some(Choice::Credits),
                 Choice::Credits => Some(Choice::Exit),
@@ -77,7 +56,7 @@ mod main_menu {
             }
         }
 
-        fn previous(&self) -> Option<Choice> {
+        pub fn previous(&self) -> Option<Choice> {
             match self {
                 Choice::NewGame => None,
                 Choice::Credits => Some(Choice::NewGame),
@@ -86,9 +65,54 @@ mod main_menu {
         }
     }
 
+    // TODO: Consider replacing this with
+    //       something more TCOD aware.
     impl Display for Choice {
         fn fmt(&self, f: &mut Formatter) -> Result {
             write!(f, "{:?}", self)
+        }
+    }
+
+    pub struct MainMenu {
+        pub selected: Choice,
+    }
+
+    impl MainMenu {
+        const ALL: &'static [&'static Choice] =
+            &[&Choice::NewGame, &Choice::Credits, &Choice::Exit];
+
+        pub fn new() -> MainMenu {
+            MainMenu {
+                selected: Choice::NewGame,
+            }
+        }
+    }
+
+    impl<'a> Menu<'a> for MainMenu {
+        type Item = Choice;
+
+        fn iter(&self) -> std::slice::Iter<'a, &'a Choice> {
+            Self::ALL.iter()
+        }
+
+        fn select_next(&mut self) {
+            if let Some(choice) = self.selected.next() {
+                self.selected = choice
+            }
+        }
+
+        fn select_previous(&mut self) {
+            if let Some(choice) = self.selected.previous() {
+                self.selected = choice
+            }
+        }
+
+        fn is_selected(&self, item: &Choice) -> bool {
+            self.selected == *item
+        }
+
+        fn selected(&self) -> Choice {
+            self.selected.clone()
         }
     }
 }

@@ -1,9 +1,9 @@
 use crate::asset;
+use crate::game::Game;
+use crate::menu::Menu;
 use crate::stage::Stage;
 use tcod::console::{self, Console, Root};
 use tcod::system::get_fps;
-
-use crate::game::Game;
 
 const MAX_FPS: u32 = 30;
 const SCREEN_WIDTH_CHAR: i32 = 80;
@@ -44,6 +44,11 @@ pub fn draw(game: &mut Game) {
                 1,
                 format!("t = {}, dt = {}, fps = {}", time, dt, &game.ui.fps),
             );
+
+            for selection in m.iter() {
+                println!("{:?}", &selection);
+            }
+
             root.flush();
         }
     }
