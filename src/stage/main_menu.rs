@@ -9,8 +9,9 @@ pub enum Choice {
     Exit,
 }
 
-// TODO: Try to remive these two; next & previous.
 impl Choice {
+    const ALL: &'static [Choice] = &[Choice::NewGame, Choice::Credits, Choice::Exit];
+
     pub fn next(&self) -> Option<Choice> {
         match self {
             Choice::NewGame => Some(Choice::Credits),
@@ -41,8 +42,6 @@ pub struct MainMenu {
 }
 
 impl MainMenu {
-    const ALL: &'static [Choice] = &[Choice::NewGame, Choice::Credits, Choice::Exit];
-
     pub fn new() -> MainMenu {
         MainMenu {
             selected: Choice::NewGame,
@@ -68,7 +67,7 @@ impl<'a> Menu<'a> for MainMenu {
 
     fn iter(&self) -> Self::IterMenu {
         MainMenuIterator {
-            i: Self::ALL.iter(),
+            i: Choice::ALL.iter(),
         }
     }
 
