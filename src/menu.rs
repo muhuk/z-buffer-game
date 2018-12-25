@@ -1,9 +1,8 @@
-use std::slice::Iter;
-
 pub trait Menu<'a> {
-    type Item: Clone + PartialEq;
+    type Item: 'a + Clone + PartialEq;
+    type IterMenu: Iterator<Item = &'a Self::Item> + Sized;
 
-    fn iter(&self) -> Iter<'a, &'a Self::Item>;
+    fn iter(&self) -> Self::IterMenu;
 
     fn select_next(&mut self);
     fn select_previous(&mut self);

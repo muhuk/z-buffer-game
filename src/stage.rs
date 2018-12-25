@@ -35,9 +35,10 @@ pub enum StageTransition {
     SwitchTo(Stage),
 }
 
-mod main_menu {
+pub mod main_menu {
     use crate::menu::Menu;
     use std::fmt::{Display, Formatter, Result};
+    use std::slice::Iter;
 
     #[derive(Clone, Debug, PartialEq)]
     pub enum Choice {
@@ -78,8 +79,7 @@ mod main_menu {
     }
 
     impl MainMenu {
-        const ALL: &'static [&'static Choice] =
-            &[&Choice::NewGame, &Choice::Credits, &Choice::Exit];
+        const ALL: &'static [Choice] = &[Choice::NewGame, Choice::Credits, Choice::Exit];
 
         pub fn new() -> MainMenu {
             MainMenu {
@@ -88,11 +88,26 @@ mod main_menu {
         }
     }
 
+    pub struct MainMenuIterator<'a> {
+        i: Iter<'a, Choice>,
+    }
+
+    impl<'a> Iterator for MainMenuIterator<'a> {
+        type Item = &'a Choice;
+
+        fn next(&mut self) -> Option<&'a Choice> {
+            self.i.next()
+        }
+    }
+
     impl<'a> Menu<'a> for MainMenu {
         type Item = Choice;
+        type IterMenu = MainMenuIterator<'a>;
 
-        fn iter(&self) -> std::slice::Iter<'a, &'a Choice> {
-            Self::ALL.iter()
+        fn iter(&self) -> Self::IterMenu {
+            MainMenuIterator {
+                i: Self::ALL.iter(),
+            }
         }
 
         fn select_next(&mut self) {

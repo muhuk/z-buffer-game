@@ -1,7 +1,9 @@
 use crate::asset;
 use crate::game::Game;
 use crate::menu::Menu;
+use crate::stage::main_menu::Choice;
 use crate::stage::Stage;
+use tcod::colors;
 use tcod::console::{self, Console, Root};
 use tcod::system::get_fps;
 
@@ -24,30 +26,35 @@ pub fn draw(game: &mut Game) {
 
     match &game.stage {
         Stage::MainMenu(m) => {
-            let dt = game.dt();
-            let time = game.time();
+            // let dt = game.dt();
+            // let time = game.time();
             let root: &mut Root = &mut game.ui.root_console;
             root.clear();
-            root.set_char(SCREEN_WIDTH_CHAR / 2, SCREEN_HEIGHT_CHAR / 2 - 2, '');
-            root.set_alignment(console::TextAlignment::Center);
-            root.print_rect(
-                SCREEN_WIDTH_CHAR / 2,
-                SCREEN_HEIGHT_CHAR / 2 + 2,
-                SCREEN_WIDTH_CHAR,
-                1,
-                format!("{}", &m.selected),
-            );
-            root.print_rect(
-                SCREEN_WIDTH_CHAR / 2,
-                SCREEN_HEIGHT_CHAR / 2,
-                SCREEN_WIDTH_CHAR,
-                1,
-                format!("t = {}, dt = {}, fps = {}", time, dt, &game.ui.fps),
-            );
+            // root.set_char(SCREEN_WIDTH_CHAR / 2, SCREEN_HEIGHT_CHAR / 2 - 2, '');
+            // root.set_alignment(console::TextAlignment::Center);
 
-            for selection in m.iter() {
-                println!("{:?}", &selection);
+            let no_of_items: i32 = m.iter().count() as i32;
+
+            for (idx, selection) in m.iter().enumerate() {
+                if m.is_selected(&selection) {
+                    root.set_default_background(colors::WHITE);
+                    root.set_default_foreground(colors::DARKER_GREY);
+                } else {
+                    root.set_default_background(colors::BLACK);
+                    root.set_default_foreground(colors::WHITE);
+                }
+                root.print_rect_ex(
+                    SCREEN_WIDTH_CHAR / 2,
+                    SCREEN_HEIGHT_CHAR / 2 + (idx as i32) - (no_of_items / 2),
+                    SCREEN_WIDTH_CHAR,
+                    1,
+                    console::BackgroundFlag::Set,
+                    console::TextAlignment::Center,
+                    format!("{}", &selection),
+                );
             }
+            root.set_default_background(colors::BLACK);
+            root.set_default_foreground(colors::WHITE);
 
             root.flush();
         }
