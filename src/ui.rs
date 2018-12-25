@@ -2,6 +2,7 @@ use crate::asset;
 use crate::game::Game;
 use crate::menu::Menu;
 use crate::stage::Stage;
+use crate::ui::main_menu_renderer::MainMenuRenderer;
 use tcod::colors;
 use tcod::console::{self, Console, Root};
 use tcod::system::get_fps;
@@ -25,36 +26,10 @@ pub fn draw(game: &mut Game) {
 
     match &game.stage {
         Stage::MainMenu(m) => {
-            // let dt = game.dt();
-            // let time = game.time();
             let root: &mut Root = &mut game.ui.root_console;
-            root.clear();
-            // root.set_char(SCREEN_WIDTH_CHAR / 2, SCREEN_HEIGHT_CHAR / 2 - 2, '');
-            // root.set_alignment(console::TextAlignment::Center);
-
-            let no_of_items: i32 = m.iter().count() as i32;
-
-            for (idx, selection) in m.iter().enumerate() {
-                if m.is_selected(&selection) {
-                    root.set_default_background(colors::WHITE);
-                    root.set_default_foreground(colors::DARKER_GREY);
-                } else {
-                    root.set_default_background(colors::BLACK);
-                    root.set_default_foreground(colors::WHITE);
-                }
-                root.print_rect_ex(
-                    SCREEN_WIDTH_CHAR / 2,
-                    SCREEN_HEIGHT_CHAR / 2 + (idx as i32) - (no_of_items / 2),
-                    SCREEN_WIDTH_CHAR,
-                    1,
-                    console::BackgroundFlag::Set,
-                    console::TextAlignment::Center,
-                    format!("{}", &selection),
-                );
-            }
-            root.set_default_background(colors::BLACK);
-            root.set_default_foreground(colors::WHITE);
-
+            let mut renderer = MainMenuRenderer::new();
+            renderer.update(m);
+            renderer.blit(root);
             root.flush();
         }
     }
@@ -76,5 +51,80 @@ pub fn initialize() -> UI {
         screen_width_char: SCREEN_WIDTH_CHAR,
         screen_height_char: SCREEN_HEIGHT_CHAR,
         fps: 0,
+    }
+}
+
+mod main_menu_renderer {
+    use crate::menu::Menu;
+    use crate::stage::main_menu::{Choice, MainMenu};
+    use std::ops::{Deref, DerefMut};
+    use tcod::colors;
+    use tcod::console::{blit, BackgroundFlag, Console, Offscreen, Root};
+
+    pub struct MainMenuRenderer {
+        console: Offscreen,
+    }
+
+    impl MainMenuRenderer {
+        pub fn new() -> MainMenuRenderer {
+            let (width, height) = Self::calculate_size();
+            let mut console = Offscreen::new(width, height);
+            for (idx, choice) in Choice::ALL.iter().enumerate() {
+                console.print(0, idx as i32, format!("{}", choice));
+            }
+            MainMenuRenderer { console }
+        }
+
+        pub fn blit(&mut self, root: &mut Root) {
+            let w: i32 = self.console.width();
+            let h: i32 = self.console.height();
+            let x: i32 = (root.width() - w) / 2;
+            let y: i32 = (root.height() - h) / 2;
+            blit(&**self, (0, 0), (w, h), root, (x, y), 1.0, 1.0);
+        }
+
+        pub fn update(&mut self, menu: &MainMenu) {
+            let width: i32 = self.console.width();
+            for (idx, choice) in menu.iter().enumerate() {
+                let y: i32 = idx as i32;
+                if menu.is_selected(choice) {
+                    for x in 0..width {
+                        self.console.set_char_foreground(x, y, colors::WHITE);
+                        self.console
+                            .set_char_background(x, y, colors::RED, BackgroundFlag::Set);
+                    }
+                } else {
+                    for x in 0..width {
+                        self.console.set_char_foreground(x, y, colors::WHITE);
+                        self.console
+                            .set_char_background(x, y, colors::BLACK, BackgroundFlag::Set);
+                    }
+                }
+            }
+        }
+
+        fn calculate_size() -> (i32, i32) {
+            let width = Choice::ALL
+                .iter()
+                .map(|c| format!("{}", c).len())
+                .max()
+                .unwrap();
+            let height = Choice::ALL.len();
+            (width as i32, height as i32)
+        }
+    }
+
+    impl Deref for MainMenuRenderer {
+        type Target = Offscreen;
+
+        fn deref(&self) -> &Offscreen {
+            &self.console
+        }
+    }
+
+    impl DerefMut for MainMenuRenderer {
+        fn deref_mut(&mut self) -> &mut Offscreen {
+            &mut self.console
+        }
     }
 }

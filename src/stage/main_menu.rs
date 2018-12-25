@@ -10,7 +10,7 @@ pub enum Choice {
 }
 
 impl Choice {
-    const ALL: &'static [Choice] = &[Choice::NewGame, Choice::Credits, Choice::Exit];
+    pub const ALL: &'static [Choice] = &[Choice::NewGame, Choice::Credits, Choice::Exit];
 
     pub fn next(&self) -> Option<Choice> {
         match self {
