@@ -1,7 +1,6 @@
 use crate::asset;
 use crate::game::Game;
 use crate::menu::Menu;
-use crate::stage::main_menu::Choice;
 use crate::stage::Stage;
 use tcod::colors;
 use tcod::console::{self, Console, Root};
