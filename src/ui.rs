@@ -25,6 +25,7 @@ pub fn draw(game: &mut Game) {
     match &game.stage {
         Stage::MainMenu(m) => {
             let root: &mut Root = &mut game.ui.root_console;
+            // TODO: Don't instantiate MainMenuRendered at every draw.
             let mut renderer = MainMenuRenderer::new();
             renderer.update(m);
             renderer.blit(root);
