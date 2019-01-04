@@ -1,10 +1,8 @@
 use crate::asset;
 use crate::game::Game;
-use crate::menu::Menu;
 use crate::stage::Stage;
 use crate::ui::main_menu_renderer::MainMenuRenderer;
-use tcod::colors;
-use tcod::console::{self, Console, Root};
+use tcod::console::{self, Root};
 use tcod::system::get_fps;
 
 const MAX_FPS: u32 = 30;
