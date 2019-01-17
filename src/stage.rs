@@ -1,6 +1,6 @@
 use crate::input::{Event, EventIterator, KeyCode};
 use crate::menu::Menu;
-use crate::stage::main_menu::{Choice, MainMenu};
+use crate::stage::main_menu::MainMenu;
 use std::process::exit;
 
 pub mod main_menu;
@@ -30,7 +30,7 @@ impl Stage {
                 Event::KeyPress(KeyCode::Down, ..) => m.select_next(),
                 Event::KeyPress(KeyCode::Enter, ..) => {
                     println!("Main menu - chosen {}", &m.selected);
-                    if m.is_selected(&Choice::Exit) {
+                    if m.is_selected(&main_menu::Choice::Exit) {
                         println!("Bye!");
                         exit(exit_code_ok);
                     }
