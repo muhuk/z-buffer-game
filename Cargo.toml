@@ -5,6 +5,6 @@ authors = ["Atamert Ölçgen <muhuk@muhuk.com>"]
 edition = "2018"
 
 [dependencies]
-dirs = "1.0"
-specs = "0.14.0"
-tcod = "0.12"
+dirs = "1.0.4"
+specs = "0.14.3"
+tcod = "0.13"
