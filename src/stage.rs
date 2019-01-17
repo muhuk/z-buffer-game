@@ -20,7 +20,7 @@ impl Stage {
     pub fn tick(&mut self, dt_millis: u32, events: EventIterator) -> StageTransition {
         match self {
             Stage::MainMenu(menu) => Stage::tick_main_menu(menu, dt_millis, events),
-            Stage::Game { .. } => unimplemented!(),
+            Stage::Game { .. } => StageTransition::Continue,
         }
     }
 
@@ -29,19 +29,27 @@ impl Stage {
         _dt_millis: u32,
         events: EventIterator,
     ) -> StageTransition {
-        let transition = StageTransition::Continue;
+        // transition is mutable here because we are
+        // processing multiple events and they may
+        // require differen transitions. This can be
+        // improved.
+        let mut transition = StageTransition::Continue;
         let exit_code_ok: i32 = 0;
         for e in events {
             match e {
                 Event::KeyPress(KeyCode::Up, ..) => menu.select_previous(),
                 Event::KeyPress(KeyCode::Down, ..) => menu.select_next(),
-                Event::KeyPress(KeyCode::Enter, ..) => {
-                    println!("Main menu - chosen {}", &menu.selected);
-                    if menu.is_selected(&main_menu::Choice::Exit) {
+                // TODO: Remove dbg! macro, use a proper logger.
+                Event::KeyPress(KeyCode::Enter, ..) => match dbg!(menu.selected) {
+                    main_menu::Choice::NewGame => {
+                        transition = StageTransition::SwitchTo(Stage::Game(Game {}));
+                    }
+                    main_menu::Choice::Credits => unimplemented!(),
+                    main_menu::Choice::Exit => {
                         println!("Bye!");
                         exit(exit_code_ok);
                     }
-                }
+                },
                 _ => (),
             }
         }

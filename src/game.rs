@@ -36,7 +36,7 @@ impl Game {
             let events = self.input.events();
             match self.stage.tick(self.dt, events) {
                 StageTransition::Continue => (),
-                StageTransition::SwitchTo(_) => unimplemented!(),
+                StageTransition::SwitchTo(new_stage) => self.stage = new_stage,
             }
             ui::draw(self);
         }

@@ -31,7 +31,20 @@ pub fn draw(game: &mut Game) {
             renderer.blit(root);
             root.flush();
         }
-        Stage::Game { .. } => unimplemented!(),
+        Stage::Game { .. } => {
+            use tcod::console::Console;
+            let root: &mut Root = &mut game.ui.root_console;
+            root.clear();
+            root.set_alignment(console::TextAlignment::Center);
+            root.print_rect(
+                SCREEN_WIDTH_CHAR / 2,
+                SCREEN_HEIGHT_CHAR / 2 + 2,
+                SCREEN_WIDTH_CHAR,
+                1,
+                "Game Stage",
+            );
+            root.flush();
+        }
     }
 }
 

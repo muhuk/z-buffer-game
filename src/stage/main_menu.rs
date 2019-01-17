@@ -2,7 +2,7 @@ use crate::menu::Menu;
 use std::fmt::{Display, Formatter, Result};
 use std::slice::Iter;
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Choice {
     NewGame,
     Credits,
