@@ -31,6 +31,7 @@ pub fn draw(game: &mut Game) {
             renderer.blit(root);
             root.flush();
         }
+        Stage::Game { .. } => unimplemented!(),
     }
 }
 
