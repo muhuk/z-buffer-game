@@ -2,6 +2,7 @@ use crate::input::{Event, EventIterator, KeyCode};
 use crate::menu::Menu;
 use crate::stage::game::Game;
 use crate::stage::main_menu::MainMenu;
+use log::{debug, info};
 use std::process::exit;
 
 pub mod game;
@@ -39,17 +40,20 @@ impl Stage {
             match e {
                 Event::KeyPress(KeyCode::Up, ..) => menu.select_previous(),
                 Event::KeyPress(KeyCode::Down, ..) => menu.select_next(),
-                // TODO: Remove dbg! macro, use a proper logger.
-                Event::KeyPress(KeyCode::Enter, ..) => match dbg!(menu.selected) {
-                    main_menu::Choice::NewGame => {
-                        transition = StageTransition::SwitchTo(Stage::Game(Game {}));
+                Event::KeyPress(KeyCode::Enter, ..) => {
+                    debug!("Menu item selected: {}", menu.selected);
+                    match menu.selected {
+                        main_menu::Choice::NewGame => {
+                            info!("Starting new game.");
+                            transition = StageTransition::SwitchTo(Stage::Game(Game {}));
+                        }
+                        main_menu::Choice::Credits => unimplemented!(),
+                        main_menu::Choice::Exit => {
+                            info!("Bye!");
+                            exit(exit_code_ok);
+                        }
                     }
-                    main_menu::Choice::Credits => unimplemented!(),
-                    main_menu::Choice::Exit => {
-                        println!("Bye!");
-                        exit(exit_code_ok);
-                    }
-                },
+                }
                 _ => (),
             }
         }

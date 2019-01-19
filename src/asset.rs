@@ -1,4 +1,5 @@
 use dirs;
+use log::debug;
 use std::fs;
 use std::io::Result;
 use std::path::Path;
@@ -25,7 +26,7 @@ impl Assets {
         };
         let mut path = get_data_dir();
         path.push(&file_name);
-        println!("Extracting file: {:?}", &path);
+        debug!("Extracting file: {:?}", &path);
         fs::write(&path, &data)?;
         Ok(path.into_boxed_path())
     }
@@ -43,7 +44,7 @@ fn initialize() {
     INIT.call_once(|| {
         let assets_dir = get_data_dir();
         if !assets_dir.exists() {
-            println!("Creating assets directory: {:?}", &assets_dir);
+            debug!("Creating assets directory: {:?}", &assets_dir);
             fs::create_dir_all(&assets_dir).unwrap();
         }
     });
