@@ -1,5 +1,5 @@
+use crate::conf;
 use crate::ui::renderer::Renderer;
-use crate::ui::{SCREEN_HEIGHT_CHAR, SCREEN_WIDTH_CHAR};
 use tcod::console::{self, Console, Root};
 
 pub struct GameRenderer {}
@@ -9,9 +9,9 @@ impl Renderer for GameRenderer {
         root.clear();
         root.set_alignment(console::TextAlignment::Center);
         root.print_rect(
-            SCREEN_WIDTH_CHAR / 2,
-            SCREEN_HEIGHT_CHAR / 2 + 2,
-            SCREEN_WIDTH_CHAR,
+            (conf::screen_width_char() / 2) as i32,
+            (conf::screen_height_char() / 2 + 2) as i32,
+            conf::screen_width_char() as i32,
             1,
             "Game Stage",
         );
