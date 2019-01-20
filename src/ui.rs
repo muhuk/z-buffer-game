@@ -1,7 +1,9 @@
 use crate::asset;
 use crate::game::Game;
 use crate::stage::Stage;
+use crate::ui::game_renderer::GameRenderer;
 use crate::ui::main_menu_renderer::MainMenuRenderer;
+use crate::ui::renderer::Renderer;
 use tcod::console::{self, Root};
 use tcod::system::get_fps;
 
@@ -25,25 +27,17 @@ pub fn draw(game: &mut Game) {
     match &game.stage {
         Stage::MainMenu(m) => {
             let root: &mut Root = &mut game.ui.root_console;
-            // TODO: Don't instantiate MainMenuRendered at every draw.
+            // TODO: Don't instantiate MainMenuRenderer at every draw.
             let mut renderer = MainMenuRenderer::new();
             renderer.update(m);
             renderer.blit(root);
             root.flush();
         }
         Stage::Game { .. } => {
-            use tcod::console::Console;
             let root: &mut Root = &mut game.ui.root_console;
-            root.clear();
-            root.set_alignment(console::TextAlignment::Center);
-            root.print_rect(
-                SCREEN_WIDTH_CHAR / 2,
-                SCREEN_HEIGHT_CHAR / 2 + 2,
-                SCREEN_WIDTH_CHAR,
-                1,
-                "Game Stage",
-            );
-            root.flush();
+            // TODO: Don't instantiate GameRenderer at every draw.
+            let mut renderer = GameRenderer {};
+            renderer.blit(root);
         }
     }
 }
@@ -67,7 +61,39 @@ pub fn initialize() -> UI {
     }
 }
 
+mod renderer {
+    use tcod::console::Root;
+
+    pub trait Renderer {
+        fn blit(&mut self, root: &mut Root);
+    }
+}
+
+mod game_renderer {
+    use super::renderer::Renderer;
+    use super::{SCREEN_HEIGHT_CHAR, SCREEN_WIDTH_CHAR};
+    use tcod::console::{self, Console, Root};
+
+    pub struct GameRenderer {}
+
+    impl Renderer for GameRenderer {
+        fn blit(&mut self, root: &mut Root) {
+            root.clear();
+            root.set_alignment(console::TextAlignment::Center);
+            root.print_rect(
+                SCREEN_WIDTH_CHAR / 2,
+                SCREEN_HEIGHT_CHAR / 2 + 2,
+                SCREEN_WIDTH_CHAR,
+                1,
+                "Game Stage",
+            );
+            root.flush();
+        }
+    }
+}
+
 mod main_menu_renderer {
+    use super::renderer::Renderer;
     use crate::menu::Menu;
     use crate::stage::main_menu::{Choice, MainMenu};
     use std::ops::{Deref, DerefMut};
@@ -86,14 +112,6 @@ mod main_menu_renderer {
                 console.print(0, idx as i32, format!("{}", choice));
             }
             MainMenuRenderer { console }
-        }
-
-        pub fn blit(&mut self, root: &mut Root) {
-            let w: i32 = self.console.width();
-            let h: i32 = self.console.height();
-            let x: i32 = (root.width() - w) / 2;
-            let y: i32 = (root.height() - h) / 2;
-            blit(&**self, (0, 0), (w, h), root, (x, y), 1.0, 1.0);
         }
 
         pub fn update(&mut self, menu: &MainMenu) {
@@ -124,6 +142,16 @@ mod main_menu_renderer {
                 self.console.set_char_foreground(x, y, fg_color);
                 self.console.set_char_background(x, y, bg_color, bg_flag);
             }
+        }
+    }
+
+    impl Renderer for MainMenuRenderer {
+        fn blit(&mut self, root: &mut Root) {
+            let w: i32 = self.console.width();
+            let h: i32 = self.console.height();
+            let x: i32 = (root.width() - w) / 2;
+            let y: i32 = (root.height() - h) / 2;
+            blit(&**self, (0, 0), (w, h), root, (x, y), 1.0, 1.0);
         }
     }
 
