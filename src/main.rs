@@ -4,12 +4,13 @@ use crate::game::Game;
 use log::info;
 use stderrlog;
 
-mod asset;
-mod game;
-mod input;
-mod menu;
-mod stage;
-mod ui;
+pub mod asset;
+pub mod conf;
+pub mod game;
+pub mod input;
+pub mod menu;
+pub mod stage;
+pub mod ui;
 
 // 4 is log everything, 3 is DEBUG.
 const LOG_VERBOSITY: usize = 4;
