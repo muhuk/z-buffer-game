@@ -1,6 +1,6 @@
-use super::renderer::Renderer;
 use crate::menu::Menu;
 use crate::stage::main_menu::{Choice, MainMenu};
+use crate::ui::renderer::Renderer;
 use std::ops::{Deref, DerefMut};
 use tcod::colors::{self, Color};
 use tcod::console::{blit, BackgroundFlag, Console, Offscreen, Root};

@@ -1,5 +1,5 @@
-use super::renderer::Renderer;
-use super::{SCREEN_HEIGHT_CHAR, SCREEN_WIDTH_CHAR};
+use crate::ui::renderer::Renderer;
+use crate::ui::{SCREEN_HEIGHT_CHAR, SCREEN_WIDTH_CHAR};
 use tcod::console::{self, Console, Root};
 
 pub struct GameRenderer {}
