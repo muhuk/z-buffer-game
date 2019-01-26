@@ -8,6 +8,9 @@ use std::process::exit;
 pub mod game;
 pub mod main_menu;
 
+/// Stages represent application state in a self contained manner.
+///
+/// See `crate::game::Game::main_loop` for the usage of `Stage`.
 pub enum Stage {
     Game(Game),
     MainMenu(MainMenu),
@@ -18,6 +21,8 @@ impl Stage {
         Stage::MainMenu(MainMenu::new())
     }
 
+    /// Update the status within the stage and signal the container if a stage
+    /// transition is necessary.
     pub fn tick(&mut self, dt_millis: u32, events: EventIterator) -> StageTransition {
         match self {
             Stage::MainMenu(menu) => Stage::tick_main_menu(menu, dt_millis, events),
