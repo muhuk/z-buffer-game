@@ -11,9 +11,8 @@ mod main_menu_renderer;
 
 /// User interface related data
 pub struct UI {
-    // TODO: Make root_console & fps private
-    pub root_console: Root,
-    pub fps: u32,
+    fps: u32,
+    root_console: Root,
     renderer: Option<(Discriminant<Stage>, Renderer)>,
 }
 
@@ -77,6 +76,10 @@ impl UI {
                 root.flush();
             }
         };
+    }
+
+    pub fn is_running(&self) -> bool {
+        !self.root_console.window_closed()
     }
 
     #[inline]

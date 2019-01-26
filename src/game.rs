@@ -30,8 +30,7 @@ impl Game {
     }
 
     pub fn main_loop(&mut self) {
-        self.ui.root_console.flush();
-        while !self.ui.root_console.window_closed() {
+        while self.ui.is_running() {
             self.update_time();
             let events = self.input.events();
             match self.stage.tick(self.dt, events) {
