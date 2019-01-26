@@ -18,6 +18,12 @@ pub struct UI {
     pub fps: u32,
 }
 
+impl UI {
+    pub fn stage_changed(&self, _new_stage: &Stage) {
+        unimplemented!();
+    }
+}
+
 /// Render UI based on the current stage.
 pub fn draw(game: &mut Game) {
     game.ui.fps = get_fps() as u32;

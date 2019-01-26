@@ -36,7 +36,10 @@ impl Game {
             let events = self.input.events();
             match self.stage.tick(self.dt, events) {
                 StageTransition::Continue => (),
-                StageTransition::SwitchTo(new_stage) => self.stage = new_stage,
+                StageTransition::SwitchTo(new_stage) => {
+                    self.stage = new_stage;
+                    self.ui.stage_changed(&self.stage)
+                }
             }
             ui::draw(self);
         }
