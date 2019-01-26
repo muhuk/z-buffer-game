@@ -41,7 +41,7 @@ impl Game {
                     self.ui.stage_changed(&self.stage)
                 }
             }
-            ui::draw(self);
+            self.ui.draw(&self.stage);
         }
     }
 

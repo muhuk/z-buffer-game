@@ -19,30 +19,30 @@ pub struct UI {
 }
 
 impl UI {
+    /// Render UI based on the current stage.
+    pub fn draw(&mut self, stage: &Stage) {
+        self.fps = get_fps() as u32;
+
+        match &stage {
+            Stage::MainMenu(m) => {
+                let root: &mut Root = &mut self.root_console;
+                // TODO: Don't instantiate MainMenuRenderer at every draw.
+                let mut renderer = MainMenuRenderer::new();
+                renderer.update(m);
+                renderer.blit(root);
+                root.flush();
+            }
+            Stage::Game { .. } => {
+                let root: &mut Root = &mut self.root_console;
+                // TODO: Don't instantiate GameRenderer at every draw.
+                let mut renderer = GameRenderer {};
+                renderer.blit(root);
+            }
+        }
+    }
+
     pub fn stage_changed(&self, _new_stage: &Stage) {
         unimplemented!();
-    }
-}
-
-/// Render UI based on the current stage.
-pub fn draw(game: &mut Game) {
-    game.ui.fps = get_fps() as u32;
-
-    match &game.stage {
-        Stage::MainMenu(m) => {
-            let root: &mut Root = &mut game.ui.root_console;
-            // TODO: Don't instantiate MainMenuRenderer at every draw.
-            let mut renderer = MainMenuRenderer::new();
-            renderer.update(m);
-            renderer.blit(root);
-            root.flush();
-        }
-        Stage::Game { .. } => {
-            let root: &mut Root = &mut game.ui.root_console;
-            // TODO: Don't instantiate GameRenderer at every draw.
-            let mut renderer = GameRenderer {};
-            renderer.blit(root);
-        }
     }
 }
 
