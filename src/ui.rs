@@ -1,20 +1,20 @@
 use crate::asset;
 use crate::conf;
 use crate::stage::Stage;
-use crate::ui::game_renderer::GameRenderer;
 use crate::ui::main_menu_renderer::MainMenuRenderer;
-use crate::ui::renderer::Renderer;
-use tcod::console::{self, Root};
+use log::debug;
+use std::mem::{discriminant, Discriminant};
+use tcod::console::{self, Console, Root};
 use tcod::system::get_fps;
 
-mod game_renderer;
 mod main_menu_renderer;
-mod renderer;
 
 /// User interface related data
 pub struct UI {
+    // TODO: Make root_console & fps private
     pub root_console: Root,
     pub fps: u32,
+    renderer: Option<(Discriminant<Stage>, Renderer)>,
 }
 
 impl UI {
@@ -35,6 +35,7 @@ impl UI {
         UI {
             root_console: root,
             fps: 0,
+            renderer: None,
         }
     }
 
@@ -42,25 +43,52 @@ impl UI {
     pub fn draw(&mut self, stage: &Stage) {
         self.fps = get_fps() as u32;
 
+        if self.is_stage_changed(stage) {
+            let renderer = match stage {
+                Stage::Game(_) => Renderer::Game,
+                Stage::MainMenu(_) => Renderer::MainMenu(MainMenuRenderer::new()),
+            };
+            debug!("Updating renderer as {:?}.", &renderer);
+            self.renderer = Some((discriminant(stage), renderer));
+        }
+
         match &stage {
-            Stage::MainMenu(m) => {
+            Stage::Game(_) => {
                 let root: &mut Root = &mut self.root_console;
-                // TODO: Don't instantiate MainMenuRenderer at every draw.
-                let mut renderer = MainMenuRenderer::new();
+                root.clear();
+                root.set_alignment(console::TextAlignment::Center);
+                root.print_rect(
+                    (conf::screen_width_char() / 2) as i32,
+                    (conf::screen_height_char() / 2 + 2) as i32,
+                    conf::screen_width_char() as i32,
+                    1,
+                    "Game Stage",
+                );
+                root.flush();
+            }
+            Stage::MainMenu(m) => {
+                let renderer: &mut MainMenuRenderer = match self.renderer {
+                    Some((_, Renderer::MainMenu(ref mut r))) => r,
+                    _ => unreachable!(),
+                };
                 renderer.update(m);
+                let root: &mut Root = &mut self.root_console;
                 renderer.blit(root);
                 root.flush();
             }
-            Stage::Game { .. } => {
-                let root: &mut Root = &mut self.root_console;
-                // TODO: Don't instantiate GameRenderer at every draw.
-                let mut renderer = GameRenderer {};
-                renderer.blit(root);
-            }
-        }
+        };
     }
 
-    pub fn stage_changed(&self, _new_stage: &Stage) {
-        unimplemented!();
+    #[inline]
+    fn is_stage_changed(&self, stage: &Stage) -> bool {
+        self.renderer
+            .as_ref()
+            .map_or(true, |(d, _)| *d != discriminant(stage))
     }
+}
+
+#[derive(Debug)]
+enum Renderer {
+    Game,
+    MainMenu(MainMenuRenderer),
 }
