@@ -1,6 +1,5 @@
 use crate::asset;
 use crate::conf;
-use crate::game::Game;
 use crate::stage::Stage;
 use crate::ui::game_renderer::GameRenderer;
 use crate::ui::main_menu_renderer::MainMenuRenderer;
@@ -19,6 +18,26 @@ pub struct UI {
 }
 
 impl UI {
+    pub fn new() -> UI {
+        let font_file = asset::Assets::FontTerminal16x16GsRo.extract().unwrap();
+
+        let root = console::Root::initializer()
+            .title(conf::window_title())
+            .size(
+                conf::screen_width_char() as i32,
+                conf::screen_height_char() as i32,
+            )
+            .font(font_file, console::FontLayout::AsciiInRow)
+            .init();
+
+        tcod::system::set_fps(conf::max_fps() as i32);
+
+        UI {
+            root_console: root,
+            fps: 0,
+        }
+    }
+
     /// Render UI based on the current stage.
     pub fn draw(&mut self, stage: &Stage) {
         self.fps = get_fps() as u32;
@@ -43,25 +62,5 @@ impl UI {
 
     pub fn stage_changed(&self, _new_stage: &Stage) {
         unimplemented!();
-    }
-}
-
-pub fn initialize() -> UI {
-    let font_file = asset::Assets::FontTerminal16x16GsRo.extract().unwrap();
-
-    let root = console::Root::initializer()
-        .title(conf::window_title())
-        .size(
-            conf::screen_width_char() as i32,
-            conf::screen_height_char() as i32,
-        )
-        .font(font_file, console::FontLayout::AsciiInRow)
-        .init();
-
-    tcod::system::set_fps(conf::max_fps() as i32);
-
-    UI {
-        root_console: root,
-        fps: 0,
     }
 }
