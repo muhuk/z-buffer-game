@@ -88,6 +88,6 @@ impl<'a> Menu<'a> for MainMenu {
     }
 
     fn selected(&self) -> Choice {
-        self.selected.clone()
+        self.selected
     }
 }
