@@ -5,14 +5,14 @@ use tcod::input::{self as tcod_input, Event as TcodEvent};
 
 const DEFAULT_EVENT_QUEUE_SIZE: usize = 20;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct Modifiers {
     pub shift: bool,
     pub alt: bool,
     pub ctrl: bool,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub enum Event {
     KeyPress(KeyCode, Option<char>, Modifiers),
     KeyDown(KeyCode, Option<char>, Modifiers),
@@ -68,7 +68,7 @@ impl Input {
         let key_code_num: u32 = *key_code as u32;
         match (e, self.key_states.contains(&key_code_num)) {
             (Event::KeyDown(_, character, modifiers), true) => {
-                Some(Event::KeyPress(*key_code, *character, (*modifiers).clone()))
+                Some(Event::KeyPress(*key_code, *character, *modifiers))
             }
             (Event::KeyDown(..), false) => {
                 self.key_states.insert(key_code_num);
@@ -76,7 +76,7 @@ impl Input {
             }
             (Event::KeyUp(_, character, modifiers), _) => {
                 self.key_states.remove(&key_code_num);
-                Some(Event::KeyPress(*key_code, *character, (*modifiers).clone()))
+                Some(Event::KeyPress(*key_code, *character, *modifiers))
             }
             _ => None,
         }
