@@ -1,5 +1,6 @@
 use crate::menu::Menu;
 use crate::stage::main_menu::{Choice, MainMenu};
+use crate::ui::render::Render;
 use std::fmt;
 use tcod::colors;
 use tcod::console::{blit, BackgroundFlag, Console, Offscreen};
@@ -11,32 +12,10 @@ pub struct MainMenuRenderer {
 
 impl MainMenuRenderer {
     pub fn new(window_width: u32, window_height: u32) -> MainMenuRenderer {
-        let (width, height) = Self::calculate_size();
         let root = Offscreen::new(window_width as i32, window_height as i32);
+        let (width, height) = Self::calculate_size();
         let console = Self::make_menu_console(width, height);
         MainMenuRenderer { root, console }
-    }
-
-    pub fn borrow_root(&self) -> &Offscreen {
-        &self.root
-    }
-
-    pub fn update(&mut self, menu: &MainMenu) {
-        let bg_flag: BackgroundFlag = BackgroundFlag::Set;
-        let width: i32 = self.console.width();
-        for (idx, choice) in menu.iter().enumerate() {
-            let y: i32 = idx as i32;
-            let (fg_color, bg_color) = if menu.is_selected(choice) {
-                (colors::WHITE, colors::RED)
-            } else {
-                (colors::WHITE, colors::BLACK)
-            };
-            for x in 0..width {
-                self.console.set_char_foreground(x, y, fg_color);
-                self.console.set_char_background(x, y, bg_color, bg_flag);
-            }
-        }
-        self.blit();
     }
 
     fn calculate_size() -> (u32, u32) {
@@ -78,5 +57,31 @@ impl MainMenuRenderer {
 impl fmt::Debug for MainMenuRenderer {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "MainMenuRenderer")
+    }
+}
+
+impl Render for MainMenuRenderer {
+    type SceneType = MainMenu;
+
+    fn borrow_root(&self) -> &Offscreen {
+        &self.root
+    }
+
+    fn update(&mut self, menu: &MainMenu) {
+        let bg_flag: BackgroundFlag = BackgroundFlag::Set;
+        let width: i32 = self.console.width();
+        for (idx, choice) in menu.iter().enumerate() {
+            let y: i32 = idx as i32;
+            let (fg_color, bg_color) = if menu.is_selected(choice) {
+                (colors::WHITE, colors::RED)
+            } else {
+                (colors::WHITE, colors::BLACK)
+            };
+            for x in 0..width {
+                self.console.set_char_foreground(x, y, fg_color);
+                self.console.set_char_background(x, y, bg_color, bg_flag);
+            }
+        }
+        self.blit();
     }
 }

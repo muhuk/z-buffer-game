@@ -1,3 +1,5 @@
+use crate::stage::game::Game;
+use crate::ui::render::Render;
 use std::fmt;
 use tcod::console::{self, Console, Offscreen};
 
@@ -18,14 +20,20 @@ impl GameRenderer {
         );
         GameRenderer { console }
     }
-
-    pub fn borrow_root(&self) -> &Offscreen {
-        &self.console
-    }
 }
 
 impl fmt::Debug for GameRenderer {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "GameRenderer")
     }
+}
+
+impl Render for GameRenderer {
+    type SceneType = Game;
+
+    fn borrow_root(&self) -> &Offscreen {
+        &self.console
+    }
+
+    fn update(&mut self, _stage: &Game) {}
 }

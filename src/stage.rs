@@ -11,6 +11,7 @@ pub mod main_menu;
 /// Stages represent application state in a self contained manner.
 ///
 /// See `crate::game::Game::main_loop` for the usage of `Stage`.
+#[derive(Debug)]
 pub enum Stage {
     Game(Game),
     MainMenu(MainMenu),

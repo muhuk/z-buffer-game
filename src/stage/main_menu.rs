@@ -37,6 +37,7 @@ impl Display for Choice {
     }
 }
 
+#[derive(Debug)]
 pub struct MainMenu {
     pub selected: Choice,
 }

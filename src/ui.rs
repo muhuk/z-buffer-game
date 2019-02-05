@@ -5,13 +5,15 @@ use crate::conf;
 use crate::stage::Stage;
 use crate::ui::game_renderer::GameRenderer;
 use crate::ui::main_menu_renderer::MainMenuRenderer;
+use crate::ui::render::Render;
 use log::debug;
 use std::mem::{discriminant, Discriminant};
-use tcod::console;
+use tcod::console::{self, Console};
 use tcod::system::get_fps;
 
 mod game_renderer;
 mod main_menu_renderer;
+mod render;
 
 /// User interface related data
 pub struct UI {
@@ -47,60 +49,22 @@ impl UI {
         self.fps = get_fps() as u32;
 
         if self.is_stage_changed(stage) {
-            let width: u32 = conf::screen_width_char();
-            let height: u32 = conf::screen_height_char();
-
-            let renderer = match stage {
-                Stage::Game(_) => Renderer::Game(GameRenderer::new(width, height)),
-                Stage::MainMenu(_) => Renderer::MainMenu(MainMenuRenderer::new(width, height)),
-            };
-            debug!("Updating renderer as {:?}.", &renderer);
-            self.renderer = Some((discriminant(stage), renderer));
+            self.reset_renderer(stage);
         }
 
-        match &stage {
-            Stage::Game(_) => {
-                let width: u32 = conf::screen_width_char();
-                let height: u32 = conf::screen_height_char();
-
-                let renderer: &mut GameRenderer = match self.renderer {
-                    Some((_, Renderer::Game(ref mut r))) => r,
-                    _ => unreachable!(),
-                };
-                // let renderer = GameRenderer::new(width, height);
-                let root: &mut console::Root = &mut self.root_console;
-                console::blit(
-                    renderer.borrow_root(),
-                    (0, 0),
-                    (width as i32, height as i32),
-                    root,
-                    (0, 0),
-                    1.0,
-                    1.0,
-                );
-                root.flush();
+        // TODO: This part is still too messy but it works somewhat.
+        let root: &mut console::Root = &mut self.root_console;
+        match (&stage, &mut self.renderer) {
+            (Stage::Game(g), Some((_, Renderer::Game(ref mut renderer)))) => {
+                renderer.update(g);
+                Self::blit(root, renderer);
             }
-            Stage::MainMenu(m) => {
-                let width: u32 = conf::screen_width_char();
-                let height: u32 = conf::screen_height_char();
-
-                let renderer: &mut MainMenuRenderer = match self.renderer {
-                    Some((_, Renderer::MainMenu(ref mut r))) => r,
-                    _ => unreachable!(),
-                };
+            (Stage::MainMenu(m), Some((_, Renderer::MainMenu(ref mut renderer)))) => {
                 renderer.update(m);
-                let root: &mut console::Root = &mut self.root_console;
-                console::blit(
-                    renderer.borrow_root(),
-                    (0, 0),
-                    (width as i32, height as i32),
-                    root,
-                    (0, 0),
-                    1.0,
-                    1.0,
-                );
-                root.flush();
+                Self::blit(root, renderer);
             }
+            (s, Some(p)) => panic!("Mismatched renderer {:?} for stage {:?}", p, s),
+            (_, None) => unreachable!(),
         };
     }
 
@@ -114,6 +78,32 @@ impl UI {
             .as_ref()
             .map_or(true, |(d, _)| *d != discriminant(stage))
     }
+
+    fn reset_renderer(&mut self, stage: &Stage) {
+        let width: u32 = self.root_console.width() as u32;
+        let height: u32 = self.root_console.height() as u32;
+        debug!("Window dimensions are {}x{}", width, height);
+        let renderer = match stage {
+            Stage::Game(_) => Renderer::Game(GameRenderer::new(width, height)),
+            Stage::MainMenu(_) => Renderer::MainMenu(MainMenuRenderer::new(width, height)),
+        };
+        debug!("Updating renderer as {:?}.", &renderer);
+        self.renderer = Some((discriminant(stage), renderer));
+    }
+
+    fn blit<T: Render>(root: &mut console::Root, renderer: &mut T) {
+        let source = renderer.borrow_root();
+        console::blit(
+            source,
+            (0, 0),
+            (source.width(), source.height()),
+            root,
+            (0, 0),
+            1.0,
+            1.0,
+        );
+        root.flush();
+    }
 }
 
 impl Default for UI {
@@ -125,7 +115,6 @@ impl Default for UI {
 /// Since [Stage](crate::stage::Stage) is an `enum` and dependency is from
 /// [ui](crate::ui) to [stage](crate::stage) we have Renderer as an enum to
 /// match its structure.
-// TODO: Consider using a trait for the wrapped values in the variants.
 #[derive(Debug)]
 enum Renderer {
     Game(GameRenderer),
