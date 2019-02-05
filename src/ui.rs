@@ -1,3 +1,5 @@
+//! User interface.
+
 use crate::asset;
 use crate::conf;
 use crate::stage::Stage;
@@ -90,6 +92,10 @@ impl UI {
     }
 }
 
+/// Since [Stage](crate::stage::Stage) is an `enum` and dependency is from
+/// [ui](crate::ui) to [stage](crate::stage) we have Renderer as an enum to
+/// match its structure.
+// TODO: Consider using a trait for the wrapped values in the variants.
 #[derive(Debug)]
 enum Renderer {
     Game,
