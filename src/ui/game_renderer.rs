@@ -1,4 +1,3 @@
-use std::ops::Deref;
 use tcod::console::{self, Console, Offscreen};
 
 pub struct GameRenderer {
@@ -18,12 +17,8 @@ impl GameRenderer {
         );
         GameRenderer { console }
     }
-}
 
-impl Deref for GameRenderer {
-    type Target = Offscreen;
-
-    fn deref(&self) -> &Offscreen {
+    pub fn borrow_root(&self) -> &Offscreen {
         &self.console
     }
 }

@@ -2,7 +2,7 @@ use crate::menu::Menu;
 use crate::stage::main_menu::{Choice, MainMenu};
 use std::fmt;
 use tcod::colors::{self, Color};
-use tcod::console::{blit, BackgroundFlag, Console, Offscreen, Root};
+use tcod::console::{BackgroundFlag, Console, Offscreen};
 
 pub struct MainMenuRenderer {
     console: Offscreen,
@@ -18,13 +18,17 @@ impl MainMenuRenderer {
         MainMenuRenderer { console }
     }
 
-    pub fn blit(&mut self, root: &mut Root) {
-        let w: i32 = self.console.width();
-        let h: i32 = self.console.height();
-        let x: i32 = (root.width() - w) / 2;
-        let y: i32 = (root.height() - h) / 2;
-        blit(&self.console, (0, 0), (w, h), root, (x, y), 1.0, 1.0);
+    pub fn borrow_root(&self) -> &Offscreen {
+        &self.console
     }
+
+    // pub fn blit(&mut self, root: &mut Root) {
+    //     let w: i32 = self.console.width();
+    //     let h: i32 = self.console.height();
+    //     let x: i32 = (root.width() - w) / 2;
+    //     let y: i32 = (root.height() - h) / 2;
+    //     blit(&self.console, (0, 0), (w, h), root, (x, y), 1.0, 1.0);
+    // }
 
     pub fn update(&mut self, menu: &MainMenu) {
         for (idx, choice) in menu.iter().enumerate() {

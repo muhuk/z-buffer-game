@@ -61,10 +61,11 @@ impl UI {
             Stage::Game(_) => {
                 let width: u32 = conf::screen_width_char();
                 let height: u32 = conf::screen_height_char();
-                let renderer = { GameRenderer::new(width, height) };
+
+                let renderer = GameRenderer::new(width, height);
                 let root: &mut console::Root = &mut self.root_console;
                 console::blit(
-                    &*renderer,
+                    renderer.borrow_root(),
                     (0, 0),
                     (width as i32, height as i32),
                     root,
@@ -75,13 +76,24 @@ impl UI {
                 root.flush();
             }
             Stage::MainMenu(m) => {
+                let width: u32 = conf::screen_width_char();
+                let height: u32 = conf::screen_height_char();
+
                 let renderer: &mut MainMenuRenderer = match self.renderer {
                     Some((_, Renderer::MainMenu(ref mut r))) => r,
                     _ => unreachable!(),
                 };
                 renderer.update(m);
                 let root: &mut console::Root = &mut self.root_console;
-                renderer.blit(root);
+                console::blit(
+                    renderer.borrow_root(),
+                    (0, 0),
+                    (width as i32, height as i32),
+                    root,
+                    (0, 0),
+                    1.0,
+                    1.0,
+                );
                 root.flush();
             }
         };
