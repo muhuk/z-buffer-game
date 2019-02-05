@@ -59,7 +59,11 @@ impl UI {
         // blit it onto the root within UI.
         match &stage {
             Stage::Game(_) => {
-                let mut renderer = GameRenderer::new();
+                let mut renderer = {
+                    let width: u32 = conf::screen_width_char();
+                    let height: u32 = conf::screen_height_char();
+                    GameRenderer::new(width, height)
+                };
                 let root: &mut Root = &mut self.root_console;
                 renderer.blit(root);
                 root.flush();
