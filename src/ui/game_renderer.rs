@@ -1,4 +1,5 @@
-use tcod::console::{self, Console, Offscreen, Root};
+use std::ops::Deref;
+use tcod::console::{self, Console, Offscreen};
 
 pub struct GameRenderer {
     console: Offscreen,
@@ -6,20 +7,23 @@ pub struct GameRenderer {
 
 impl GameRenderer {
     pub fn new(width: u32, height: u32) -> GameRenderer {
-        let console = Offscreen::new(width as i32, height as i32);
-        GameRenderer { console }
-    }
-
-    pub fn blit(&mut self, root: &mut Root) {
-        root.clear();
-        root.set_alignment(console::TextAlignment::Center);
-        root.print_rect(
-            self.console.width() / 2,
-            self.console.height() / 2 + 2,
-            self.console.width(),
+        let mut console = Offscreen::new(width as i32, height as i32);
+        console.set_alignment(console::TextAlignment::Center);
+        console.print_rect(
+            console.width() / 2,
+            console.height() / 2 + 2,
+            console.width(),
             1,
             "Game Stage",
         );
-        root.flush();
+        GameRenderer { console }
+    }
+}
+
+impl Deref for GameRenderer {
+    type Target = Offscreen;
+
+    fn deref(&self) -> &Offscreen {
+        &self.console
     }
 }

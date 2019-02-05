@@ -7,7 +7,7 @@ use crate::ui::game_renderer::GameRenderer;
 use crate::ui::main_menu_renderer::MainMenuRenderer;
 use log::debug;
 use std::mem::{discriminant, Discriminant};
-use tcod::console::{self, Root};
+use tcod::console;
 use tcod::system::get_fps;
 
 mod game_renderer;
@@ -16,7 +16,7 @@ mod main_menu_renderer;
 /// User interface related data
 pub struct UI {
     fps: u32,
-    root_console: Root,
+    root_console: console::Root,
     renderer: Option<(Discriminant<Stage>, Renderer)>,
 }
 
@@ -59,13 +59,19 @@ impl UI {
         // blit it onto the root within UI.
         match &stage {
             Stage::Game(_) => {
-                let mut renderer = {
-                    let width: u32 = conf::screen_width_char();
-                    let height: u32 = conf::screen_height_char();
-                    GameRenderer::new(width, height)
-                };
-                let root: &mut Root = &mut self.root_console;
-                renderer.blit(root);
+                let width: u32 = conf::screen_width_char();
+                let height: u32 = conf::screen_height_char();
+                let renderer = { GameRenderer::new(width, height) };
+                let root: &mut console::Root = &mut self.root_console;
+                console::blit(
+                    &*renderer,
+                    (0, 0),
+                    (width as i32, height as i32),
+                    root,
+                    (0, 0),
+                    1.0,
+                    1.0,
+                );
                 root.flush();
             }
             Stage::MainMenu(m) => {
@@ -74,7 +80,7 @@ impl UI {
                     _ => unreachable!(),
                 };
                 renderer.update(m);
-                let root: &mut Root = &mut self.root_console;
+                let root: &mut console::Root = &mut self.root_console;
                 renderer.blit(root);
                 root.flush();
             }
