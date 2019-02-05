@@ -58,8 +58,6 @@ impl UI {
             self.renderer = Some((discriminant(stage), renderer));
         }
 
-        // TODO: Instead of passing root into the renderer, get offscreen console and
-        // blit it onto the root within UI.
         match &stage {
             Stage::Game(_) => {
                 let width: u32 = conf::screen_width_char();
