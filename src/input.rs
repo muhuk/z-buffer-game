@@ -22,6 +22,7 @@ pub enum Event {
 
 pub type EventIterator = IntoIter<Event>;
 
+#[derive(Default)]
 pub struct Input {
     // Key type should be a KeyCode, but since it does not
     // satisfy Ord constraint we will be casting to u32.

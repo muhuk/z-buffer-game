@@ -12,7 +12,7 @@ pub enum Choice {
 impl Choice {
     pub const ALL: &'static [Choice] = &[Choice::NewGame, Choice::Credits, Choice::Exit];
 
-    pub fn next(&self) -> Option<Choice> {
+    pub fn next(self) -> Option<Choice> {
         match self {
             Choice::NewGame => Some(Choice::Credits),
             Choice::Credits => Some(Choice::Exit),
@@ -20,7 +20,7 @@ impl Choice {
         }
     }
 
-    pub fn previous(&self) -> Option<Choice> {
+    pub fn previous(self) -> Option<Choice> {
         match self {
             Choice::NewGame => None,
             Choice::Credits => Some(Choice::NewGame),
@@ -46,6 +46,12 @@ impl MainMenu {
         MainMenu {
             selected: Choice::NewGame,
         }
+    }
+}
+
+impl Default for MainMenu {
+    fn default() -> Self {
+        Self::new()
     }
 }
 

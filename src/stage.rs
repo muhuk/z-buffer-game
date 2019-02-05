@@ -66,6 +66,12 @@ impl Stage {
     }
 }
 
+impl Default for Stage {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 pub enum StageTransition {
     Continue,
     SwitchTo(Stage),

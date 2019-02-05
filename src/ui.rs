@@ -114,6 +114,12 @@ impl UI {
     }
 }
 
+impl Default for UI {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Since [Stage](crate::stage::Stage) is an `enum` and dependency is from
 /// [ui](crate::ui) to [stage](crate::stage) we have Renderer as an enum to
 /// match its structure.

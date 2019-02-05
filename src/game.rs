@@ -6,6 +6,7 @@ use std::time::Duration;
 use tcod::system::get_elapsed_time;
 
 /// Game state.
+#[derive(Default)]
 pub struct Game {
     pub stage: Stage,
     pub ui: UI,
