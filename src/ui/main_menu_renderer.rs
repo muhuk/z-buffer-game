@@ -1,7 +1,7 @@
 use crate::menu::Menu;
 use crate::stage::main_menu::{Choice, MainMenu};
 use std::fmt;
-use tcod::colors::{self, Color};
+use tcod::colors;
 use tcod::console::{blit, BackgroundFlag, Console, Offscreen};
 
 pub struct MainMenuRenderer {
@@ -22,13 +22,18 @@ impl MainMenuRenderer {
     }
 
     pub fn update(&mut self, menu: &MainMenu) {
-        // TODO: Refactor paint_row
+        let bg_flag: BackgroundFlag = BackgroundFlag::Set;
+        let width: i32 = self.console.width();
         for (idx, choice) in menu.iter().enumerate() {
             let y: i32 = idx as i32;
-            if menu.is_selected(choice) {
-                self.paint_row(y, colors::WHITE, colors::RED);
+            let (fg_color, bg_color) = if menu.is_selected(choice) {
+                (colors::WHITE, colors::RED)
             } else {
-                self.paint_row(y, colors::WHITE, colors::BLACK);
+                (colors::WHITE, colors::BLACK)
+            };
+            for x in 0..width {
+                self.console.set_char_foreground(x, y, fg_color);
+                self.console.set_char_background(x, y, bg_color, bg_flag);
             }
         }
         self.blit();
@@ -67,15 +72,6 @@ impl MainMenuRenderer {
             1.0,
             1.0,
         );
-    }
-
-    fn paint_row(&mut self, y: i32, fg_color: Color, bg_color: Color) {
-        let bg_flag: BackgroundFlag = BackgroundFlag::Set;
-        let width: i32 = self.console.width();
-        for x in 0..width {
-            self.console.set_char_foreground(x, y, fg_color);
-            self.console.set_char_background(x, y, bg_color, bg_flag);
-        }
     }
 }
 
