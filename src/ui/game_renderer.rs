@@ -1,3 +1,4 @@
+use std::fmt;
 use tcod::console::{self, Console, Offscreen};
 
 pub struct GameRenderer {
@@ -20,5 +21,11 @@ impl GameRenderer {
 
     pub fn borrow_root(&self) -> &Offscreen {
         &self.console
+    }
+}
+
+impl fmt::Debug for GameRenderer {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "GameRenderer")
     }
 }

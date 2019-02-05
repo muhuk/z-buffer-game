@@ -51,7 +51,7 @@ impl UI {
             let height: u32 = conf::screen_height_char();
 
             let renderer = match stage {
-                Stage::Game(_) => Renderer::Game,
+                Stage::Game(_) => Renderer::Game(GameRenderer::new(width, height)),
                 Stage::MainMenu(_) => Renderer::MainMenu(MainMenuRenderer::new(width, height)),
             };
             debug!("Updating renderer as {:?}.", &renderer);
@@ -65,7 +65,11 @@ impl UI {
                 let width: u32 = conf::screen_width_char();
                 let height: u32 = conf::screen_height_char();
 
-                let renderer = GameRenderer::new(width, height);
+                let renderer: &mut GameRenderer = match self.renderer {
+                    Some((_, Renderer::Game(ref mut r))) => r,
+                    _ => unreachable!(),
+                };
+                // let renderer = GameRenderer::new(width, height);
                 let root: &mut console::Root = &mut self.root_console;
                 console::blit(
                     renderer.borrow_root(),
@@ -126,6 +130,6 @@ impl Default for UI {
 // TODO: Consider using a trait for the wrapped values in the variants.
 #[derive(Debug)]
 enum Renderer {
-    Game,
+    Game(GameRenderer),
     MainMenu(MainMenuRenderer),
 }
