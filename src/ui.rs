@@ -3,10 +3,11 @@
 use crate::asset;
 use crate::conf;
 use crate::stage::Stage;
+use crate::ui::game_renderer::GameRenderer;
 use crate::ui::main_menu_renderer::MainMenuRenderer;
 use log::debug;
 use std::mem::{discriminant, Discriminant};
-use tcod::console::{self, Console, Root};
+use tcod::console::{self, Root};
 use tcod::system::get_fps;
 
 mod main_menu_renderer;
@@ -55,16 +56,9 @@ impl UI {
 
         match &stage {
             Stage::Game(_) => {
+                let mut renderer = GameRenderer::new();
                 let root: &mut Root = &mut self.root_console;
-                root.clear();
-                root.set_alignment(console::TextAlignment::Center);
-                root.print_rect(
-                    (conf::screen_width_char() / 2) as i32,
-                    (conf::screen_height_char() / 2 + 2) as i32,
-                    conf::screen_width_char() as i32,
-                    1,
-                    "Game Stage",
-                );
+                renderer.blit(root);
                 root.flush();
             }
             Stage::MainMenu(m) => {
@@ -100,4 +94,32 @@ impl UI {
 enum Renderer {
     Game,
     MainMenu(MainMenuRenderer),
+}
+
+// TODO: Instead of passing root into the renderer, get offscreen console and
+// blit it onto the root within UI.
+mod game_renderer {
+    use crate::conf;
+    use tcod::console::{self, Console, Root};
+
+    pub struct GameRenderer {}
+
+    impl GameRenderer {
+        pub fn new() -> GameRenderer {
+            GameRenderer {}
+        }
+
+        pub fn blit(&mut self, root: &mut Root) {
+            root.clear();
+            root.set_alignment(console::TextAlignment::Center);
+            root.print_rect(
+                (conf::screen_width_char() / 2) as i32,
+                (conf::screen_height_char() / 2 + 2) as i32,
+                conf::screen_width_char() as i32,
+                1,
+                "Game Stage",
+            );
+            root.flush();
+        }
+    }
 }
