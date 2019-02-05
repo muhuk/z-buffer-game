@@ -47,9 +47,12 @@ impl UI {
         self.fps = get_fps() as u32;
 
         if self.is_stage_changed(stage) {
+            let width: u32 = conf::screen_width_char();
+            let height: u32 = conf::screen_height_char();
+
             let renderer = match stage {
                 Stage::Game(_) => Renderer::Game,
-                Stage::MainMenu(_) => Renderer::MainMenu(MainMenuRenderer::new()),
+                Stage::MainMenu(_) => Renderer::MainMenu(MainMenuRenderer::new(width, height)),
             };
             debug!("Updating renderer as {:?}.", &renderer);
             self.renderer = Some((discriminant(stage), renderer));
