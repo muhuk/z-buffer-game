@@ -56,22 +56,23 @@ mod tests {
     #[test]
     fn map_takes_at_least_the_minimums_defined_in_constants() {
         let (min_width, min_height) = MAP_MIN_SIZE;
-        for a in 0..MAX_X {
-            for b in 0..MAX_Y {
-                let (w, h) = GameRenderer::calculate_map_viewport((b, a));
+        for b in 0..MAX_Y {
+            for a in 0..MAX_X {
+                let (w, h) = GameRenderer::calculate_map_viewport((a, b));
                 assert!(
                     w >= min_width,
                     "Calculated witdth is {}, but the minimum is set as {}.",
                     w,
                     min_width
                 );
-
+                assert_eq!(max(a, min_width), w);
                 assert!(
                     h >= min_height,
                     "Calculated height is {}, but the minimum is set as {}.",
                     h,
                     min_height
                 );
+                assert_eq!(max(b, min_height), h);
             }
         }
     }
