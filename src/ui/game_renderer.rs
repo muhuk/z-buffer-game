@@ -1,5 +1,7 @@
 use crate::stage::game::Game;
+use crate::ui::constants::MAP_MIN_SIZE;
 use crate::ui::render::Render;
+use std::cmp::max;
 use std::fmt;
 use tcod::console::{self, Console, Offscreen};
 
@@ -20,6 +22,12 @@ impl GameRenderer {
         );
         GameRenderer { console }
     }
+
+    pub fn calculate_map_viewport(requested_size: (u32, u32)) -> (u32, u32) {
+        let (req_w, req_h) = requested_size;
+        let (min_w, min_h) = MAP_MIN_SIZE;
+        (max(req_w, min_w), max(req_h, min_h))
+    }
 }
 
 impl fmt::Debug for GameRenderer {
@@ -36,4 +44,35 @@ impl Render for GameRenderer {
     }
 
     fn update(&mut self, _stage: &Game) {}
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const MAX_X: u32 = MAP_MIN_SIZE.0 * 2;
+    const MAX_Y: u32 = MAP_MIN_SIZE.1 * 2;
+
+    #[test]
+    fn map_takes_at_least_the_minimums_defined_in_constants() {
+        let (min_width, min_height) = MAP_MIN_SIZE;
+        for a in 0..MAX_X {
+            for b in 0..MAX_Y {
+                let (w, h) = GameRenderer::calculate_map_viewport((b, a));
+                assert!(
+                    w >= min_width,
+                    "Calculated witdth is {}, but the minimum is set as {}.",
+                    w,
+                    min_width
+                );
+
+                assert!(
+                    h >= min_height,
+                    "Calculated height is {}, but the minimum is set as {}.",
+                    h,
+                    min_height
+                );
+            }
+        }
+    }
 }

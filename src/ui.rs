@@ -11,6 +11,7 @@ use std::mem::{discriminant, Discriminant};
 use tcod::console::{self, Console};
 use tcod::system::get_fps;
 
+mod constants;
 mod game_renderer;
 mod main_menu_renderer;
 mod render;
