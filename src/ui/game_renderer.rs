@@ -3,24 +3,42 @@ use crate::ui::constants::MAP_MIN_SIZE;
 use crate::ui::render::Render;
 use std::cmp::max;
 use std::fmt;
-use tcod::console::{self, Console, Offscreen};
+use tcod::console::{blit, Console, Offscreen, TextAlignment};
 
 pub struct GameRenderer {
     console: Offscreen,
+    map: Offscreen,
 }
 
 impl GameRenderer {
     pub fn new(width: u32, height: u32) -> GameRenderer {
-        let mut console = Offscreen::new(width as i32, height as i32);
-        console.set_alignment(console::TextAlignment::Center);
-        console.print_rect(
-            console.width() / 2,
-            console.height() / 2 + 2,
-            console.width(),
+        let console = Offscreen::new(width as i32, height as i32);
+        let (map_w, map_h) = Self::calculate_map_viewport((width, height));
+        // TODO: Draw an actual map instead of this text.
+        let mut map = Offscreen::new(map_w as i32, map_h as i32);
+        map.set_alignment(TextAlignment::Center);
+        map.print_rect(
+            map.width() / 2,
+            map.height() / 2 + 2,
+            map.width(),
             1,
             "Game Stage",
         );
-        GameRenderer { console }
+        GameRenderer { console, map }
+    }
+
+    fn blit(&mut self) {
+        let w = self.map.width();
+        let h = self.map.height();
+        blit(
+            &self.map,
+            (0, 0),
+            (w, h),
+            &mut self.console,
+            (0, 0),
+            1.0,
+            1.0,
+        );
     }
 
     pub fn calculate_map_viewport(requested_size: (u32, u32)) -> (u32, u32) {
@@ -43,7 +61,9 @@ impl Render for GameRenderer {
         &self.console
     }
 
-    fn update(&mut self, _stage: &Game) {}
+    fn update(&mut self, _stage: &Game) {
+        self.blit();
+    }
 }
 
 #[cfg(test)]
