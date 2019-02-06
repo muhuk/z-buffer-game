@@ -54,6 +54,12 @@ impl Render for GameRenderer {
     }
 
     fn update(&mut self, _stage: &Game) {
+        // TODO: Remove notes below after implementation.
+        //
+        // 1. Figure out the camera location.  It comes from the stage.
+        // 2. Based on map size, figure out the viewport in world coordinates.
+        // 3. Query the map in stage for tile types.
+        // 4. Convert tiles to glyphs and render them on map.
         self.blit();
     }
 }

@@ -1,4 +1,4 @@
-//! Various defaults for the game.
+//! Configuration access and defaults.
 //!
 //! Public access is through functions are to allow reading configuration
 //! externally later.

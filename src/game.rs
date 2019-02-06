@@ -1,3 +1,5 @@
+//! Application data that brings together display, input & game state.
+
 use crate::input::Input;
 use crate::stage::{Stage, StageTransition};
 
@@ -5,7 +7,6 @@ use crate::ui::UI;
 use std::time::Duration;
 use tcod::system::get_elapsed_time;
 
-/// Game state.
 #[derive(Default)]
 pub struct Game {
     pub stage: Stage,

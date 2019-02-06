@@ -1,3 +1,7 @@
+//! Stage where the main menu is.
+//!
+//! [MainMenu] is the entry point.
+
 use crate::menu::Menu;
 use std::fmt::{Display, Formatter, Result};
 use std::slice::Iter;

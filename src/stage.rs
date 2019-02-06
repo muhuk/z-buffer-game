@@ -1,3 +1,5 @@
+//! Game state
+
 use crate::input::{Event, EventIterator, KeyCode};
 use crate::menu::Menu;
 use crate::stage::game::Game;
@@ -8,7 +10,7 @@ use std::process::exit;
 pub mod game;
 pub mod main_menu;
 
-/// Stages represent application state in a self contained manner.
+/// Stages represent game state in a self contained manner.
 ///
 /// See `crate::game::Game::main_loop` for the usage of `Stage`.
 #[derive(Debug)]
