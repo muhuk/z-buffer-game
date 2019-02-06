@@ -6,13 +6,13 @@ use std::fmt;
 use tcod::console::{blit, Console, Offscreen, TextAlignment};
 
 pub struct GameRenderer {
-    console: Offscreen,
+    root: Offscreen,
     map: Offscreen,
 }
 
 impl GameRenderer {
     pub fn new(width: u32, height: u32) -> GameRenderer {
-        let console = Offscreen::new(width as i32, height as i32);
+        let root = Offscreen::new(width as i32, height as i32);
         let (map_w, map_h) = Self::calculate_map_viewport((width, height));
         // TODO: Draw an actual map instead of this text.
         let mut map = Offscreen::new(map_w as i32, map_h as i32);
@@ -24,21 +24,13 @@ impl GameRenderer {
             1,
             "Game Stage",
         );
-        GameRenderer { console, map }
+        GameRenderer { root, map }
     }
 
     fn blit(&mut self) {
         let w = self.map.width();
         let h = self.map.height();
-        blit(
-            &self.map,
-            (0, 0),
-            (w, h),
-            &mut self.console,
-            (0, 0),
-            1.0,
-            1.0,
-        );
+        blit(&self.map, (0, 0), (w, h), &mut self.root, (0, 0), 1.0, 1.0);
     }
 
     pub fn calculate_map_viewport(requested_size: (u32, u32)) -> (u32, u32) {
@@ -58,7 +50,7 @@ impl Render for GameRenderer {
     type SceneType = Game;
 
     fn borrow_root(&self) -> &Offscreen {
-        &self.console
+        &self.root
     }
 
     fn update(&mut self, _stage: &Game) {
