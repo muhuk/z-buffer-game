@@ -3,7 +3,7 @@ use crate::ui::constants::MAP_MIN_SIZE;
 use crate::ui::render::Render;
 use std::cmp::max;
 use std::fmt;
-use tcod::console::{blit, Console, Offscreen, TextAlignment};
+use tcod::console::{blit, BackgroundFlag, Console, Offscreen, TextAlignment};
 
 pub struct GameRenderer {
     root: Offscreen,
@@ -14,16 +14,7 @@ impl GameRenderer {
     pub fn new(width: u32, height: u32) -> GameRenderer {
         let root = Offscreen::new(width as i32, height as i32);
         let (map_w, map_h) = Self::calculate_map_viewport((width, height));
-        // TODO: Draw an actual map instead of this text.
-        let mut map = Offscreen::new(map_w as i32, map_h as i32);
-        map.set_alignment(TextAlignment::Center);
-        map.print_rect(
-            map.width() / 2,
-            map.height() / 2 + 2,
-            map.width(),
-            1,
-            "Game Stage",
-        );
+        let map = Offscreen::new(map_w as i32, map_h as i32);
         GameRenderer { root, map }
     }
 
@@ -60,6 +51,25 @@ impl Render for GameRenderer {
         // 2. Based on map size, figure out the viewport in world coordinates.
         // 3. Query the map in stage for tile types.
         // 4. Convert tiles to glyphs and render them on map.
+
+        let mut map = &self.map;
+        let w = map.width();
+        let h = map.height();
+
+        // Fill the map with soma glyph.
+        for y in 0..h {
+            for x in 0..w {
+                map.put_char(x, y, '\u{f7}', BackgroundFlag::None);
+            }
+        }
+        map.set_alignment(TextAlignment::Center);
+        map.print_rect(
+            map.width() / 2,
+            map.height() / 2 + 2,
+            map.width(),
+            1,
+            "Game Stage",
+        );
         self.blit();
     }
 }
