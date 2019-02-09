@@ -1,5 +1,5 @@
 use crate::stage::game::Game;
-use crate::ui::constants::MAP_MIN_SIZE;
+use crate::ui::constants::{MAP_MIN_SIZE, SIDE_PANEL_WIDTH};
 use crate::ui::render::Render;
 use std::cmp::max;
 use std::fmt;
@@ -13,7 +13,7 @@ pub struct GameRenderer {
 impl GameRenderer {
     pub fn new(width: u32, height: u32) -> GameRenderer {
         let root = Offscreen::new(width as i32, height as i32);
-        let (map_w, map_h) = Self::calculate_map_viewport((width, height));
+        let (map_w, map_h) = Self::calculate_map_viewport((width, height)).unwrap();
         let map = Offscreen::new(map_w as i32, map_h as i32);
         GameRenderer { root, map }
     }
@@ -24,10 +24,14 @@ impl GameRenderer {
         blit(&self.map, (0, 0), (w, h), &mut self.root, (0, 0), 1.0, 1.0);
     }
 
-    pub fn calculate_map_viewport(requested_size: (u32, u32)) -> (u32, u32) {
+    pub(self) fn calculate_map_viewport(requested_size: (u32, u32)) -> Option<(u32, u32)> {
         let (req_w, req_h) = requested_size;
-        let (min_w, min_h) = MAP_MIN_SIZE;
-        (max(req_w, min_w), max(req_h, min_h))
+        let (map_min_w, map_min_h) = MAP_MIN_SIZE;
+        if req_w >= map_min_w + SIDE_PANEL_WIDTH && req_h >= map_min_h {
+            Some((req_w - SIDE_PANEL_WIDTH, req_h))
+        } else {
+            None
+        }
     }
 }
 
@@ -78,29 +82,35 @@ impl Render for GameRenderer {
 mod tests {
     use super::*;
 
-    const MAX_X: u32 = MAP_MIN_SIZE.0 * 2;
-    const MAX_Y: u32 = MAP_MIN_SIZE.1 * 2;
+    // 4K display & 8 pixel glyphs, times 2
+    const MAX_X: u32 = 3840 / 8 * 2;
+    const MAX_Y: u32 = 2160 / 8 * 2;
 
     #[test]
-    fn map_takes_at_least_the_minimums_defined_in_constants() {
-        let (min_width, min_height) = MAP_MIN_SIZE;
+    fn viewport_calculation_is_never_less_than_minimum_requirements() {
+        let (map_min_width, map_min_height) = MAP_MIN_SIZE;
+        let min_width = map_min_width + SIDE_PANEL_WIDTH;
+        let min_height = map_min_height;
+
         for b in 0..MAX_Y {
             for a in 0..MAX_X {
-                let (w, h) = GameRenderer::calculate_map_viewport((a, b));
-                assert!(
-                    w >= min_width,
-                    "Calculated witdth is {}, but the minimum is set as {}.",
-                    w,
-                    min_width
-                );
-                assert_eq!(max(a, min_width), w);
-                assert!(
-                    h >= min_height,
-                    "Calculated height is {}, but the minimum is set as {}.",
-                    h,
-                    min_height
-                );
-                assert_eq!(max(b, min_height), h);
+                match GameRenderer::calculate_map_viewport((a, b)) {
+                    Some((w, h)) => {
+                        assert!(
+                            w >= map_min_width,
+                            "Map width {} is calculated as less than minimum required!",
+                            w
+                        );
+                        assert_eq!(a, w + SIDE_PANEL_WIDTH);
+                        assert!(
+                            h >= map_min_height,
+                            "Map height {} is calculated as less than minimum required!",
+                            h
+                        );
+                        assert_eq!(b, h);
+                    }
+                    None => assert!(a < min_width || b < min_height),
+                }
             }
         }
     }
