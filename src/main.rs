@@ -6,6 +6,7 @@ use stderrlog;
 
 pub mod asset;
 pub mod conf;
+pub mod data;
 pub mod game;
 pub mod input;
 pub mod menu;

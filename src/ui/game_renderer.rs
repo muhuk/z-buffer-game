@@ -54,7 +54,7 @@ impl Render for GameRenderer {
         &self.root
     }
 
-    fn update(&mut self, _stage: &Game) {
+    fn update(&mut self, stage: &Game) {
         // TODO: Remove notes below after implementation.
         //
         // 1. Figure out the camera location.  It comes from the stage.
@@ -73,7 +73,7 @@ impl Render for GameRenderer {
             }
         }
 
-        let (x, y) = (0, 0);
+        let (x, y) = stage.player_coordinates();
         map.set_alignment(TextAlignment::Center);
         {
             let (mid_x, mid_y) = (map.width() / 2, map.height() / 2);
