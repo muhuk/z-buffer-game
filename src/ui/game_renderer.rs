@@ -66,20 +66,23 @@ impl Render for GameRenderer {
         let w = map.width();
         let h = map.height();
 
-        // Fill the map with soma glyph.
+        // Fill the map with some glyph.
         for y in 0..h {
             for x in 0..w {
                 map.put_char(x, y, '\u{f7}', BackgroundFlag::None);
             }
         }
+
+        let (x, y) = (0, 0);
         map.set_alignment(TextAlignment::Center);
-        map.print_rect(
-            map.width() / 2,
-            map.height() / 2,
-            map.width(),
-            1,
-            "Game Stage",
-        );
+        {
+            let (mid_x, mid_y) = (map.width() / 2, map.height() / 2);
+            let s: String = format!(" Player location {}:{} ", x, y);
+            let e: String = " ".repeat(s.len());
+            map.print_rect(mid_x, mid_y - 1, map.width(), 1, &e);
+            map.print_rect(mid_x, mid_y, map.width(), 1, s);
+            map.print_rect(mid_x, mid_y + 1, map.width(), 1, &e);
+        }
         self.blit();
     }
 }
