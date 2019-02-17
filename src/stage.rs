@@ -2,10 +2,9 @@
 
 use crate::data::Direction;
 use crate::input::{Event, EventIterator, KeyCode};
-use crate::menu::Menu;
 use crate::stage::game::Game;
 use crate::stage::main_menu::MainMenu;
-use log::{debug, info};
+use log::info;
 use std::process::exit;
 
 pub mod game;
@@ -71,36 +70,19 @@ impl Stage {
         _dt_millis: u32,
         events: EventIterator,
     ) -> StageTransition {
-        // transition is mutable here because we are
-        // processing multiple events and they may
-        // require differen transitions. This can be
-        // improved.
-        let mut transition = StageTransition::Continue;
         const EXIT_CODE_OK: i32 = 0;
-        for e in events {
-            match e {
-                Event::KeyPress(KeyCode::Up, ..) => menu.select_previous(),
-                Event::KeyPress(KeyCode::Down, ..) => menu.select_next(),
-                Event::KeyPress(KeyCode::Enter, ..) => {
-                    debug!("Menu item selected: {}", menu.selected);
-                    match menu.selected {
-                        main_menu::Choice::NewGame => {
-                            info!("Starting new game.");
-                            transition = StageTransition::SwitchTo(
-                                Stage::Game(Game::new()),
-                            );
-                        }
-                        main_menu::Choice::Credits => unimplemented!(),
-                        main_menu::Choice::Exit => {
-                            info!("Bye!");
-                            exit(EXIT_CODE_OK);
-                        }
-                    }
-                }
-                _ => (),
+        match menu.handle_events(events) {
+            Some(main_menu::Choice::NewGame) => {
+                info!("Starting new game.");
+                StageTransition::SwitchTo(Stage::Game(Game::new()))
             }
+            Some(main_menu::Choice::Credits) => unimplemented!(),
+            Some(main_menu::Choice::Exit) => {
+                info!("Bye!");
+                exit(EXIT_CODE_OK);
+            }
+            None => StageTransition::Continue,
         }
-        transition
     }
 }
 
