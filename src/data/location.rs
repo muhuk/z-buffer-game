@@ -1,6 +1,6 @@
 use super::direction::Direction;
 
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
 pub struct Location {
     pub x: i32,
     pub y: i32,

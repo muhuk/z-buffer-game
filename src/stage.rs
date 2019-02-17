@@ -42,7 +42,7 @@ impl Stage {
 
     fn tick_game(
         game: &mut Game,
-        _dt_millis: u32,
+        dt_millis: u32,
         events: EventIterator,
     ) -> StageTransition {
         for e in events {
@@ -62,6 +62,7 @@ impl Stage {
                 _ => (),
             }
         }
+        game.update_world(dt_millis);
         StageTransition::Continue
     }
 

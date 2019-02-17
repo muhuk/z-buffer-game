@@ -1,9 +1,11 @@
+use crate::data::{Location, SceneData};
 use crate::stage::game::Game;
 use crate::ui::constants::{
     BOTTOM_PANEL_HEIGHT, MAP_MIN_SIZE, SIDE_PANEL_WIDTH,
 };
 use crate::ui::render::Render;
 use std::fmt;
+use std::rc::{Rc, Weak};
 use tcod::console::{blit, BackgroundFlag, Console, Offscreen, TextAlignment};
 
 pub struct GameRenderer {
@@ -73,16 +75,17 @@ impl Render for GameRenderer {
             }
         }
 
-        let (x, y) = stage.player_coordinates();
+        let Location { x, y } =
+            stage.scene_data().upgrade().unwrap().cursor_location.get();
+
         map.set_alignment(TextAlignment::Center);
-        {
-            let (mid_x, mid_y) = (map.width() / 2, map.height() / 2);
-            let s: String = format!(" Player location {}:{} ", x, y);
-            let e: String = " ".repeat(s.len());
-            map.print_rect(mid_x, mid_y - 1, map.width(), 1, &e);
-            map.print_rect(mid_x, mid_y, map.width(), 1, s);
-            map.print_rect(mid_x, mid_y + 1, map.width(), 1, &e);
-        }
+        let (mid_x, mid_y) = (map.width() / 2, map.height() / 2);
+        let s: String = format!(" Player location {}:{} ", x, y);
+        let e: String = " ".repeat(s.len());
+        map.print_rect(mid_x, mid_y - 1, map.width(), 1, &e);
+        map.print_rect(mid_x, mid_y, map.width(), 1, s);
+        map.print_rect(mid_x, mid_y + 1, map.width(), 1, &e);
+
         self.blit();
     }
 }
