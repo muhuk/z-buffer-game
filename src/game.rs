@@ -27,10 +27,6 @@ impl Game {
         }
     }
 
-    pub fn dt(&self) -> u32 {
-        self.dt
-    }
-
     /// Application main loop, blocks until UI terminates.
     pub fn main_loop(&mut self) {
         while self.ui.is_running() {
@@ -42,10 +38,6 @@ impl Game {
             }
             self.ui.draw(&self.stage);
         }
-    }
-
-    pub fn time(&self) -> u64 {
-        self.time
     }
 
     fn update_time(&mut self) {
