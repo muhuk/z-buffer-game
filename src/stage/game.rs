@@ -3,43 +3,52 @@
 //! [Game] is the entry point.
 
 use crate::data::{Direction, SceneData};
+use crate::stage::game::game_event::GameEvent;
+use crate::stage::game::input::InputSystem;
 use crate::stage::game::{cursor::Cursor, rendering::RenderingSystem};
-use log::debug;
 use specs::prelude::*;
 use std::fmt::{Debug, Error, Formatter};
 use std::rc::{Rc, Weak};
+use std::sync::mpsc::{self, Sender};
 
 mod cursor;
+mod game_event;
+mod input;
 mod rendering;
 
 pub struct Game {
     dispatcher: Dispatcher<'static, 'static>,
+    event_sink: Sender<GameEvent>,
     scene_data: Rc<SceneData>,
     world: World,
 }
 
 impl Game {
     pub fn new() -> Game {
+        let scene_data = Rc::new(SceneData::default());
+        let (event_sink, event_source) = mpsc::channel::<GameEvent>();
+
         let mut world = World::new();
         world.add_resource(Cursor::default());
-        let scene_data = Rc::new(SceneData::default());
-        //world.add_resource(scene_data.clone());
         // TODO: Register components
         let mut dispatcher = DispatcherBuilder::new()
+            .with(InputSystem::new(event_source), "input_system", &[])
             .with_thread_local(RenderingSystem::new(scene_data.clone()))
             .build();
         dispatcher.setup(&mut world.res);
 
         Game {
             dispatcher,
+            event_sink,
             scene_data,
             world,
         }
     }
 
-    // TODO: Remove this.
-    pub fn player_move(&mut self, direction: Direction) {
-        debug!("Player move towards {:?}", direction);
+    // TODO: Consider inlining this function
+    pub fn player_move(&self, direction: Direction) {
+        // TODO: Handle send result
+        self.event_sink.send(GameEvent::Move(direction)).unwrap();
     }
 
     pub fn scene_data(&self) -> Weak<SceneData> {
@@ -47,7 +56,7 @@ impl Game {
     }
 
     pub fn update_world(&mut self, _dt_millis: u32) {
-        self.dispatcher.dispatch(&mut self.world.res);
+        self.dispatcher.dispatch(&self.world.res);
     }
 }
 

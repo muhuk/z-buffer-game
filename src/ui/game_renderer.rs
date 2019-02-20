@@ -5,7 +5,6 @@ use crate::ui::constants::{
 };
 use crate::ui::render::Render;
 use std::fmt;
-use std::rc::{Rc, Weak};
 use tcod::console::{blit, BackgroundFlag, Console, Offscreen, TextAlignment};
 
 pub struct GameRenderer {
