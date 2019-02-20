@@ -15,7 +15,7 @@ impl Location {
         Location::new(0, 0)
     }
 
-    pub fn move_towards(&self, direction: Direction) -> Location {
+    pub fn move_towards(self, direction: Direction) -> Location {
         let (dx, dy): (i32, i32) = direction.to_vector();
         Location {
             x: self.x + dx,

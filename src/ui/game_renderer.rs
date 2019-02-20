@@ -1,4 +1,4 @@
-use crate::data::{Location, SceneData};
+use crate::data::Location;
 use crate::stage::game::Game;
 use crate::ui::constants::{
     BOTTOM_PANEL_HEIGHT, MAP_MIN_SIZE, SIDE_PANEL_WIDTH,
