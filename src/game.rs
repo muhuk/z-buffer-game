@@ -31,6 +31,7 @@ impl Game {
         self.dt
     }
 
+    /// Application main loop, blocks until UI terminates.
     pub fn main_loop(&mut self) {
         while self.ui.is_running() {
             self.update_time();
