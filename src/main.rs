@@ -11,6 +11,7 @@ use tcod::system::get_elapsed_time;
 pub mod asset;
 pub mod conf;
 pub mod data;
+pub mod game;
 pub mod input;
 pub mod menu;
 pub mod stage;

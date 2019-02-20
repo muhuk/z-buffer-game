@@ -1,5 +1,5 @@
 use crate::data::SceneData;
-use crate::stage::game::cursor::Cursor;
+use crate::game::Cursor;
 use specs::prelude::*;
 use std::rc::Rc;
 

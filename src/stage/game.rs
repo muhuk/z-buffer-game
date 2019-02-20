@@ -3,18 +3,11 @@
 //! [Game] is the entry point.
 
 use crate::data::{Direction, SceneData};
-use crate::stage::game::game_event::GameEvent;
-use crate::stage::game::input::InputSystem;
-use crate::stage::game::{cursor::Cursor, rendering::RenderingSystem};
+use crate::game::{Cursor, GameEvent, InputSystem, RenderingSystem};
 use specs::prelude::*;
 use std::fmt::{Debug, Error, Formatter};
 use std::rc::{Rc, Weak};
 use std::sync::mpsc::{self, Sender};
-
-mod cursor;
-mod game_event;
-mod input;
-mod rendering;
 
 pub struct Game {
     dispatcher: Dispatcher<'static, 'static>,

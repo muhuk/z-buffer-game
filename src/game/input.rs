@@ -1,5 +1,4 @@
-use crate::stage::game::game_event::GameEvent;
-use crate::stage::game::Cursor;
+use crate::game::{Cursor, GameEvent};
 use log::debug;
 use specs::prelude::*;
 use std::sync::mpsc::Receiver;
