@@ -9,8 +9,8 @@ use tcod::system::get_elapsed_time;
 
 #[derive(Default)]
 pub struct Game {
-    pub stage: Stage,
-    pub ui: UI,
+    stage: Stage,
+    ui: UI,
     dt: u32,
     input: Input,
     time: u64,
