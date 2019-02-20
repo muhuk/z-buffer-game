@@ -24,6 +24,7 @@ fn main() {
     init_logger();
     info!("Starting z-buffer-game.");
     Application::new().main_loop();
+    info!("Bye!");
 }
 
 /// Application data that brings together display, input & game state.
@@ -49,7 +50,7 @@ impl Application {
 
     /// Application main loop, blocks until UI terminates.
     fn main_loop(&mut self) {
-        while self.ui.is_running() {
+        while self.ui.is_running() && self.stage.is_running() {
             self.update_time();
             let events = self.input.events();
             match self.stage.tick(self.dt, events) {

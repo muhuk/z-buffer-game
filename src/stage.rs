@@ -5,7 +5,6 @@ use crate::input::{Event, EventIterator, KeyCode};
 use crate::stage::game::Game;
 use crate::stage::main_menu::MainMenu;
 use log::info;
-use std::process::exit;
 
 pub mod game;
 pub mod main_menu;
@@ -36,6 +35,13 @@ impl Stage {
                 Stage::tick_main_menu(menu, dt_millis, events)
             }
             Stage::Game(game) => Stage::tick_game(game, dt_millis, events),
+        }
+    }
+
+    pub fn is_running(&self) -> bool {
+        match self {
+            Stage::MainMenu(menu) => !menu.should_exit,
+            Stage::Game(_game) => true,
         }
     }
 
@@ -70,7 +76,6 @@ impl Stage {
         _dt_millis: u32,
         events: EventIterator,
     ) -> StageTransition {
-        const EXIT_CODE_OK: i32 = 0;
         match menu.handle_events(events) {
             Some(main_menu::Choice::NewGame) => {
                 info!("Starting new game.");
@@ -78,8 +83,8 @@ impl Stage {
             }
             Some(main_menu::Choice::Credits) => unimplemented!(),
             Some(main_menu::Choice::Exit) => {
-                info!("Bye!");
-                exit(EXIT_CODE_OK);
+                menu.should_exit = true;
+                StageTransition::Continue
             }
             None => StageTransition::Continue,
         }

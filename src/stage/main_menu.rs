@@ -46,12 +46,14 @@ impl Display for Choice {
 #[derive(Debug)]
 pub struct MainMenu {
     pub selected: Choice,
+    pub should_exit: bool,
 }
 
 impl MainMenu {
     pub fn new() -> MainMenu {
         MainMenu {
             selected: Choice::NewGame,
+            should_exit: false,
         }
     }
 
