@@ -5,11 +5,13 @@ use std::rc::Rc;
 
 pub struct RenderingSystem {
     scene_data: Rc<SceneData>,
+    // TODO: Remove i
+    i: u32,
 }
 
 impl RenderingSystem {
     pub fn new(scene_data: Rc<SceneData>) -> RenderingSystem {
-        RenderingSystem { scene_data }
+        RenderingSystem { scene_data, i: 0 }
     }
 }
 
@@ -19,15 +21,8 @@ impl<'a> System<'a> for RenderingSystem {
     fn run(&mut self, sys_data: Self::SystemData) {
         let cursor = sys_data;
         self.scene_data.update(cursor.location);
-        *self.scene_data.messages.borrow_mut() = vec![
-            String::from("Message 1"),
-            String::from("Message 2"),
-            String::from("Message 3"),
-            String::from("Message 4"),
-            String::from("Message 5"),
-            String::from("Message 6"),
-            String::from("Message 7"),
-            String::from("Message 8"),
-        ];
+        // TODO: Remove the message below.
+        self.scene_data.add_message(format!("message #{}", self.i));
+        self.i += 1;
     }
 }

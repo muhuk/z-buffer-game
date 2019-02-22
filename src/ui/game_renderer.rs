@@ -128,9 +128,7 @@ impl Render for GameRenderer {
             let scene_data: Rc<SceneData> =
                 stage.scene_data().upgrade().unwrap();
 
-            for (idx, msg) in
-                scene_data.messages.borrow().iter().enumerate().take(5)
-            {
+            for (idx, msg) in scene_data.messages(5).into_iter().enumerate() {
                 bottom_panel.print_rect(0, idx as i32, w, 1, msg);
             }
         }
