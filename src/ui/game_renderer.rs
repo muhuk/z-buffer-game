@@ -1,10 +1,12 @@
 use crate::data::Location;
+use crate::data::SceneData;
 use crate::stage::game::Game;
 use crate::ui::constants::{
     BOTTOM_PANEL_HEIGHT, MAP_MIN_SIZE, SIDE_PANEL_WIDTH,
 };
 use crate::ui::render::Render;
 use std::fmt;
+use std::rc::Rc;
 use tcod::console::{blit, BackgroundFlag, Console, Offscreen, TextAlignment};
 
 pub struct GameRenderer {
@@ -95,7 +97,7 @@ impl Render for GameRenderer {
             }
 
             let Location { x, y } =
-                stage.scene_data().upgrade().unwrap().cursor_location.get();
+                stage.scene_data().upgrade().unwrap().cursor_location();
 
             map.set_alignment(TextAlignment::Center);
             let (mid_x, mid_y) = (map.width() / 2, map.height() / 2);
@@ -123,8 +125,6 @@ impl Render for GameRenderer {
                 }
             }
 
-            use crate::data::SceneData;
-            use std::rc::Rc;
             let scene_data: Rc<SceneData> =
                 stage.scene_data().upgrade().unwrap();
 

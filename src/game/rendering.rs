@@ -18,7 +18,7 @@ impl<'a> System<'a> for RenderingSystem {
 
     fn run(&mut self, sys_data: Self::SystemData) {
         let cursor = sys_data;
-        self.scene_data.cursor_location.set(cursor.location);
+        self.scene_data.update(cursor.location);
         *self.scene_data.messages.borrow_mut() = vec![
             String::from("Message 1"),
             String::from("Message 2"),
