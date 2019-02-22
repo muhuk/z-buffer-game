@@ -8,6 +8,7 @@ use std::fmt;
 use tcod::console::{blit, BackgroundFlag, Console, Offscreen, TextAlignment};
 
 pub struct GameRenderer {
+    bottom_panel: Offscreen,
     root: Offscreen,
     map: Offscreen,
 }
@@ -18,7 +19,13 @@ impl GameRenderer {
         let (map_w, map_h) =
             Self::calculate_map_viewport_size((width, height)).unwrap();
         let map = Offscreen::new(map_w as i32, map_h as i32);
-        GameRenderer { root, map }
+        let bottom_panel =
+            Offscreen::new(width as i32, (height - map_h) as i32);
+        GameRenderer {
+            bottom_panel,
+            root,
+            map,
+        }
     }
 
     pub(self) fn calculate_map_viewport_size(
@@ -36,9 +43,28 @@ impl GameRenderer {
     }
 
     fn blit(&mut self) {
-        let w = self.map.width();
-        let h = self.map.height();
-        blit(&self.map, (0, 0), (w, h), &mut self.root, (0, 0), 1.0, 1.0);
+        let w = self.root.width();
+        let h = self.root.height();
+        let mw = self.map.width();
+        let mh = self.map.height();
+        blit(
+            &self.map,
+            (0, 0),
+            (mw, mh),
+            &mut self.root,
+            (0, 0),
+            1.0,
+            1.0,
+        );
+        blit(
+            &self.bottom_panel,
+            (0, 0),
+            (w, h - mh),
+            &mut self.root,
+            (0, mh),
+            1.0,
+            1.0,
+        );
     }
 }
 
@@ -56,34 +82,58 @@ impl Render for GameRenderer {
     }
 
     fn update(&mut self, stage: &Game) {
-        // TODO: Remove notes below after implementation.
-        //
-        // 1. [Done] Figure out the camera location.  It comes from the stage.
-        // 2. Based on map size, figure out the viewport in world coordinates.
-        // 3. Query the map in stage for tile types.
-        // 4. Convert tiles to glyphs and render them on map.
+        {
+            let mut map = &self.map;
+            let w = map.width();
+            let h = map.height();
 
-        let mut map = &self.map;
-        let w = map.width();
-        let h = map.height();
-
-        // Fill the map with some glyph.
-        for y in 0..h {
-            for x in 0..w {
-                map.put_char(x, y, '\u{f7}', BackgroundFlag::None);
+            // Fill the map with some glyph.
+            for y in 0..h {
+                for x in 0..w {
+                    map.put_char(x, y, '\u{f7}', BackgroundFlag::None);
+                }
             }
+
+            let Location { x, y } =
+                stage.scene_data().upgrade().unwrap().cursor_location.get();
+
+            map.set_alignment(TextAlignment::Center);
+            let (mid_x, mid_y) = (map.width() / 2, map.height() / 2);
+            let s: String = format!(" Player location {}:{} ", x, y);
+            let e: String = " ".repeat(s.len());
+            map.print_rect(mid_x, mid_y - 1, w, 1, &e);
+            map.print_rect(mid_x, mid_y, w, 1, s);
+            map.print_rect(mid_x, mid_y + 1, w, 1, &e);
         }
 
-        let Location { x, y } =
-            stage.scene_data().upgrade().unwrap().cursor_location.get();
+        {
+            let mut bottom_panel = &self.bottom_panel;
+            let w = bottom_panel.width();
+            let h = bottom_panel.height();
 
-        map.set_alignment(TextAlignment::Center);
-        let (mid_x, mid_y) = (map.width() / 2, map.height() / 2);
-        let s: String = format!(" Player location {}:{} ", x, y);
-        let e: String = " ".repeat(s.len());
-        map.print_rect(mid_x, mid_y - 1, map.width(), 1, &e);
-        map.print_rect(mid_x, mid_y, map.width(), 1, s);
-        map.print_rect(mid_x, mid_y + 1, map.width(), 1, &e);
+            // Fill the map with some glyph.
+            for y in 0..h {
+                for x in 0..w {
+                    bottom_panel.put_char(
+                        x,
+                        y,
+                        '\u{b0}',
+                        BackgroundFlag::None,
+                    );
+                }
+            }
+
+            use crate::data::SceneData;
+            use std::rc::Rc;
+            let scene_data: Rc<SceneData> =
+                stage.scene_data().upgrade().unwrap();
+
+            for (idx, msg) in
+                scene_data.messages.borrow().iter().enumerate().take(5)
+            {
+                bottom_panel.print_rect(0, idx as i32, w, 1, msg);
+            }
+        }
 
         self.blit();
     }
