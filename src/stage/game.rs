@@ -3,7 +3,9 @@
 //! [Game] is the entry point.
 
 use crate::data::{Direction, SceneData};
-use crate::game::{Cursor, GameEvent, InputSystem, RenderingSystem};
+use crate::game::{
+    Cursor, GameEvent, InputSystem, Message, Messages, RenderingSystem,
+};
 use specs::prelude::*;
 use std::fmt::{Debug, Error, Formatter};
 use std::rc::{Rc, Weak};
@@ -23,12 +25,16 @@ impl Game {
 
         let mut world = World::new();
         world.add_resource(Cursor::default());
+        world.add_resource(Messages::default());
         // TODO: Register components
         let mut dispatcher = DispatcherBuilder::new()
             .with(InputSystem::new(event_source), "input_system", &[])
             .with_thread_local(RenderingSystem::new(scene_data.clone()))
             .build();
         dispatcher.setup(&mut world.res);
+        world
+            .write_resource::<Messages>()
+            .push(Message::new(String::from("Game world initialized")));
 
         Game {
             dispatcher,
