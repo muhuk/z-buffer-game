@@ -22,17 +22,21 @@ impl SceneData {
         self.cursor_location.get()
     }
 
-    pub fn messages(&self, n: usize) -> impl IntoIterator<Item = String> {
+    pub fn messages<F>(&self, n: usize, f: F)
+    where
+        F: FnMut((usize, &String)),
+    {
         assert!(n > 0);
         {
+            // We are not able to use VecDeque::truncate as it drops elements
+            // from the back.
             let mut msgs: RefMut<VecDeque<String>> =
                 self.messages.borrow_mut();
             while msgs.len() > n {
                 assert!(msgs.pop_front().is_some());
             }
         }
-        // TODO: Try to void cloning both the Vec and the elements here.
-        self.messages.borrow().iter().cloned().collect::<Vec<_>>()
+        self.messages.borrow().iter().enumerate().for_each(f);
     }
 
     /// Since [`SceneData`] has interior mutability, calling update does not
