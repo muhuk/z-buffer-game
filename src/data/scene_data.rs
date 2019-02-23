@@ -1,5 +1,6 @@
 use crate::data::Location;
-use std::cell::{Cell, RefCell, RefMut};
+use crate::game::LogEntry;
+use std::cell::{Cell, RefCell};
 use std::collections::VecDeque;
 
 /// Data structure used to pass UI data from rendering system to the UI.
@@ -10,38 +11,40 @@ use std::collections::VecDeque;
 #[derive(Debug, Default)]
 pub struct SceneData {
     cursor_location: Cell<Location>,
-    messages: RefCell<VecDeque<String>>,
+    game_log: RefCell<VecDeque<LogEntry>>,
 }
 
 impl SceneData {
-    pub fn add_message(&self, message: String) {
-        self.messages.borrow_mut().push_back(message);
-    }
-
     pub fn cursor_location(&self) -> Location {
         self.cursor_location.get()
     }
 
+    // TODO: fix the name
     pub fn messages<F>(&self, n: usize, f: F)
     where
-        F: FnMut((usize, &String)),
+        F: FnMut((usize, &LogEntry)),
     {
         assert!(n > 0);
         {
             // We are not able to use VecDeque::truncate as it drops elements
             // from the back.
-            let mut msgs: RefMut<VecDeque<String>> =
-                self.messages.borrow_mut();
+            let mut msgs = self.game_log.borrow_mut();
             while msgs.len() > n {
                 assert!(msgs.pop_front().is_some());
             }
         }
-        self.messages.borrow().iter().enumerate().for_each(f);
+        self.game_log.borrow().iter().enumerate().for_each(f);
     }
 
     /// Since [`SceneData`] has interior mutability, calling update does not
     /// require a mutable reference to the instance.
-    pub fn update(&self, cursor_location: Location) {
+    pub fn update(
+        &self,
+        cursor_location: Location,
+        new_entries: Vec<LogEntry>,
+    ) {
         self.cursor_location.set(cursor_location);
+        let mut game_log = self.game_log.borrow_mut();
+        game_log.extend(new_entries);
     }
 }

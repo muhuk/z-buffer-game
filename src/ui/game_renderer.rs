@@ -129,7 +129,7 @@ impl Render for GameRenderer {
                 stage.scene_data().upgrade().unwrap();
 
             scene_data.messages(5, |(idx, msg)| {
-                bottom_panel.print_rect(0, idx as i32, w, 1, msg);
+                bottom_panel.print_rect(0, idx as i32, w, 1, msg.contents());
             });
         }
 
