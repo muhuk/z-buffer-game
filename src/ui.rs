@@ -7,7 +7,6 @@ use crate::ui::game_renderer::GameRenderer;
 use crate::ui::main_menu_renderer::MainMenuRenderer;
 use crate::ui::render::Render;
 use log::debug;
-use std::mem::{discriminant, Discriminant};
 use tcod::console::{self, Console};
 use tcod::system::get_fps;
 
@@ -20,12 +19,13 @@ mod render;
 pub struct UI {
     fps: u32,
     root_console: console::Root,
-    renderer: Option<(Discriminant<Stage>, Renderer)>,
+    renderer: Option<Renderer>,
 }
 
 impl UI {
     pub fn new() -> UI {
-        let font_file = asset::Assets::FontTerminal16x16GsRo.extract().unwrap();
+        let font_file =
+            asset::Assets::FontTerminal16x16GsRo.extract().unwrap();
 
         let root = console::Root::initializer()
             .title(conf::window_title())
@@ -56,15 +56,20 @@ impl UI {
         // TODO: This part is still too messy but it works somewhat.
         let root: &mut console::Root = &mut self.root_console;
         match (&stage, &mut self.renderer) {
-            (Stage::Game(g), Some((_, Renderer::Game(ref mut renderer)))) => {
+            (Stage::Game(g), Some(Renderer::Game(ref mut renderer))) => {
                 renderer.update(g);
                 Self::blit(root, renderer);
             }
-            (Stage::MainMenu(m), Some((_, Renderer::MainMenu(ref mut renderer)))) => {
+            (
+                Stage::MainMenu(m),
+                Some(Renderer::MainMenu(ref mut renderer)),
+            ) => {
                 renderer.update(m);
                 Self::blit(root, renderer);
             }
-            (s, Some(p)) => panic!("Mismatched renderer {:?} for stage {:?}", p, s),
+            (s, Some(p)) => {
+                panic!("Mismatched renderer {:?} for stage {:?}", p, s)
+            }
             (_, None) => unreachable!(),
         };
     }
@@ -75,9 +80,11 @@ impl UI {
 
     #[inline]
     fn is_stage_changed(&self, stage: &Stage) -> bool {
-        self.renderer
-            .as_ref()
-            .map_or(true, |(d, _)| *d != discriminant(stage))
+        match (stage, &self.renderer) {
+            (Stage::MainMenu(_), Some(Renderer::MainMenu(_))) => false,
+            (Stage::Game(_), Some(Renderer::Game(_))) => false,
+            _ => true,
+        }
     }
 
     fn reset_renderer(&mut self, stage: &Stage) {
@@ -86,10 +93,12 @@ impl UI {
         debug!("Window dimensions are {}x{}", width, height);
         let renderer = match stage {
             Stage::Game(_) => Renderer::Game(GameRenderer::new(width, height)),
-            Stage::MainMenu(_) => Renderer::MainMenu(MainMenuRenderer::new(width, height)),
+            Stage::MainMenu(_) => {
+                Renderer::MainMenu(MainMenuRenderer::new(width, height))
+            }
         };
         debug!("Updating renderer as {:?}.", &renderer);
-        self.renderer = Some((discriminant(stage), renderer));
+        self.renderer = Some(renderer);
     }
 
     fn blit<T: Render>(root: &mut console::Root, renderer: &mut T) {
