@@ -49,29 +49,37 @@ impl UI {
     pub fn draw(&mut self, stage: &Stage) {
         self.fps = get_fps() as u32;
 
+        // Create a new renderer if necessary.
+        // Use the existing one if the stage is not changed.
         if self.is_stage_changed(stage) {
             self.reset_renderer(stage);
         }
 
-        // TODO: This part is still too messy but it works somewhat.
-        let root: &mut console::Root = &mut self.root_console;
+        // Update the renderer.
         match (&stage, &mut self.renderer) {
-            (Stage::Game(g), Some(Renderer::Game(ref mut renderer))) => {
+            (Stage::Game(g), Some(Renderer::Game(renderer))) => {
                 renderer.update(g);
-                Self::blit(root, renderer);
             }
-            (
-                Stage::MainMenu(m),
-                Some(Renderer::MainMenu(ref mut renderer)),
-            ) => {
+            (Stage::MainMenu(m), Some(Renderer::MainMenu(renderer))) => {
                 renderer.update(m);
-                Self::blit(root, renderer);
             }
             (s, Some(p)) => {
                 panic!("Mismatched renderer {:?} for stage {:?}", p, s)
             }
             (_, None) => unreachable!(),
         };
+
+        // Blit whatever is in the renderer's root onto the root console.
+        {
+            let root: &mut console::Root = &mut self.root_console;
+            match &mut self.renderer {
+                Some(Renderer::Game(renderer)) => Self::blit(root, renderer),
+                Some(Renderer::MainMenu(renderer)) => {
+                    Self::blit(root, renderer)
+                }
+                None => unreachable!(),
+            }
+        }
     }
 
     pub fn is_running(&self) -> bool {
@@ -101,6 +109,7 @@ impl UI {
         self.renderer = Some(renderer);
     }
 
+    #[inline]
     fn blit<T: Render>(root: &mut console::Root, renderer: &mut T) {
         let source = renderer.borrow_root();
         console::blit(

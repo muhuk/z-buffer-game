@@ -99,3 +99,5 @@ pub enum StageTransition {
     Continue,
     SwitchTo(Stage),
 }
+
+pub trait StageData {}

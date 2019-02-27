@@ -6,6 +6,7 @@ use crate::data::{Direction, SceneData};
 use crate::game::{
     Cursor, GameEvent, GameLog, InputSystem, LogEntry, RenderingSystem,
 };
+use crate::stage::StageData;
 use specs::prelude::*;
 use std::fmt::{Debug, Error, Formatter};
 use std::rc::{Rc, Weak};
@@ -64,3 +65,5 @@ impl Debug for Game {
         write!(f, "Game")
     }
 }
+
+impl StageData for Game {}

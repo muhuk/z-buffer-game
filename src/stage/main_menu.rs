@@ -4,6 +4,7 @@
 
 use crate::input::{Event, EventIterator, KeyCode};
 use crate::menu::Menu;
+use crate::stage::StageData;
 use std::fmt::{Display, Formatter, Result};
 use std::slice::Iter;
 
@@ -121,3 +122,5 @@ impl<'a> Menu<'a> for MainMenu {
         self.selected
     }
 }
+
+impl StageData for MainMenu {}

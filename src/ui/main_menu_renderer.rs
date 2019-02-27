@@ -61,7 +61,7 @@ impl fmt::Debug for MainMenuRenderer {
 }
 
 impl Render for MainMenuRenderer {
-    type SceneType = MainMenu;
+    type StageType = MainMenu;
 
     fn borrow_root(&self) -> &Offscreen {
         &self.root

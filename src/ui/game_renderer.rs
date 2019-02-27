@@ -77,7 +77,7 @@ impl fmt::Debug for GameRenderer {
 }
 
 impl Render for GameRenderer {
-    type SceneType = Game;
+    type StageType = Game;
 
     fn borrow_root(&self) -> &Offscreen {
         &self.root
