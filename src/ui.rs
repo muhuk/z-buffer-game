@@ -3,8 +3,6 @@
 use crate::asset;
 use crate::conf;
 use crate::stage::Stage;
-use crate::ui::game_renderer::GameRenderer;
-use crate::ui::main_menu_renderer::MainMenuRenderer;
 use crate::ui::render::Render;
 use crate::ui::renderer::Renderer;
 use log::debug;
@@ -93,12 +91,7 @@ impl UI {
         let width: u32 = self.root_console.width() as u32;
         let height: u32 = self.root_console.height() as u32;
         debug!("Window dimensions are {}x{}", width, height);
-        let renderer = match stage {
-            Stage::Game(_) => Renderer::Game(GameRenderer::new(width, height)),
-            Stage::MainMenu(_) => {
-                Renderer::MainMenu(MainMenuRenderer::new(width, height))
-            }
-        };
+        let renderer = Renderer::new(stage, width, height);
         debug!("Updating renderer as {:?}.", &renderer);
         self.renderer = Some(renderer);
     }

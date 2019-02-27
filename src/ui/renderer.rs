@@ -13,6 +13,15 @@ pub enum Renderer {
 }
 
 impl Renderer {
+    pub fn new(stage: &Stage, width: u32, height: u32) -> Self {
+        match stage {
+            Stage::Game(_) => Renderer::Game(GameRenderer::new(width, height)),
+            Stage::MainMenu(_) => {
+                Renderer::MainMenu(MainMenuRenderer::new(width, height))
+            }
+        }
+    }
+
     pub fn update(&mut self, stage: &Stage) {
         match (&stage, self) {
             (Stage::Game(g), Renderer::Game(renderer)) => {
