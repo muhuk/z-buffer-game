@@ -6,6 +6,7 @@ use crate::stage::Stage;
 use crate::ui::game_renderer::GameRenderer;
 use crate::ui::main_menu_renderer::MainMenuRenderer;
 use crate::ui::render::Render;
+use crate::ui::renderer::Renderer;
 use log::debug;
 use tcod::console::{self, Console};
 use tcod::system::get_fps;
@@ -14,6 +15,7 @@ mod constants;
 mod game_renderer;
 mod main_menu_renderer;
 mod render;
+mod renderer;
 
 /// User interface related data
 pub struct UI {
@@ -56,18 +58,10 @@ impl UI {
         }
 
         // Update the renderer.
-        match (&stage, &mut self.renderer) {
-            (Stage::Game(g), Some(Renderer::Game(renderer))) => {
-                renderer.update(g);
-            }
-            (Stage::MainMenu(m), Some(Renderer::MainMenu(renderer))) => {
-                renderer.update(m);
-            }
-            (s, Some(p)) => {
-                panic!("Mismatched renderer {:?} for stage {:?}", p, s)
-            }
-            (_, None) => unreachable!(),
-        };
+        match &mut self.renderer {
+            Some(r) => r.update(stage),
+            None => unreachable!(),
+        }
 
         // Blit whatever is in the renderer's root onto the root console.
         {
@@ -129,13 +123,4 @@ impl Default for UI {
     fn default() -> Self {
         Self::new()
     }
-}
-
-/// Since [Stage](crate::stage::Stage) is an `enum` and dependency is from
-/// [ui](crate::ui) to [stage](crate::stage) we have Renderer as an enum to
-/// match its structure.
-#[derive(Debug)]
-enum Renderer {
-    Game(GameRenderer),
-    MainMenu(MainMenuRenderer),
 }
