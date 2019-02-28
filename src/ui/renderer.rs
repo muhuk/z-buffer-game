@@ -2,6 +2,7 @@ use crate::stage::Stage;
 use crate::ui::game_renderer::GameRenderer;
 use crate::ui::main_menu_renderer::MainMenuRenderer;
 use crate::ui::render::Render;
+use tcod::console::Offscreen;
 
 /// Since [Stage](crate::stage::Stage) is an `enum` and dependency is from
 /// [ui](crate::ui) to [stage](crate::stage) we have Renderer as an enum to
@@ -19,6 +20,13 @@ impl Renderer {
             Stage::MainMenu(_) => {
                 Renderer::MainMenu(MainMenuRenderer::new(width, height))
             }
+        }
+    }
+
+    pub fn borrow_root(&self) -> &Offscreen {
+        match self {
+            Renderer::Game(r) => r.borrow_root(),
+            Renderer::MainMenu(r) => r.borrow_root(),
         }
     }
 

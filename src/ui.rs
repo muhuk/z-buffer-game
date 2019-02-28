@@ -3,9 +3,9 @@
 use crate::asset;
 use crate::conf;
 use crate::stage::Stage;
-use crate::ui::render::Render;
 use crate::ui::renderer::Renderer;
 use log::debug;
+use tcod::console::Offscreen;
 use tcod::console::{self, Console};
 use tcod::system::get_fps;
 
@@ -49,8 +49,8 @@ impl UI {
     pub fn draw(&mut self, stage: &Stage) {
         self.fps = get_fps() as u32;
 
-        // Create a new renderer if necessary.
-        // Use the existing one if the stage is not changed.
+        // Create a new renderer if the existing one does not match the stage,
+        // or if none exists.
         if self
             .renderer
             .as_ref()
@@ -59,23 +59,17 @@ impl UI {
             self.reset_renderer(stage);
         }
 
-        // Update the renderer.
-        match &mut self.renderer {
-            Some(r) => r.update(stage),
-            None => unreachable!(),
-        }
+        let root: &mut console::Root = &mut self.root_console;
+        self.renderer
+            .as_mut()
+            .map(|r| {
+                // Update the renderer.
+                r.update(stage);
 
-        // Blit whatever is in the renderer's root onto the root console.
-        {
-            let root: &mut console::Root = &mut self.root_console;
-            match &mut self.renderer {
-                Some(Renderer::Game(renderer)) => Self::blit(root, renderer),
-                Some(Renderer::MainMenu(renderer)) => {
-                    Self::blit(root, renderer)
-                }
-                None => unreachable!(),
-            }
-        }
+                // Blit whatever is in the renderer's root onto the root console.
+                Self::blit(root, r.borrow_root());
+            })
+            .unwrap();
     }
 
     pub fn is_running(&self) -> bool {
@@ -92,8 +86,7 @@ impl UI {
     }
 
     #[inline]
-    fn blit<T: Render>(root: &mut console::Root, renderer: &mut T) {
-        let source = renderer.borrow_root();
+    fn blit(root: &mut console::Root, source: &Offscreen) {
         console::blit(
             source,
             (0, 0),
