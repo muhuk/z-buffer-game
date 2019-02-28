@@ -2,7 +2,7 @@
 //!
 //! [Game] is the entry point.
 
-use crate::data::{Direction, SceneData};
+use crate::data::SceneData;
 use crate::game::{
     Cursor, GameEvent, GameLog, InputSystem, LogEntry, RenderingSystem,
 };
@@ -45,10 +45,9 @@ impl Game {
         }
     }
 
-    // TODO: Consider inlining this function
-    pub fn player_move(&self, direction: Direction) {
+    pub fn publish_event(&self, event: GameEvent) {
         // TODO: Handle send result
-        self.event_sink.send(GameEvent::Move(direction)).unwrap();
+        self.event_sink.send(event).unwrap();
     }
 
     pub fn scene_data(&self) -> Weak<SceneData> {

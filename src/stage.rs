@@ -1,6 +1,7 @@
 //! Game state
 
 use crate::data::Direction;
+use crate::game::GameEvent;
 use crate::input::{Event, EventIterator, KeyCode};
 use crate::stage::game::Game;
 use crate::stage::main_menu::MainMenu;
@@ -51,16 +52,16 @@ impl Stage {
         for e in events {
             match e {
                 Event::KeyPress(KeyCode::Up, ..) => {
-                    game.player_move(Direction::North)
+                    game.publish_event(GameEvent::Move(Direction::North))
                 }
                 Event::KeyPress(KeyCode::Right, ..) => {
-                    game.player_move(Direction::East)
+                    game.publish_event(GameEvent::Move(Direction::East))
                 }
                 Event::KeyPress(KeyCode::Down, ..) => {
-                    game.player_move(Direction::South)
+                    game.publish_event(GameEvent::Move(Direction::South))
                 }
                 Event::KeyPress(KeyCode::Left, ..) => {
-                    game.player_move(Direction::West)
+                    game.publish_event(GameEvent::Move(Direction::West))
                 }
                 _ => (),
             }
