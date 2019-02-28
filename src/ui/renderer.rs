@@ -33,4 +33,12 @@ impl Renderer {
             (s, p) => panic!("Mismatched renderer {:?} for stage {:?}", p, s),
         };
     }
+
+    pub fn is_stage_compatible(&self, stage: &Stage) -> bool {
+        match (stage, &self) {
+            (Stage::MainMenu(_), Renderer::MainMenu(_)) => true,
+            (Stage::Game(_), Renderer::Game(_)) => true,
+            _ => false,
+        }
+    }
 }

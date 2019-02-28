@@ -51,7 +51,11 @@ impl UI {
 
         // Create a new renderer if necessary.
         // Use the existing one if the stage is not changed.
-        if self.is_stage_changed(stage) {
+        if self
+            .renderer
+            .as_ref()
+            .map_or(true, |r| !r.is_stage_compatible(stage))
+        {
             self.reset_renderer(stage);
         }
 
@@ -76,15 +80,6 @@ impl UI {
 
     pub fn is_running(&self) -> bool {
         !self.root_console.window_closed()
-    }
-
-    #[inline]
-    fn is_stage_changed(&self, stage: &Stage) -> bool {
-        match (stage, &self.renderer) {
-            (Stage::MainMenu(_), Some(Renderer::MainMenu(_))) => false,
-            (Stage::Game(_), Some(Renderer::Game(_))) => false,
-            _ => true,
-        }
     }
 
     fn reset_renderer(&mut self, stage: &Stage) {
