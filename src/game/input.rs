@@ -1,4 +1,4 @@
-use crate::game::{Cursor, GameEvent};
+use crate::game::{Cursor, GameEvent, GameLog, LogEntry};
 use log::debug;
 use specs::prelude::*;
 use std::sync::mpsc::Receiver;
@@ -14,14 +14,23 @@ impl InputSystem {
 }
 
 impl<'a> System<'a> for InputSystem {
-    type SystemData = Write<'a, Cursor>;
+    type SystemData = (Write<'a, Cursor>, Read<'a, GameLog>);
 
-    fn run(&mut self, mut cursor: Self::SystemData) {
+    fn run(&mut self, system_data: Self::SystemData) {
+        let (mut cursor, game_log) = system_data;
         for e in self.event_source.try_iter() {
             debug!("Received game event {:?}", e);
             match e {
                 GameEvent::Move(direction) => {
-                    cursor.location = cursor.location.move_towards(direction)
+                    cursor.move_towards(direction);
+                    game_log.push(LogEntry::new(
+                        format!(
+                            "moved {:?}, new location is {:?}",
+                            direction,
+                            cursor.location()
+                        )
+                        .as_str(),
+                    ))
                 }
             }
         }

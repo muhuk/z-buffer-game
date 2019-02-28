@@ -18,6 +18,6 @@ impl<'a> System<'a> for RenderingSystem {
 
     fn run(&mut self, sys_data: Self::SystemData) {
         let (cursor, mut game_log) = sys_data;
-        self.scene_data.update(cursor.location, game_log.take());
+        self.scene_data.update(cursor.location(), game_log.take());
     }
 }

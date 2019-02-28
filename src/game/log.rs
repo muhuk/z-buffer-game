@@ -1,12 +1,18 @@
 use std::mem::replace;
 use std::sync::Mutex;
 
+/// Game logs that show up in the UI (bottom panel).
+///
+/// Counterintuitively you need a [Write](specs::Write) to **read** from the
+/// logs, and a [Read](specs::Read) to **write** to logs.  This means multiple
+/// systems can write to the logs simultaneously, but there can be one reader
+/// at a time.  Synchronization across the writers are done via a `Mutex`.
 #[derive(Clone, Debug)]
 pub struct LogEntry(String);
 
 impl LogEntry {
-    pub fn new(contents: String) -> LogEntry {
-        LogEntry(contents)
+    pub fn new(contents: &str) -> LogEntry {
+        LogEntry(contents.to_owned())
     }
 
     pub fn contents(&self) -> &String {

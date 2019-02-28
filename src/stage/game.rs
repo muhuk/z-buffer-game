@@ -35,7 +35,7 @@ impl Game {
         dispatcher.setup(&mut world.res);
         world
             .write_resource::<GameLog>()
-            .push(LogEntry::new(String::from("Game world initialized")));
+            .push(LogEntry::new("Game world initialized"));
 
         Game {
             dispatcher,
