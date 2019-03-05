@@ -11,8 +11,8 @@ use tcod::console::{blit, BackgroundFlag, Console, Offscreen, TextAlignment};
 
 pub struct GameRenderer {
     bottom_panel: Offscreen,
-    root: Offscreen,
     map: Offscreen,
+    root: Offscreen,
 }
 
 impl GameRenderer {
@@ -25,8 +25,8 @@ impl GameRenderer {
             Offscreen::new(width as i32, (height - map_h) as i32);
         GameRenderer {
             bottom_panel,
-            root,
             map,
+            root,
         }
     }
 
