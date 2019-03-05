@@ -13,6 +13,7 @@ pub struct GameRenderer {
     bottom_panel: Offscreen,
     map: Offscreen,
     root: Offscreen,
+    side_panel: Offscreen,
 }
 
 impl GameRenderer {
@@ -23,10 +24,12 @@ impl GameRenderer {
         let map = Offscreen::new(map_w as i32, map_h as i32);
         let bottom_panel =
             Offscreen::new(width as i32, (height - map_h) as i32);
+        let side_panel = Offscreen::new((width - map_w) as i32, map_h as i32);
         GameRenderer {
             bottom_panel,
             map,
             root,
+            side_panel,
         }
     }
 
@@ -64,6 +67,15 @@ impl GameRenderer {
             (w, h - mh),
             &mut self.root,
             (0, mh),
+            1.0,
+            1.0,
+        );
+        blit(
+            &self.side_panel,
+            (0, 0),
+            (w - mw, mh),
+            &mut self.root,
+            (mw, 0),
             1.0,
             1.0,
         );
@@ -131,6 +143,26 @@ impl Render for GameRenderer {
             scene_data.messages(5, |(idx, msg)| {
                 bottom_panel.print_rect(0, idx as i32, w, 1, msg.contents());
             });
+        }
+
+        {
+            let mut side_panel = &self.side_panel;
+            let w = side_panel.width();
+            let h = side_panel.height();
+
+            // Fill the map with some glyph.
+            for y in 0..h {
+                for x in 0..w {
+                    side_panel.put_char(x, y, '\u{e6}', BackgroundFlag::None);
+                }
+            }
+
+            let Location { x, y } =
+                stage.scene_data().upgrade().unwrap().cursor_location();
+
+            side_panel.set_alignment(TextAlignment::Center);
+            let s: String = format!("[{: >4}:{: >4}]", x, y);
+            side_panel.print_rect(w / 2, 0, w, 1, &s);
         }
 
         self.blit();
