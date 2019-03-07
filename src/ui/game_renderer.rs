@@ -140,7 +140,7 @@ impl Render for GameRenderer {
             let scene_data: Rc<SceneData> =
                 stage.scene_data().upgrade().unwrap();
 
-            scene_data.messages(5, |(idx, msg)| {
+            scene_data.for_each_game_log(5, |(idx, msg)| {
                 bottom_panel.print_rect(0, idx as i32, w, 1, msg.contents());
             });
         }

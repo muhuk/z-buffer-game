@@ -19,8 +19,7 @@ impl SceneData {
         self.cursor_location.get()
     }
 
-    // TODO: fix the name
-    pub fn messages<F>(&self, n: usize, f: F)
+    pub fn for_each_game_log<F>(&self, n: usize, f: F)
     where
         F: FnMut((usize, &LogEntry)),
     {
