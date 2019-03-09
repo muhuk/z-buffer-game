@@ -1,0 +1,9 @@
+# Default tile configuration.
+
+[[tiles]]
+name = "Grass"
+glyph_id = 0x0010
+
+[[tiles]]
+name = "Soil"
+glyph_id = 0x0011
