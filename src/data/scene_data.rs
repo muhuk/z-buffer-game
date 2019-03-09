@@ -1,4 +1,4 @@
-use crate::data::Location;
+use crate::data::{Location, VisibleObject};
 use crate::game::LogEntry;
 use std::cell::{Cell, RefCell};
 use std::collections::VecDeque;
@@ -33,6 +33,20 @@ impl SceneData {
             }
         }
         self.game_log.borrow().iter().enumerate().for_each(f);
+    }
+
+    pub fn for_each_map_tile<F>(&self, mut f: F)
+    where
+        F: FnMut(Location, &[VisibleObject]),
+    {
+        use rand::prelude::*;
+        let mut rng = thread_rng();
+        f(
+            Location::new(0, 0),
+            &[**&[VisibleObject::Soil, VisibleObject::Grass]
+                .choose(&mut rng)
+                .unwrap()],
+        );
     }
 
     /// Since [`SceneData`] has interior mutability, calling update does not

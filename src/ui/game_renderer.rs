@@ -1,5 +1,4 @@
-use crate::data::Location;
-use crate::data::SceneData;
+use crate::data::{Location, SceneData, VisibleObject};
 use crate::stage::game::Game;
 use crate::ui::constants::{
     BOTTOM_PANEL_HEIGHT, MAP_MIN_SIZE, SIDE_PANEL_WIDTH,
@@ -108,16 +107,17 @@ impl Render for GameRenderer {
                 }
             }
 
-            let Location { x, y } =
-                stage.scene_data().upgrade().unwrap().cursor_location();
+            // let Location { x, y } = stage.scene_data().upgrade().unwrap().cursor_location();
 
-            map.set_alignment(TextAlignment::Center);
-            let (mid_x, mid_y) = (map.width() / 2, map.height() / 2);
-            let s: String = format!(" Player location {}:{} ", x, y);
-            let e: String = " ".repeat(s.len());
-            map.print_rect(mid_x, mid_y - 1, w, 1, &e);
-            map.print_rect(mid_x, mid_y, w, 1, s);
-            map.print_rect(mid_x, mid_y + 1, w, 1, &e);
+            stage.scene_data().upgrade().unwrap().for_each_map_tile(
+                |Location { x, y }, obj| {
+                    let glyph = match obj[0] {
+                        VisibleObject::Soil => '\u{10}',
+                        VisibleObject::Grass => '\u{11}',
+                    };
+                    map.put_char(x, y, glyph, BackgroundFlag::None);
+                },
+            );
         }
 
         {
