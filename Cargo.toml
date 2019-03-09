@@ -8,6 +8,8 @@ edition = "2018"
 dirs = "1.0.4"
 log = "0.4.6"
 rand = "0.6.5"
+serde = { version = "1.0", features = ["derive"] }
 specs = "0.14.3"
 stderrlog = "0.4.1"
 tcod = "0.13"
+toml = "0.4"
