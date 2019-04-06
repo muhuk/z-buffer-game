@@ -1,9 +1,10 @@
-use crate::data::{Location, SceneData, VisibleObject};
+use crate::data::{Location, SceneData};
 use crate::stage::game::Game;
 use crate::ui::constants::{
     BOTTOM_PANEL_HEIGHT, MAP_MIN_SIZE, SIDE_PANEL_WIDTH,
 };
 use crate::ui::render::Render;
+use crate::ui::tiles::Tiles;
 use std::fmt;
 use std::rc::Rc;
 use tcod::console::{blit, BackgroundFlag, Console, Offscreen, TextAlignment};
@@ -13,6 +14,7 @@ pub struct GameRenderer {
     map: Offscreen,
     root: Offscreen,
     side_panel: Offscreen,
+    tiles: Tiles,
 }
 
 impl GameRenderer {
@@ -24,11 +26,13 @@ impl GameRenderer {
         let bottom_panel =
             Offscreen::new(width as i32, (height - map_h) as i32);
         let side_panel = Offscreen::new((width - map_w) as i32, map_h as i32);
+        let tiles = Tiles::read();
         GameRenderer {
             bottom_panel,
             map,
             root,
             side_panel,
+            tiles,
         }
     }
 
@@ -109,10 +113,7 @@ impl Render for GameRenderer {
 
             let scene_data = stage.scene_data().upgrade().unwrap();
             scene_data.for_each_map_tile(|Location { x, y }, obj| {
-                let glyph = match obj[0] {
-                    VisibleObject::Soil => '\u{10}',
-                    VisibleObject::Grass => '\u{11}',
-                };
+                let glyph: char = self.tiles.get(obj[0]).unwrap().glyph();
                 map.put_char(x, y, glyph, BackgroundFlag::None);
             });
         }

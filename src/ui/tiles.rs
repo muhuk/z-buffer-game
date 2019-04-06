@@ -1,30 +1,52 @@
 use crate::asset::Assets;
+use crate::data::VisibleObject;
 use serde::Deserialize;
+use std::char::decode_utf16;
 use std::collections::HashMap;
 use std::fs;
+use std::iter;
 use std::path::Path;
 use std::result::Result;
 use toml;
 
-#[derive(Clone, Debug, Deserialize, Eq, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct Tile {
-    name: String,
+    object_id: VisibleObject,
     glyph_id: u16,
+}
+
+impl Tile {
+    pub fn glyph(&self) -> char {
+        decode_utf16(iter::once(self.glyph_id))
+            .next()
+            .unwrap()
+            .unwrap()
+    }
 }
 
 #[derive(Debug)]
 pub struct Tiles {
-    tiles: HashMap<String, Tile>,
+    tiles: HashMap<VisibleObject, Tile>,
+}
+
+#[derive(Deserialize)]
+pub struct TileEntry {
+    name: String,
+    glyph_id: u16,
 }
 
 #[derive(Deserialize)]
 struct TilesConfig {
-    tiles: Vec<Tile>,
+    tiles: Vec<TileEntry>,
 }
 
 impl Tiles {
     pub fn read() -> Tiles {
         Self::from_path(&*Assets::TilesToml.extract().unwrap()).unwrap()
+    }
+
+    pub fn get(&self, key: VisibleObject) -> Option<Tile> {
+        self.tiles.get(&key).cloned()
     }
 
     pub(self) fn from_str(s: &str) -> Result<Tiles, String> {
@@ -34,7 +56,23 @@ impl Tiles {
             tiles: conf
                 .tiles
                 .iter()
-                .map(|tile| (tile.name.clone(), tile.clone()))
+                .map(|tile| {
+                    let object_id = VisibleObject::from_str(&tile.name)
+                        .expect(
+                            format!(
+                                "Unrecognized tile name \"{}\"",
+                                tile.name
+                            )
+                            .as_str(),
+                        );
+                    (
+                        object_id,
+                        Tile {
+                            object_id,
+                            glyph_id: tile.glyph_id,
+                        },
+                    )
+                })
                 .collect(),
         };
         Result::Ok(tiles)
@@ -55,7 +93,7 @@ mod tests {
     fn read_tiles_from_a_string() {
         let input = r#"
             [[tiles]]
-            name = "Test"
+            name = "Grass"
             glyph_id = 0x0001
         "#;
 
@@ -63,10 +101,10 @@ mod tests {
         assert_eq!(1, tiles.tiles.iter().count());
         assert_eq!(
             Some(&Tile {
-                name: String::from("Test"),
+                object_id: VisibleObject::Grass,
                 glyph_id: 0x0001
             }),
-            tiles.tiles.get("Test")
+            tiles.tiles.get(&VisibleObject::Grass)
         );
     }
 }

@@ -2,8 +2,8 @@
 
 [[tiles]]
 name = "Grass"
-glyph_id = 0x0010
+glyph_id = 0x00af
 
 [[tiles]]
 name = "Soil"
-glyph_id = 0x0011
+glyph_id = 0x002e
