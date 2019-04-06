@@ -7,13 +7,18 @@ use std::result::Result;
 use toml;
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq)]
-struct Tile {
+pub struct Tile {
     name: String,
     glyph_id: u16,
 }
 
-#[derive(Debug, Deserialize)]
-struct Tiles {
+#[derive(Debug)]
+pub struct Tiles {
+    tiles: HashMap<String, Tile>,
+}
+
+#[derive(Deserialize)]
+struct TilesConfig {
     tiles: Vec<Tile>,
 }
 
@@ -22,14 +27,17 @@ impl Tiles {
         Self::from_path(&*Assets::TilesToml.extract().unwrap()).unwrap()
     }
 
-    pub fn get(&self, name: &str) -> Option<&Tile> {
-        self.tiles.iter().find(|tile| tile.name == name)
-    }
-
     pub(self) fn from_str(s: &str) -> Result<Tiles, String> {
-        let conf: Tiles = toml::from_str::<Tiles>(s)
+        let conf: TilesConfig = toml::from_str::<TilesConfig>(s)
             .map_err(|e| format!("Failed to parse tiles: {:?}", e))?;
-        Result::Ok(conf)
+        let tiles = Tiles {
+            tiles: conf
+                .tiles
+                .iter()
+                .map(|tile| (tile.name.clone(), tile.clone()))
+                .collect(),
+        };
+        Result::Ok(tiles)
     }
 
     fn from_path(path: &Path) -> Result<Tiles, String> {
@@ -58,7 +66,7 @@ mod tests {
                 name: String::from("Test"),
                 glyph_id: 0x0001
             }),
-            tiles.get("Test")
+            tiles.tiles.get("Test")
         );
     }
 }
