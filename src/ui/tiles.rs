@@ -7,11 +7,12 @@ use std::fs;
 use std::iter;
 use std::path::Path;
 use std::result::Result;
+use std::str::FromStr;
 use toml;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct Tile {
-    object_id: TileId,
+    tile_id: TileId,
     glyph: char,
 }
 
@@ -54,15 +55,12 @@ impl Tiles {
                 .tiles
                 .iter()
                 .map(|tile| {
-                    let object_id = TileId::from_str(&tile.name).expect(
-                        format!("Unrecognized tile name \"{}\"", tile.name)
-                            .as_str(),
-                    );
+                    let tile_id = TileId::from_str(&tile.name).unwrap();
                     let glyph: char = decode_utf16(iter::once(tile.glyph_id))
                         .next()
                         .unwrap()
                         .unwrap();
-                    (object_id, Tile { object_id, glyph })
+                    (tile_id, Tile { tile_id, glyph })
                 })
                 .collect(),
         };
@@ -92,7 +90,7 @@ mod tests {
         assert_eq!(1, tiles.tiles.iter().count());
         assert_eq!(
             Some(&Tile {
-                object_id: TileId::Grass,
+                tile_id: TileId::Grass,
                 glyph: '\u{01}'
             }),
             tiles.tiles.get(&TileId::Grass)
