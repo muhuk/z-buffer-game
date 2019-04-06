@@ -5,7 +5,7 @@ use crate::ui::constants::{
     SIDE_PANEL_WIDTH,
 };
 use crate::ui::render::Render;
-use crate::ui::tiles::Tiles;
+use crate::ui::tile::Tile;
 use std::fmt;
 use std::rc::Rc;
 use tcod::console::{blit, BackgroundFlag, Console, Offscreen, TextAlignment};
@@ -15,7 +15,6 @@ pub struct GameRenderer {
     map: Offscreen,
     root: Offscreen,
     side_panel: Offscreen,
-    tiles: Tiles,
 }
 
 impl GameRenderer {
@@ -27,13 +26,11 @@ impl GameRenderer {
         let bottom_panel =
             Offscreen::new(width as i32, (height - map_h) as i32);
         let side_panel = Offscreen::new((width - map_w) as i32, map_h as i32);
-        let tiles = Tiles::read();
         GameRenderer {
             bottom_panel,
             map,
             root,
             side_panel,
-            tiles,
         }
     }
 
@@ -114,8 +111,7 @@ impl Render for GameRenderer {
 
             let scene_data = stage.scene_data().upgrade().unwrap();
             scene_data.for_each_map_tile(|Location { x, y }, obj| {
-                let glyph: char = self.tiles.get(obj[0]).unwrap().glyph();
-                map.put_char(x, y, glyph, BackgroundFlag::None);
+                Tile::from_visible_object(obj[0]).put(&mut map, x, y);
             });
         }
 

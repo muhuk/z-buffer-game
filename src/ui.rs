@@ -14,7 +14,7 @@ mod game_renderer;
 mod main_menu_renderer;
 mod render;
 mod renderer;
-mod tiles;
+mod tile;
 
 /// User interface related data
 pub struct UI {
