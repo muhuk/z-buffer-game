@@ -12,15 +12,12 @@ use toml;
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct Tile {
     object_id: VisibleObject,
-    glyph_id: u16,
+    glyph: char,
 }
 
 impl Tile {
     pub fn glyph(&self) -> char {
-        decode_utf16(iter::once(self.glyph_id))
-            .next()
-            .unwrap()
-            .unwrap()
+        self.glyph
     }
 }
 
@@ -65,13 +62,11 @@ impl Tiles {
                             )
                             .as_str(),
                         );
-                    (
-                        object_id,
-                        Tile {
-                            object_id,
-                            glyph_id: tile.glyph_id,
-                        },
-                    )
+                    let glyph: char = decode_utf16(iter::once(tile.glyph_id))
+                        .next()
+                        .unwrap()
+                        .unwrap();
+                    (object_id, Tile { object_id, glyph })
                 })
                 .collect(),
         };
@@ -102,7 +97,7 @@ mod tests {
         assert_eq!(
             Some(&Tile {
                 object_id: VisibleObject::Grass,
-                glyph_id: 0x0001
+                glyph: '\u{01}'
             }),
             tiles.tiles.get(&VisibleObject::Grass)
         );
