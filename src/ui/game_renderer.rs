@@ -107,17 +107,14 @@ impl Render for GameRenderer {
                 }
             }
 
-            // let Location { x, y } = stage.scene_data().upgrade().unwrap().cursor_location();
-
-            stage.scene_data().upgrade().unwrap().for_each_map_tile(
-                |Location { x, y }, obj| {
-                    let glyph = match obj[0] {
-                        VisibleObject::Soil => '\u{10}',
-                        VisibleObject::Grass => '\u{11}',
-                    };
-                    map.put_char(x, y, glyph, BackgroundFlag::None);
-                },
-            );
+            let scene_data = stage.scene_data().upgrade().unwrap();
+            scene_data.for_each_map_tile(|Location { x, y }, obj| {
+                let glyph = match obj[0] {
+                    VisibleObject::Soil => '\u{10}',
+                    VisibleObject::Grass => '\u{11}',
+                };
+                map.put_char(x, y, glyph, BackgroundFlag::None);
+            });
         }
 
         {
