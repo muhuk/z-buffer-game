@@ -1,14 +1,14 @@
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd)]
-pub enum VisibleObject {
+pub enum TileId {
     Grass,
     Soil,
 }
 
-impl VisibleObject {
+impl TileId {
     pub fn from_str(name: &str) -> Option<Self> {
         match name {
-            "Grass" => Some(VisibleObject::Grass),
-            "Soil" => Some(VisibleObject::Soil),
+            "Grass" => Some(TileId::Grass),
+            "Soil" => Some(TileId::Soil),
             _ => None,
         }
     }

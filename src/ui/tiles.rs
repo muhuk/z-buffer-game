@@ -1,5 +1,5 @@
 use crate::asset::Assets;
-use crate::data::VisibleObject;
+use crate::data::TileId;
 use serde::Deserialize;
 use std::char::decode_utf16;
 use std::collections::HashMap;
@@ -11,7 +11,7 @@ use toml;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct Tile {
-    object_id: VisibleObject,
+    object_id: TileId,
     glyph: char,
 }
 
@@ -23,7 +23,7 @@ impl Tile {
 
 #[derive(Debug)]
 pub struct Tiles {
-    tiles: HashMap<VisibleObject, Tile>,
+    tiles: HashMap<TileId, Tile>,
 }
 
 #[derive(Deserialize)]
@@ -42,7 +42,7 @@ impl Tiles {
         Self::from_path(&*Assets::TilesToml.extract().unwrap()).unwrap()
     }
 
-    pub fn get(&self, key: VisibleObject) -> Option<Tile> {
+    pub fn get(&self, key: TileId) -> Option<Tile> {
         self.tiles.get(&key).cloned()
     }
 
@@ -54,14 +54,10 @@ impl Tiles {
                 .tiles
                 .iter()
                 .map(|tile| {
-                    let object_id = VisibleObject::from_str(&tile.name)
-                        .expect(
-                            format!(
-                                "Unrecognized tile name \"{}\"",
-                                tile.name
-                            )
+                    let object_id = TileId::from_str(&tile.name).expect(
+                        format!("Unrecognized tile name \"{}\"", tile.name)
                             .as_str(),
-                        );
+                    );
                     let glyph: char = decode_utf16(iter::once(tile.glyph_id))
                         .next()
                         .unwrap()
@@ -96,10 +92,10 @@ mod tests {
         assert_eq!(1, tiles.tiles.iter().count());
         assert_eq!(
             Some(&Tile {
-                object_id: VisibleObject::Grass,
+                object_id: TileId::Grass,
                 glyph: '\u{01}'
             }),
-            tiles.tiles.get(&VisibleObject::Grass)
+            tiles.tiles.get(&TileId::Grass)
         );
     }
 }
