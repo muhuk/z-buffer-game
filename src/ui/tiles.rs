@@ -46,7 +46,7 @@ impl Tiles {
         self.tiles.get(&key).cloned()
     }
 
-    pub(self) fn from_str(s: &str) -> Result<Tiles, String> {
+    pub(self) fn parse_str(s: &str) -> Result<Tiles, String> {
         let conf: TilesConfig = toml::from_str::<TilesConfig>(s)
             .map_err(|e| format!("Failed to parse tiles: {:?}", e))?;
         let tiles = Tiles {
@@ -70,7 +70,7 @@ impl Tiles {
     }
 
     fn from_path(path: &Path) -> Result<Tiles, String> {
-        Self::from_str(&fs::read_to_string(path).map_err(|e| {
+        Self::parse_str(&fs::read_to_string(path).map_err(|e| {
             format!("Failed to read {}, {:?}", path.to_str().unwrap(), e)
         })?)
     }
@@ -88,7 +88,7 @@ mod tests {
             glyph_id = 0x0001
         "#;
 
-        let tiles: Tiles = Tiles::from_str(input).unwrap();
+        let tiles: Tiles = Tiles::parse_str(input).unwrap();
         assert_eq!(1, tiles.tiles.iter().count());
         assert_eq!(
             Some(&Tile {
