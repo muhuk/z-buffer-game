@@ -1,7 +1,8 @@
 use crate::data::{Location, SceneData};
 use crate::stage::game::Game;
 use crate::ui::constants::{
-    BOTTOM_PANEL_HEIGHT, MAP_MIN_SIZE, SIDE_PANEL_WIDTH,
+    BOTTOM_PANEL_BACKGROUND_GLYPH, BOTTOM_PANEL_HEIGHT, MAP_MIN_SIZE,
+    SIDE_PANEL_WIDTH,
 };
 use crate::ui::render::Render;
 use crate::ui::tiles::Tiles;
@@ -123,13 +124,12 @@ impl Render for GameRenderer {
             let w = bottom_panel.width();
             let h = bottom_panel.height();
 
-            // Fill the map with some glyph.
             for y in 0..h {
                 for x in 0..w {
                     bottom_panel.put_char(
                         x,
                         y,
-                        '\u{b0}',
+                        BOTTOM_PANEL_BACKGROUND_GLYPH,
                         BackgroundFlag::None,
                     );
                 }
