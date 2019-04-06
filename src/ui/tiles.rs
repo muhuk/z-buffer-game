@@ -18,25 +18,21 @@ struct Tiles {
 }
 
 impl Tiles {
-    pub fn read() -> HashMap<String, Tile> {
+    pub fn read() -> Tiles {
         Self::from_path(&*Assets::TilesToml.extract().unwrap()).unwrap()
     }
 
-    pub(self) fn from_str(s: &str) -> Result<HashMap<String, Tile>, String> {
-        let conf: Tiles = toml::from_str::<Tiles>(s)
-            .map_err(|e| format!("Failed to parse tiles: {:?}", e))?;
-
-        let mut result: HashMap<String, Tile> = HashMap::new();
-        conf.tiles
-            .iter()
-            .map(|t| (t.name.clone(), t))
-            .for_each(|(k, v)| {
-                result.insert(k, v.clone());
-            });
-        Result::Ok(result)
+    pub fn get(&self, name: &str) -> Option<&Tile> {
+        self.tiles.iter().find(|tile| tile.name == name)
     }
 
-    fn from_path(path: &Path) -> Result<HashMap<String, Tile>, String> {
+    pub(self) fn from_str(s: &str) -> Result<Tiles, String> {
+        let conf: Tiles = toml::from_str::<Tiles>(s)
+            .map_err(|e| format!("Failed to parse tiles: {:?}", e))?;
+        Result::Ok(conf)
+    }
+
+    fn from_path(path: &Path) -> Result<Tiles, String> {
         Self::from_str(&fs::read_to_string(path).map_err(|e| {
             format!("Failed to read {}, {:?}", path.to_str().unwrap(), e)
         })?)
@@ -55,19 +51,13 @@ mod tests {
             glyph_id = 0x0001
         "#;
 
-        let deserialized: HashMap<String, Tile> =
-            Tiles::from_str(input).unwrap();
+        let deserialized: Vec<Tile> = Tiles::from_str(input).unwrap().tiles;
         assert_eq!(
-            vec!["Test"],
-            deserialized.keys().collect::<Vec<&String>>()
-        );
-        let key = "Test";
-        assert_eq!(
-            Tile {
-                name: key.to_owned(),
-                glyph_id: 1u16
-            },
-            *deserialized.get(key).unwrap()
+            vec![Tile {
+                name: String::from("Test"),
+                glyph_id: 0x0001
+            }],
+            deserialized
         );
     }
 }
