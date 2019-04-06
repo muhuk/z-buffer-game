@@ -1,6 +1,6 @@
 use crate::data::VisibleObject;
 use tcod::colors::{self, Color};
-use tcod::console::{BackgroundFlag, Console, Offscreen};
+use tcod::console::{BackgroundFlag, Console};
 
 #[derive(Clone, Copy, Debug)]
 pub struct Tile {
@@ -17,13 +17,13 @@ impl Tile {
                 glyph: '\u{af}',
                 foreground: colors::DESATURATED_GREEN,
                 background: colors::DARKEST_GREEN,
-                background_flag: BackgroundFlag::None,
+                background_flag: BackgroundFlag::Set,
             },
             VisibleObject::Soil => Tile {
                 glyph: '\u{2e}',
-                foreground: colors::LIGHT_FLAME,
-                background: colors::SEPIA,
-                background_flag: BackgroundFlag::None,
+                foreground: colors::DARK_SEPIA,
+                background: colors::LIGHT_SEPIA,
+                background_flag: BackgroundFlag::Set,
             },
         }
     }
