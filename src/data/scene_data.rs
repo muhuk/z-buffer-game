@@ -1,4 +1,4 @@
-use crate::data::{Location, TileId};
+use crate::data::{Location, VisibleObject};
 use crate::game::LogEntry;
 use std::cell::{Cell, RefCell};
 use std::collections::VecDeque;
@@ -37,13 +37,15 @@ impl SceneData {
 
     pub fn for_each_map_tile<F>(&self, mut f: F)
     where
-        F: FnMut(Location, &[TileId]),
+        F: FnMut(Location, &[VisibleObject]),
     {
         use rand::prelude::*;
         let mut rng = thread_rng();
         f(
             Location::new(0, 0),
-            &[*[TileId::Soil, TileId::Grass].choose(&mut rng).unwrap()],
+            &[*[VisibleObject::Soil, VisibleObject::Grass]
+                .choose(&mut rng)
+                .unwrap()],
         );
     }
 
