@@ -51,13 +51,14 @@ mod tests {
             glyph_id = 0x0001
         "#;
 
-        let deserialized: Vec<Tile> = Tiles::from_str(input).unwrap().tiles;
+        let tiles: Tiles = Tiles::from_str(input).unwrap();
+        assert_eq!(1, tiles.tiles.iter().count());
         assert_eq!(
-            vec![Tile {
+            Some(&Tile {
                 name: String::from("Test"),
                 glyph_id: 0x0001
-            }],
-            deserialized
+            }),
+            tiles.get("Test")
         );
     }
 }
