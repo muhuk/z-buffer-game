@@ -16,7 +16,7 @@ pub struct Tile {
 }
 
 impl Tile {
-    pub fn glyph(&self) -> char {
+    pub fn glyph(self) -> char {
         self.glyph
     }
 }

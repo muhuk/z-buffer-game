@@ -43,7 +43,7 @@ impl SceneData {
         let mut rng = thread_rng();
         f(
             Location::new(0, 0),
-            &[**&[TileId::Soil, TileId::Grass].choose(&mut rng).unwrap()],
+            &[*[TileId::Soil, TileId::Grass].choose(&mut rng).unwrap()],
         );
     }
 
