@@ -1,4 +1,4 @@
-use super::direction::Direction;
+use crate::data::Direction;
 
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
 pub struct Location {
