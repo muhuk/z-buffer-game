@@ -1,6 +1,6 @@
 use crate::data::Direction;
 
-#[derive(Clone, Copy, Debug, Default, PartialEq)]
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
 pub struct Location {
     pub x: i32,
     pub y: i32,
