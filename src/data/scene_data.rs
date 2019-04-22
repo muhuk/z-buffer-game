@@ -1,12 +1,12 @@
-use crate::data::{Location, VisibleObject};
+use crate::data::{Location, Rectangle, VisibleObject};
 use crate::game::LogEntry;
 use std::cell::{Cell, RefCell};
 use std::collections::VecDeque;
 
 /// Data structure used to pass UI data from rendering system to the UI.
 ///
-/// The game world is not supposed to know UI details.  Details like sizing
-/// are passed into this struct as function parameters to allow doing
+/// The game world is not supposed to know UI details.  Details like window
+/// sizing are passed into this struct as function parameters to allow doing
 /// housekeeping.
 #[derive(Debug, Default)]
 pub struct SceneData {
@@ -35,18 +35,22 @@ impl SceneData {
         self.game_log.borrow().iter().enumerate().for_each(f);
     }
 
-    pub fn for_each_map_tile<F>(&self, mut f: F)
+    pub fn for_each_map_tile<F>(&self, mut f: F, boundaries: Rectangle)
     where
         F: FnMut(Location, &[VisibleObject]),
     {
-        use rand::prelude::*;
-        let mut rng = thread_rng();
-        f(
-            Location::new(0, 0),
-            &[*[VisibleObject::Soil, VisibleObject::Grass]
-                .choose(&mut rng)
-                .unwrap()],
-        );
+        for y in boundaries.min_y..boundaries.max_y {
+            for x in boundaries.min_x..boundaries.max_x {
+                f(
+                    Location::new(x, y),
+                    if x * y % 3 == 0 {
+                        &[VisibleObject::Soil]
+                    } else {
+                        &[VisibleObject::Grass]
+                    },
+                );
+            }
+        }
     }
 
     /// Since [`SceneData`] has interior mutability, calling update does not

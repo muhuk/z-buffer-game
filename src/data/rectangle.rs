@@ -10,7 +10,7 @@ pub struct Rectangle {
 }
 
 impl Rectangle {
-    fn new(a: Location, b: Location) -> Result<Rectangle, RectangleError> {
+    pub fn new(a: Location, b: Location) -> Result<Rectangle, RectangleError> {
         let r = Rectangle {
             min_x: min(a.x, b.x),
             min_y: min(a.y, b.y),

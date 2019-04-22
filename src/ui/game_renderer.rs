@@ -1,4 +1,4 @@
-use crate::data::{Location, SceneData};
+use crate::data::{Location, Rectangle, SceneData};
 use crate::stage::game::Game;
 use crate::ui::constants::{
     BOTTOM_PANEL_BACKGROUND_GLYPH, BOTTOM_PANEL_HEIGHT, MAP_MIN_SIZE,
@@ -110,9 +110,13 @@ impl Render for GameRenderer {
             }
 
             let scene_data = stage.scene_data().upgrade().unwrap();
-            scene_data.for_each_map_tile(|Location { x, y }, obj| {
-                Tile::from_visible_object(obj[0]).put(&mut map, x, y);
-            });
+            scene_data.for_each_map_tile(
+                |Location { x, y }, obj| {
+                    Tile::from_visible_object(obj[0]).put(&mut map, x, y);
+                },
+                Rectangle::new(Location::new(0, 0), Location::new(10, 10))
+                    .unwrap(),
+            );
         }
 
         {
