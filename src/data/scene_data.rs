@@ -39,17 +39,15 @@ impl SceneData {
     where
         F: FnMut(Location, &[VisibleObject]),
     {
-        for y in boundaries.min_y..boundaries.max_y {
-            for x in boundaries.min_x..boundaries.max_x {
-                f(
-                    Location::new(x, y),
-                    if x * y % 3 == 0 {
-                        &[VisibleObject::Soil]
-                    } else {
-                        &[VisibleObject::Grass]
-                    },
-                );
-            }
+        for loc in boundaries {
+            f(
+                loc,
+                if (loc.x * loc.y) % 3 == 0 {
+                    &[VisibleObject::Soil]
+                } else {
+                    &[VisibleObject::Grass]
+                },
+            );
         }
     }
 

@@ -114,8 +114,10 @@ impl Render for GameRenderer {
                 |Location { x, y }, obj| {
                     Tile::from_visible_object(obj[0]).put(&mut map, x, y);
                 },
-                Rectangle::new(Location::new(0, 0), Location::new(10, 10))
-                    .unwrap(),
+                Rectangle::new(
+                    Location::new(0, 0),
+                    Location::new(w - 1, h - 1),
+                ),
             );
         }
 
