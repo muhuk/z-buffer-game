@@ -20,8 +20,32 @@ impl Rectangle {
         }
     }
 
+    fn centered_around(
+        center: Location,
+        width: i32,
+        height: i32,
+    ) -> Rectangle {
+        let half_width = width / 2;
+        let width_correction = 1 - width % 2;
+        let half_height = height / 2;
+        let height_correction = 1 - height % 2;
+        Rectangle::new(
+            center.move_by(-half_width + width_correction, -half_height),
+            center.move_by(half_width, half_height - height_correction),
+        )
+    }
+
     fn area(self) -> i32 {
         self.width() * self.height()
+    }
+
+    fn center(self) -> Location {
+        let width_correction = self.width() % 2 - 1;
+        let height_correction = self.height() % 2;
+        Location::new(
+            self.min_x + self.width() / 2 + width_correction,
+            self.min_y + self.height() / 2,
+        )
     }
 
     fn height(self) -> i32 {
@@ -120,5 +144,61 @@ mod tests {
                 .into_iter()
                 .collect::<Vec<Location>>()
         );
+    }
+
+    #[test]
+    fn centering_around_with_odd_dimensions_place_the_center_in_the_middle() {
+        assert_eq!(
+            Rectangle::new(Location::new(-1, -1), Location::new(1, 1)),
+            Rectangle::centered_around(Location::origin(), 3, 3)
+        );
+        assert_eq!(
+            Location::origin(),
+            Rectangle::centered_around(Location::origin(), 11, 11).center()
+        );
+        assert_eq!(
+            Location::origin(),
+            Rectangle::centered_around(Location::origin(), 7, 4).center()
+        );
+        assert_eq!(
+            Location::origin(),
+            Rectangle::centered_around(Location::origin(), 4, 5).center()
+        );
+    }
+
+    #[test]
+    fn centering_around_with_even_dimensions_place_the_center_on_top_left_coordinate(
+    ) {
+        assert_eq!(
+            Rectangle::new(Location::new(-1, -2), Location::new(2, 1)),
+            Rectangle::centered_around(Location::origin(), 4, 4)
+        );
+        assert_eq!(
+            Location::origin(),
+            Rectangle::centered_around(Location::origin(), 4, 4).center()
+        );
+    }
+
+    #[test]
+    fn centering_around_produces_rectangle_with_given_dimensions() {
+        let origin_odd_odd =
+            Rectangle::centered_around(Location::origin(), 3, 5);
+        assert_eq!(3, origin_odd_odd.width());
+        assert_eq!(5, origin_odd_odd.height());
+
+        let origin_even_even =
+            Rectangle::centered_around(Location::origin(), 6, 8);
+        assert_eq!(6, origin_even_even.width());
+        assert_eq!(8, origin_even_even.height());
+
+        let other_odd_odd =
+            Rectangle::centered_around(Location::new(1, 1), 9, 7);
+        assert_eq!(9, other_odd_odd.width());
+        assert_eq!(7, other_odd_odd.height());
+
+        let other_even_even =
+            Rectangle::centered_around(Location::new(1, 1), 16, 2);
+        assert_eq!(16, other_even_even.width());
+        assert_eq!(2, other_even_even.height());
     }
 }

@@ -110,6 +110,7 @@ impl Render for GameRenderer {
             }
 
             let scene_data = stage.scene_data().upgrade().unwrap();
+            // TODO: Center around the cursor & translate (x, y) to screen space.
             scene_data.for_each_map_tile(
                 |Location { x, y }, obj| {
                     Tile::from_visible_object(obj[0]).put(&mut map, x, y);
