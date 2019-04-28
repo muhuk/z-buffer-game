@@ -11,16 +11,7 @@ pub struct Rectangle {
 }
 
 impl Rectangle {
-    pub fn new(a: Location, b: Location) -> Rectangle {
-        Rectangle {
-            min_x: min(a.x, b.x),
-            min_y: min(a.y, b.y),
-            max_x: max(a.x, b.x),
-            max_y: max(a.y, b.y),
-        }
-    }
-
-    fn centered_around(
+    pub fn centered_around(
         center: Location,
         width: i32,
         height: i32,
@@ -35,13 +26,21 @@ impl Rectangle {
         )
     }
 
+    pub fn new(a: Location, b: Location) -> Rectangle {
+        Rectangle {
+            min_x: min(a.x, b.x),
+            min_y: min(a.y, b.y),
+            max_x: max(a.x, b.x),
+            max_y: max(a.y, b.y),
+        }
+    }
+
     fn area(self) -> i32 {
         self.width() * self.height()
     }
 
     fn center(self) -> Location {
         let width_correction = self.width() % 2 - 1;
-        let height_correction = self.height() % 2;
         Location::new(
             self.min_x + self.width() / 2 + width_correction,
             self.min_y + self.height() / 2,
