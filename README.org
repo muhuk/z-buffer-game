@@ -1,3 +1,10 @@
+#+STARTUP: inlineimages
+
+* Screenshots
+** 28 April 2019
+
+[[./screenshots/20190428.gif]]
+
 * Development Setup
 1. Checkout [[https://github.com/muhuk/z-buffer-game/][git repository]].
 1. Install dev packages required for libtcod:
