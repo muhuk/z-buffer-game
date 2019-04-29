@@ -46,20 +46,20 @@ mod tests {
     #[test]
     fn move_towards_adds_direction_vector_to_current_location() {
         assert_eq!(
-            Location::new(-1, 0),
+            Location::new(0, -1),
             Location::origin().move_towards(Direction::North)
         );
         assert_eq!(
-            Location::new(3, 1),
-            Location::new(2, 1).move_towards(Direction::South)
+            Location::new(1, 3),
+            Location::new(1, 2).move_towards(Direction::South)
         );
         assert_eq!(
-            Location::new(5, 9),
-            Location::new(5, 10).move_towards(Direction::West)
+            Location::new(9, 5),
+            Location::new(10, 5).move_towards(Direction::West)
         );
         assert_eq!(
-            Location::new(-2, 1),
-            Location::new(-2, 0).move_towards(Direction::East)
+            Location::new(1, -2),
+            Location::new(0, -2).move_towards(Direction::East)
         );
     }
 }
