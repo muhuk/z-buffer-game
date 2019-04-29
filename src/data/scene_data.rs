@@ -1,4 +1,4 @@
-use crate::data::{Location, Rectangle, VisibleObject};
+use crate::data::{Location, Rectangle, Time, VisibleObject};
 use crate::game::LogEntry;
 use std::cell::{Cell, RefCell};
 use std::collections::VecDeque;
@@ -12,6 +12,7 @@ use std::collections::VecDeque;
 pub struct SceneData {
     cursor_location: Cell<Location>,
     game_log: RefCell<VecDeque<LogEntry>>,
+    time: Cell<Time>,
 }
 
 impl SceneData {
@@ -57,9 +58,10 @@ impl SceneData {
         &self,
         cursor_location: Location,
         new_entries: Vec<LogEntry>,
+        time: Time,
     ) {
         self.cursor_location.set(cursor_location);
-        let mut game_log = self.game_log.borrow_mut();
-        game_log.extend(new_entries);
+        self.game_log.borrow_mut().extend(new_entries);
+        self.time.set(time);
     }
 }

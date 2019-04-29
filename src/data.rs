@@ -1,3 +1,4 @@
+pub use self::time::Time;
 pub use direction::Direction;
 pub use location::Location;
 pub use object::VisibleObject;
@@ -9,3 +10,4 @@ mod location;
 mod object;
 mod rectangle;
 mod scene_data;
+mod time;

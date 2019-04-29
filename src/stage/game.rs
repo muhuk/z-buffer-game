@@ -2,7 +2,7 @@
 //!
 //! [Game] is the entry point.
 
-use crate::data::SceneData;
+use crate::data::{SceneData, Time};
 use crate::game::{
     Cursor, GameEvent, GameLog, InputSystem, LogEntry, RenderingSystem,
 };
@@ -27,6 +27,7 @@ impl Game {
         let mut world = World::new();
         world.add_resource(Cursor::default());
         world.add_resource(GameLog::default());
+        world.add_resource(Time::default());
         // TODO: Register components
         let mut dispatcher = DispatcherBuilder::new()
             .with(InputSystem::new(event_source), "input_system", &[])
@@ -54,7 +55,8 @@ impl Game {
         Rc::downgrade(&self.scene_data)
     }
 
-    pub fn update_world(&mut self, _dt_millis: u32) {
+    pub fn update_world(&mut self, dt_millis: u32) {
+        self.world.write_resource::<Time>().advance_dt(dt_millis);
         self.dispatcher.dispatch(&self.world.res);
     }
 }
