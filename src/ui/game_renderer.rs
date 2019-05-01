@@ -5,7 +5,7 @@ use crate::ui::constants::{
     SIDE_PANEL_WIDTH,
 };
 use crate::ui::render::Render;
-use crate::ui::tile::Tile;
+use crate::ui::tile::{self, Tile};
 use std::fmt;
 use std::rc::Rc;
 use tcod::console::{blit, BackgroundFlag, Console, Offscreen, TextAlignment};
@@ -110,24 +110,27 @@ impl Render for GameRenderer {
             }
 
             let scene_data = stage.scene_data().upgrade().unwrap();
+            let t: u64 = scene_data.t_millis();
             let boundaries =
                 Rectangle::centered_around(scene_data.cursor_location(), w, h);
             scene_data.for_each_map_tile(
                 |Location { x, y }, obj| {
-                    Tile::from_visible_object(obj[0]).put(
+                    tile::from_visible_object(obj[0]).put(
                         &mut map,
                         x - boundaries.min_x,
                         y - boundaries.min_y,
+                        t,
                     );
                 },
                 boundaries,
             );
             {
                 let Location { x: cx, y: cy } = scene_data.cursor_location();
-                Tile::CURSOR.put(
+                tile::CURSOR.put(
                     &mut map,
                     cx - boundaries.min_x,
                     cy - boundaries.min_y,
+                    t,
                 );
             }
         }

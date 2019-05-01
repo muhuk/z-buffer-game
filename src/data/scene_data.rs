@@ -52,6 +52,10 @@ impl SceneData {
         }
     }
 
+    pub fn t_millis(&self) -> u64 {
+        self.time.get().t_millis()
+    }
+
     /// Since [`SceneData`] has interior mutability, calling update does not
     /// require a mutable reference to the instance.
     pub fn update(
