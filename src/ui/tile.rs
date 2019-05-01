@@ -11,6 +11,13 @@ pub struct Tile {
 }
 
 impl Tile {
+    pub const CURSOR: Tile = Tile {
+        glyph: '\u{c5}', // Alternate '\u{ce}'
+        foreground: colors::LIGHTER_CYAN,
+        background: colors::SKY,
+        background_flag: BackgroundFlag::Multiply,
+    };
+
     pub fn from_visible_object(v: VisibleObject) -> Tile {
         match v {
             VisibleObject::Grass => Tile {

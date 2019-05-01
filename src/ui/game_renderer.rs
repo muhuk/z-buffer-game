@@ -122,6 +122,14 @@ impl Render for GameRenderer {
                 },
                 boundaries,
             );
+            {
+                let Location { x: cx, y: cy } = scene_data.cursor_location();
+                Tile::CURSOR.put(
+                    &mut map,
+                    cx - boundaries.min_x,
+                    cy - boundaries.min_y,
+                );
+            }
         }
 
         {
