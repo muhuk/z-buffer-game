@@ -2,15 +2,34 @@ use crate::data::VisibleObject;
 use tcod::colors::{self, Color};
 use tcod::console::{BackgroundFlag, Console};
 
-pub const CURSOR: StaticTile = StaticTile {
-    glyph: '\u{c5}', // Alternate '\u{ce}'
-    foreground: colors::LIGHTER_CYAN,
-    background: colors::SKY,
-    background_flag: BackgroundFlag::Multiply,
-};
+pub const CURSOR: Cursor = Cursor {};
 
 pub trait Tile {
     fn put<T: Console>(self, console: &mut T, x: i32, y: i32, t: u64);
+}
+
+pub struct Cursor {}
+
+impl Cursor {
+    const GLYPH: char = '\u{c5}'; // Alternate '\u{ce}'
+    const FOREGROUND: Color = colors::LIGHTER_CYAN;
+    const BACKGROUND: Color = colors::SKY;
+    const BACKGROUND_FLAG: BackgroundFlag = BackgroundFlag::Multiply;
+}
+
+impl Tile for Cursor {
+    fn put<T: Console>(self, console: &mut T, x: i32, y: i32, t: u64) {
+        if t % 500 < 250 {
+            console.set_char_foreground(x, y, Self::FOREGROUND);
+            console.set_char_background(
+                x,
+                y,
+                Self::BACKGROUND,
+                Self::BACKGROUND_FLAG,
+            );
+            console.set_char(x, y, Self::GLYPH);
+        }
+    }
 }
 
 #[derive(Clone, Copy, Debug)]
