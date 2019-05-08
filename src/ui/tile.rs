@@ -4,47 +4,27 @@ use tcod::console::{BackgroundFlag, Console};
 
 pub const CURSOR: AnimatedTile = AnimatedTile {
     frames: &[
-        (
-            250,
-            Some(StaticTile {
-                glyph: '\u{ce}',
-                foreground: colors::LIGHTER_CYAN,
-                background: colors::SKY,
-                background_flag: BackgroundFlag::Multiply,
-            }),
-        ),
+        (250, Some(CURSOR_1)),
         (250, None),
-        (
-            250,
-            Some(StaticTile {
-                glyph: '\u{ce}',
-                foreground: colors::LIGHTER_CYAN,
-                background: colors::SKY,
-                background_flag: BackgroundFlag::Multiply,
-            }),
-        ),
+        (250, Some(CURSOR_1)),
         (250, None),
-        (
-            250,
-            Some(StaticTile {
-                glyph: '\u{c5}',
-                foreground: colors::LIGHTER_CYAN,
-                background: colors::SKY,
-                background_flag: BackgroundFlag::Multiply,
-            }),
-        ),
+        (250, Some(CURSOR_2)),
         (250, None),
-        (
-            250,
-            Some(StaticTile {
-                glyph: '\u{c5}',
-                foreground: colors::LIGHTER_CYAN,
-                background: colors::SKY,
-                background_flag: BackgroundFlag::Multiply,
-            }),
-        ),
+        (250, Some(CURSOR_2)),
         (250, None),
     ],
+};
+const CURSOR_1: StaticTile = StaticTile {
+    glyph: '\u{c5}',
+    foreground: colors::LIGHTER_CYAN,
+    background: colors::SKY,
+    background_flag: BackgroundFlag::Multiply,
+};
+const CURSOR_2: StaticTile = StaticTile {
+    glyph: '\u{ce}',
+    foreground: colors::LIGHTER_CYAN,
+    background: colors::SKY,
+    background_flag: BackgroundFlag::Multiply,
 };
 
 pub trait Tile {
