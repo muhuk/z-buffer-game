@@ -2,32 +2,37 @@ use crate::data::VisibleObject;
 use tcod::colors::{self, Color};
 use tcod::console::{BackgroundFlag, Console};
 
-pub const CURSOR: Cursor = Cursor {};
+pub const CURSOR: BlinkingTile = BlinkingTile {
+    glyph: '\u{c5}', // Alternate '\u{ce}'
+    foreground: colors::LIGHTER_CYAN,
+    background: colors::SKY,
+    background_flag: BackgroundFlag::Multiply,
+    period_millis: 500,
+};
 
 pub trait Tile {
     fn put<T: Console>(self, console: &mut T, x: i32, y: i32, t: u64);
 }
 
-pub struct Cursor {}
-
-impl Cursor {
-    const GLYPH: char = '\u{c5}'; // Alternate '\u{ce}'
-    const FOREGROUND: Color = colors::LIGHTER_CYAN;
-    const BACKGROUND: Color = colors::SKY;
-    const BACKGROUND_FLAG: BackgroundFlag = BackgroundFlag::Multiply;
+pub struct BlinkingTile {
+    glyph: char,
+    foreground: Color,
+    background: Color,
+    background_flag: BackgroundFlag,
+    period_millis: u64,
 }
 
-impl Tile for Cursor {
+impl Tile for BlinkingTile {
     fn put<T: Console>(self, console: &mut T, x: i32, y: i32, t: u64) {
-        if t % 500 < 250 {
+        if t % self.period_millis < (self.period_millis / 2) {
             put(
                 console,
                 x,
                 y,
-                Self::GLYPH,
-                Self::FOREGROUND,
-                Self::BACKGROUND,
-                Self::BACKGROUND_FLAG,
+                self.glyph,
+                self.foreground,
+                self.background,
+                self.background_flag,
             );
         }
     }
