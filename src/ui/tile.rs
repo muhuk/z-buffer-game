@@ -2,38 +2,54 @@ use crate::data::VisibleObject;
 use tcod::colors::{self, Color};
 use tcod::console::{BackgroundFlag, Console};
 
-pub const CURSOR: BlinkingTile = BlinkingTile {
-    glyph: '\u{c5}', // Alternate '\u{ce}'
+pub const CURSOR: AnimatedTile = AnimatedTile {
+    glyphs: &[
+        (250, Some('\u{ce}')),
+        (250, None),
+        (250, Some('\u{ce}')),
+        (250, None),
+        (250, Some('\u{c5}')),
+        (250, None),
+        (250, Some('\u{c5}')),
+        (250, None),
+    ],
     foreground: colors::LIGHTER_CYAN,
     background: colors::SKY,
     background_flag: BackgroundFlag::Multiply,
-    period_millis: 500,
 };
 
 pub trait Tile {
     fn put<T: Console>(self, console: &mut T, x: i32, y: i32, t: u64);
 }
 
-pub struct BlinkingTile {
-    glyph: char,
+pub struct AnimatedTile {
+    glyphs: &'static [(u64, Option<char>)],
     foreground: Color,
     background: Color,
     background_flag: BackgroundFlag,
-    period_millis: u64,
 }
 
-impl Tile for BlinkingTile {
+impl Tile for AnimatedTile {
     fn put<T: Console>(self, console: &mut T, x: i32, y: i32, t: u64) {
-        if t % self.period_millis < (self.period_millis / 2) {
-            put(
-                console,
-                x,
-                y,
-                self.glyph,
-                self.foreground,
-                self.background,
-                self.background_flag,
-            );
+        let sum: u64 = self.glyphs.iter().map(|(p, _)| p).sum();
+        let mut k = t % sum;
+        for (p, maybe_glyph) in self.glyphs {
+            if k < *p {
+                maybe_glyph.iter().for_each(|glyph| {
+                    put(
+                        console,
+                        x,
+                        y,
+                        *glyph,
+                        self.foreground,
+                        self.background,
+                        self.background_flag,
+                    );
+                });
+                break;
+            } else {
+                k -= p
+            }
         }
     }
 }
