@@ -3,19 +3,48 @@ use tcod::colors::{self, Color};
 use tcod::console::{BackgroundFlag, Console};
 
 pub const CURSOR: AnimatedTile = AnimatedTile {
-    glyphs: &[
-        (250, Some('\u{ce}')),
+    frames: &[
+        (
+            250,
+            Some(StaticTile {
+                glyph: '\u{ce}',
+                foreground: colors::LIGHTER_CYAN,
+                background: colors::SKY,
+                background_flag: BackgroundFlag::Multiply,
+            }),
+        ),
         (250, None),
-        (250, Some('\u{ce}')),
+        (
+            250,
+            Some(StaticTile {
+                glyph: '\u{ce}',
+                foreground: colors::LIGHTER_CYAN,
+                background: colors::SKY,
+                background_flag: BackgroundFlag::Multiply,
+            }),
+        ),
         (250, None),
-        (250, Some('\u{c5}')),
+        (
+            250,
+            Some(StaticTile {
+                glyph: '\u{c5}',
+                foreground: colors::LIGHTER_CYAN,
+                background: colors::SKY,
+                background_flag: BackgroundFlag::Multiply,
+            }),
+        ),
         (250, None),
-        (250, Some('\u{c5}')),
+        (
+            250,
+            Some(StaticTile {
+                glyph: '\u{c5}',
+                foreground: colors::LIGHTER_CYAN,
+                background: colors::SKY,
+                background_flag: BackgroundFlag::Multiply,
+            }),
+        ),
         (250, None),
     ],
-    foreground: colors::LIGHTER_CYAN,
-    background: colors::SKY,
-    background_flag: BackgroundFlag::Multiply,
 };
 
 pub trait Tile {
@@ -23,28 +52,17 @@ pub trait Tile {
 }
 
 pub struct AnimatedTile {
-    glyphs: &'static [(u64, Option<char>)],
-    foreground: Color,
-    background: Color,
-    background_flag: BackgroundFlag,
+    frames: &'static [(u64, Option<StaticTile>)],
 }
 
 impl Tile for AnimatedTile {
     fn put<T: Console>(self, console: &mut T, x: i32, y: i32, t: u64) {
-        let sum: u64 = self.glyphs.iter().map(|(p, _)| p).sum();
+        let sum: u64 = self.frames.iter().map(|(p, _)| p).sum();
         let mut k = t % sum;
-        for (p, maybe_glyph) in self.glyphs {
+        for (p, maybe_tile) in self.frames {
             if k < *p {
-                maybe_glyph.iter().for_each(|glyph| {
-                    put(
-                        console,
-                        x,
-                        y,
-                        *glyph,
-                        self.foreground,
-                        self.background,
-                        self.background_flag,
-                    );
+                maybe_tile.iter().for_each(|tile| {
+                    tile.put(console, x, y, t);
                 });
                 break;
             } else {
