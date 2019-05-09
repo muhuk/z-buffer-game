@@ -16,6 +16,7 @@ impl Rectangle {
         width: i32,
         height: i32,
     ) -> Rectangle {
+        assert!(width > 0 && height > 0);
         let half_width = width / 2;
         let width_correction = 1 - width % 2;
         let half_height = height / 2;
@@ -33,6 +34,11 @@ impl Rectangle {
             max_x: max(a.x, b.x),
             max_y: max(a.y, b.y),
         }
+    }
+
+    pub fn contains(self, location: Location) -> bool {
+        (self.min_x <= location.x && location.x <= self.max_x)
+            && (self.min_y <= location.y && location.y <= self.max_y)
     }
 
     pub fn intersect(self, other: Rectangle) -> Option<Rectangle> {
@@ -161,6 +167,12 @@ mod tests {
     }
 
     #[test]
+    #[should_panic]
+    fn centered_around_requires_non_zero_dimensions() {
+        Rectangle::centered_around(Location::origin(), 0, 0);
+    }
+
+    #[test]
     fn centering_around_with_odd_dimensions_place_the_center_in_the_middle() {
         assert_eq!(
             Rectangle::new(Location::new(-1, -1), Location::new(1, 1)),
@@ -236,5 +248,16 @@ mod tests {
         let b = Rectangle::new(Location::new(5, 3), Location::new(15, 13));
         let c = Rectangle::new(Location::new(5, 3), Location::new(8, 5));
         assert_eq!(Some(c), a.intersect(b));
+    }
+
+    #[test]
+    fn contains_returns_true_if_the_location_is_inside_the_rectangle() {
+        let rect = Rectangle::centered_around(Location::origin(), 5, 5);
+        assert!(rect.contains(Location::origin()));
+        assert!(rect.contains(Location::new(2, 2)));
+        assert!(!rect.contains(Location::new(10, 10)));
+        assert!(!rect.contains(Location::new(10, -10)));
+        assert!(!rect.contains(Location::new(-10, 10)));
+        assert!(!rect.contains(Location::new(-10, -10)));
     }
 }
