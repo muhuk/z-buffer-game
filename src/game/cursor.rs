@@ -7,6 +7,13 @@ pub struct Cursor {
 }
 
 impl Cursor {
+    pub fn new(location: Location, boundaries: Option<Rectangle>) -> Cursor {
+        Cursor {
+            location,
+            boundaries,
+        }
+    }
+
     pub fn boundaries(&self) -> Option<Rectangle> {
         self.boundaries
     }
@@ -30,7 +37,6 @@ impl Cursor {
         }
     }
 
-    // TODO: Avoid going outside of the map boundaries.
     pub fn move_towards(&mut self, direction: Direction) {
         let new_location = self.location.move_towards(direction);
         if self

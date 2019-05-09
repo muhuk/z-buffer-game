@@ -2,9 +2,10 @@
 //!
 //! [Game] is the entry point.
 
-use crate::data::{SceneData, Time};
+use crate::data::{Location, SceneData, Time};
 use crate::game::{
-    Cursor, GameEvent, GameLog, InputSystem, LogEntry, RenderingSystem,
+    map_boundaries, Cursor, GameEvent, GameLog, InputSystem, LogEntry,
+    RenderingSystem,
 };
 use crate::stage::StageData;
 use specs::prelude::*;
@@ -25,7 +26,10 @@ impl Game {
         let (event_sink, event_source) = mpsc::channel::<GameEvent>();
 
         let mut world = World::new();
-        world.add_resource(Cursor::default());
+        world.add_resource(Cursor::new(
+            Location::origin(),
+            Some(map_boundaries()),
+        ));
         world.add_resource(GameLog::default());
         world.add_resource(Time::default());
         // TODO: Register components
