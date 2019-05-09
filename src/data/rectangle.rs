@@ -35,6 +35,21 @@ impl Rectangle {
         }
     }
 
+    pub fn intersect(self, other: Rectangle) -> Option<Rectangle> {
+        let min_x = max(self.min_x, other.min_x);
+        let min_y = max(self.min_y, other.min_y);
+        let max_x = min(self.max_x, other.max_x);
+        let max_y = min(self.max_y, other.max_y);
+        if min_x <= max_x && min_y <= max_y {
+            Some(Rectangle::new(
+                Location::new(min_x, min_y),
+                Location::new(max_x, max_y),
+            ))
+        } else {
+            None
+        }
+    }
+
     fn area(self) -> i32 {
         self.width() * self.height()
     }
@@ -49,21 +64,6 @@ impl Rectangle {
 
     fn height(self) -> i32 {
         self.max_y - self.min_y + 1
-    }
-
-    fn intersection(self, other: Rectangle) -> Option<Rectangle> {
-        let min_x = max(self.min_x, other.min_x);
-        let min_y = max(self.min_y, other.min_y);
-        let max_x = min(self.max_x, other.max_x);
-        let max_y = min(self.max_y, other.max_y);
-        if min_x <= max_x && min_y <= max_y {
-            Some(Rectangle::new(
-                Location::new(min_x, min_y),
-                Location::new(max_x, max_y),
-            ))
-        } else {
-            None
-        }
     }
 
     fn width(self) -> i32 {
@@ -220,14 +220,14 @@ mod tests {
     fn interrection_of_non_overlapping_rectangles_is_none() {
         let a = Rectangle::new(Location::new(-10, -10), Location::new(-5, -5));
         let b = Rectangle::new(Location::new(10, 10), Location::new(5, 5));
-        assert_eq!(None, a.intersection(b));
+        assert_eq!(None, a.intersect(b));
     }
 
     #[test]
     fn intersection_of_a_rectangle_that_contains_another_is_the_smaller_one() {
         let a = Rectangle::new(Location::new(-10, -10), Location::new(10, 10));
         let b = Rectangle::new(Location::new(-5, -5), Location::new(5, 5));
-        assert_eq!(Some(b), a.intersection(b));
+        assert_eq!(Some(b), a.intersect(b));
     }
 
     #[test]
@@ -235,6 +235,6 @@ mod tests {
         let a = Rectangle::new(Location::new(2, 1), Location::new(8, 5));
         let b = Rectangle::new(Location::new(5, 3), Location::new(15, 13));
         let c = Rectangle::new(Location::new(5, 3), Location::new(8, 5));
-        assert_eq!(Some(c), a.intersection(b));
+        assert_eq!(Some(c), a.intersect(b));
     }
 }

@@ -40,15 +40,23 @@ impl SceneData {
     where
         F: FnMut(Location, &[VisibleObject]),
     {
-        for loc in boundaries {
-            f(
-                loc,
-                if (loc.x * loc.y) % 3 == 0 {
-                    &[VisibleObject::Soil]
-                } else {
-                    &[VisibleObject::Grass]
-                },
-            );
+        let map_bounds =
+            Rectangle::centered_around(Location::new(0, 0), 64, 64);
+
+        match boundaries.intersect(map_bounds) {
+            Some(bounds) => {
+                for loc in bounds {
+                    f(
+                        loc,
+                        if (loc.x * loc.y) % 3 == 0 {
+                            &[VisibleObject::Soil]
+                        } else {
+                            &[VisibleObject::Grass]
+                        },
+                    );
+                }
+            }
+            None => {}
         }
     }
 
