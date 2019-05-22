@@ -36,6 +36,12 @@ impl SceneData {
         self.game_log.borrow().iter().enumerate().for_each(f);
     }
 
+    /// Call `f` once for each location in `boundaries`, pass in the
+    /// coordinates and an array of [`VisibleObject`]'s.
+    ///
+    /// The order of visible objects in the array is ascending z-order.  The
+    /// object at the bottom is the first element, the object on top of it is
+    /// the second and so on.
     pub fn for_each_map_tile<F>(&self, mut f: F, boundaries: Rectangle)
     where
         F: FnMut(Location, &[VisibleObject]),
