@@ -109,13 +109,15 @@ impl Render for GameRenderer {
             let boundaries =
                 Rectangle::centered_around(scene_data.cursor_location(), w, h);
             scene_data.for_each_map_tile(
-                |Location { x, y }, obj| {
-                    tile::from_visible_object(obj[0]).put(
-                        &mut map,
-                        x - boundaries.min_x,
-                        y - boundaries.min_y,
-                        t,
-                    );
+                |Location { x, y }, objects| {
+                    for obj in objects {
+                        tile::from_visible_object(*obj).put(
+                            &mut map,
+                            x - boundaries.min_x,
+                            y - boundaries.min_y,
+                            t,
+                        );
+                    }
                 },
                 boundaries,
             );
