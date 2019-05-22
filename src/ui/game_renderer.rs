@@ -102,12 +102,7 @@ impl Render for GameRenderer {
             let w = map.width();
             let h = map.height();
 
-            // Fill the map with some glyph.
-            for y in 0..h {
-                for x in 0..w {
-                    map.put_char(x, y, '\u{f7}', BackgroundFlag::None);
-                }
-            }
+            map.clear();
 
             let scene_data = stage.scene_data().upgrade().unwrap();
             let t: u64 = scene_data.t_millis();
