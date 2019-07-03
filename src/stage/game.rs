@@ -2,9 +2,10 @@
 //!
 //! [Game] is the entry point.
 
-use crate::data::{SceneData, Time};
+use crate::data::Time;
 use crate::game::{
     Cursor, GameEvent, GameLog, InputSystem, LogEntry, Map, RenderingSystem,
+    SceneData,
 };
 use crate::stage::StageData;
 use specs::prelude::*;

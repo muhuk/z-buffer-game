@@ -1,4 +1,5 @@
-use crate::data::{Location, Rectangle, SceneData};
+use crate::data::{Location, Rectangle};
+use crate::game::SceneData;
 use crate::stage::game::Game;
 use crate::ui::constants::{
     BOTTOM_PANEL_BACKGROUND_GLYPH, BOTTOM_PANEL_HEIGHT, MAP_MIN_SIZE,

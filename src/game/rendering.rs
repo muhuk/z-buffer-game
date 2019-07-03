@@ -1,5 +1,5 @@
-use crate::data::{SceneData, Time};
-use crate::game::{Cursor, GameLog, Map};
+use crate::data::Time;
+use crate::game::{Cursor, GameLog, Map, SceneData};
 use specs::prelude::*;
 use std::rc::Rc;
 
