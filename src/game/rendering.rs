@@ -1,5 +1,6 @@
 use crate::data::Time;
 use crate::game::{Cursor, GameLog, MapTile, Renderable, SceneData};
+use shred_derive::*;
 use specs::prelude::*;
 
 pub struct RenderingSystem {}
@@ -11,30 +12,29 @@ impl RenderingSystem {
 }
 
 impl<'a> System<'a> for RenderingSystem {
-    type SystemData = (
-        Read<'a, Cursor>,
-        Write<'a, GameLog>,
-        Write<'a, SceneData>,
-        Read<'a, Time>,
-        // FIXME: Filter components by renderable
-        ReadStorage<'a, MapTile>,
-        ReadStorage<'a, Renderable>,
-    );
+    type SystemData = RenderingSystemData<'a>;
 
-    fn run(&mut self, sys_data: Self::SystemData) {
-        // FIXME: Read map data from entities.
-        let (
-            cursor,
-            mut game_log,
-            mut scene_data,
-            time,
-            map_tiles,
-            renderables,
-        ) = sys_data;
-        for (tile, _) in (&map_tiles, &renderables).join() {
+    fn run(&mut self, mut sys_data: Self::SystemData) {
+        let mut scene_data = sys_data.scene_data;
+        // TODO: Add other renderable object to scene data.
+        for (tile, _) in (&sys_data.map_tiles, &sys_data.renderables).join() {
             scene_data
                 .set_objects_for_location(tile.location, vec![tile.object]);
         }
-        scene_data.update(cursor.location(), game_log.take(), time.clone());
+        scene_data.update(
+            sys_data.cursor.location(),
+            sys_data.game_log.take(),
+            sys_data.time.clone(),
+        );
     }
+}
+
+#[derive(SystemData)]
+pub struct RenderingSystemData<'a> {
+    cursor: Read<'a, Cursor>,
+    game_log: Write<'a, GameLog>,
+    scene_data: Write<'a, SceneData>,
+    time: Read<'a, Time>,
+    map_tiles: ReadStorage<'a, MapTile>,
+    renderables: ReadStorage<'a, Renderable>,
 }
