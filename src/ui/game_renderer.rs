@@ -1,5 +1,4 @@
 use crate::data::{Location, Rectangle};
-use crate::game::SceneData;
 use crate::stage::game::Game;
 use crate::ui::constants::{
     BOTTOM_PANEL_BACKGROUND_GLYPH, BOTTOM_PANEL_HEIGHT, MAP_MIN_SIZE,
@@ -8,7 +7,6 @@ use crate::ui::constants::{
 use crate::ui::render::Render;
 use crate::ui::tile::{self, Tile};
 use std::fmt;
-use std::rc::Rc;
 use tcod::console::{blit, BackgroundFlag, Console, Offscreen, TextAlignment};
 
 pub struct GameRenderer {

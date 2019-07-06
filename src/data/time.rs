@@ -7,7 +7,7 @@ pub struct Time {
 impl Time {
     pub fn advance_dt(&mut self, dt: u32) {
         self.dt_millis = dt;
-        self.t_millis += dt as u64;
+        self.t_millis += u64::from(dt);
     }
 
     pub fn dt_millis(self) -> u32 {
