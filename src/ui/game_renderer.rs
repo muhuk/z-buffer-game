@@ -98,14 +98,13 @@ impl Render for GameRenderer {
     }
 
     fn update(&mut self, stage: &Game) {
-        {
+        stage.with_scene_data(|scene_data| {
             let mut map = &self.map;
             let w = map.width();
             let h = map.height();
 
             map.clear();
 
-            let scene_data = stage.scene_data().upgrade().unwrap();
             let t: u64 = scene_data.t_millis();
             let boundaries =
                 Rectangle::centered_around(scene_data.cursor_location(), w, h);
@@ -131,9 +130,9 @@ impl Render for GameRenderer {
                     t,
                 );
             }
-        }
+        });
 
-        {
+        stage.with_scene_data(|scene_data| {
             let mut bottom_panel = &self.bottom_panel;
             let w = bottom_panel.width();
             let h = bottom_panel.height();
@@ -149,15 +148,12 @@ impl Render for GameRenderer {
                 }
             }
 
-            let scene_data: Rc<SceneData> =
-                stage.scene_data().upgrade().unwrap();
-
             scene_data.for_each_game_log(5, |(idx, msg)| {
                 bottom_panel.print_rect(0, idx as i32, w, 1, msg.contents());
             });
-        }
+        });
 
-        {
+        stage.with_scene_data(|scene_data| {
             let mut side_panel = &self.side_panel;
             let w = side_panel.width();
             let h = side_panel.height();
@@ -169,13 +165,12 @@ impl Render for GameRenderer {
                 }
             }
 
-            let Location { x, y } =
-                stage.scene_data().upgrade().unwrap().cursor_location();
+            let Location { x, y } = scene_data.cursor_location();
 
             side_panel.set_alignment(TextAlignment::Center);
             let s: String = format!("[{: >4}:{: >4}]", x, y);
             side_panel.print_rect(w / 2, 0, w, 1, &s);
-        }
+        });
 
         self.blit();
     }

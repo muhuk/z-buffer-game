@@ -1,29 +1,69 @@
-use crate::data::{Location, Rectangle};
+use crate::data::{Location, Rectangle, VisibleObject};
+use crate::game::{Cursor, MapTile, Renderable};
+use log::debug;
+use specs::prelude::*;
 
-const DEFAULT_MAP_WIDTH: i32 = 64;
-const DEFAULT_MAP_HEIGHT: i32 = 64;
+const MAP_WIDTH: i32 = 64;
+const MAP_HEIGHT: i32 = 64;
 
 #[derive(Debug)]
-pub struct Map {
-    width: i32,
-    height: i32,
+pub enum MapStatus {
+    Unitialized,
+    Initialized,
 }
 
-impl Map {
-    pub fn new(width: i32, height: i32) -> Self {
-        Self { width, height }
-    }
-
-    pub fn boundaries(&self) -> Rectangle {
-        Rectangle::centered_around(Location::origin(), self.width, self.height)
-    }
+pub struct MapSystem {
+    status: MapStatus,
 }
 
-impl Default for Map {
-    fn default() -> Self {
+impl MapSystem {
+    pub fn new() -> Self {
+        // Initialize the map.
         Self {
-            width: DEFAULT_MAP_WIDTH,
-            height: DEFAULT_MAP_HEIGHT,
+            status: MapStatus::Unitialized,
+        }
+    }
+}
+
+impl<'a> System<'a> for MapSystem {
+    type SystemData = (
+        Write<'a, Cursor>,
+        Entities<'a>,
+        WriteStorage<'a, MapTile>,
+        WriteStorage<'a, Renderable>,
+    );
+
+    fn run(&mut self, sys_data: Self::SystemData) {
+        let (mut cursor, entities, mut map_tiles, mut renderables) = sys_data;
+
+        match self.status {
+            MapStatus::Unitialized => {
+                debug!("Generating new map");
+                let boundaries = Rectangle::centered_around(
+                    Location::origin(),
+                    MAP_WIDTH,
+                    MAP_HEIGHT,
+                );
+                for loc in boundaries.into_iter() {
+                    let obj = if loc.x % 8 == 0 && loc.y % 8 == 0 {
+                        VisibleObject::Soil
+                    } else {
+                        VisibleObject::Grass
+                    };
+                    let entity = entities.create();
+                    assert!(map_tiles
+                        .insert(entity, MapTile::new(loc, obj))
+                        .unwrap()
+                        .is_none());
+                    assert!(renderables
+                        .insert(entity, Renderable {})
+                        .unwrap()
+                        .is_none());
+                }
+                cursor.set_boundaries(boundaries).unwrap();
+                self.status = MapStatus::Initialized
+            }
+            _ => (),
         }
     }
 }

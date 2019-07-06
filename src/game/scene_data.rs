@@ -1,7 +1,7 @@
 use crate::data::{Location, Rectangle, Time, VisibleObject};
 use crate::game::LogEntry;
-use std::cell::{Cell, RefCell};
-use std::collections::VecDeque;
+use std::collections::{BTreeMap, VecDeque};
+use std::sync::Mutex;
 
 /// Data structure used to pass UI data from rendering system to the UI.
 ///
@@ -10,14 +10,15 @@ use std::collections::VecDeque;
 /// housekeeping.
 #[derive(Debug, Default)]
 pub struct SceneData {
-    cursor_location: Cell<Location>,
-    game_log: RefCell<VecDeque<LogEntry>>,
-    time: Cell<Time>,
+    cursor_location: Location,
+    game_log: Mutex<VecDeque<LogEntry>>,
+    objects: BTreeMap<Location, Vec<VisibleObject>>,
+    time: Time,
 }
 
 impl SceneData {
     pub fn cursor_location(&self) -> Location {
-        self.cursor_location.get()
+        self.cursor_location
     }
 
     pub fn for_each_game_log<F>(&self, n: usize, f: F)
@@ -25,15 +26,15 @@ impl SceneData {
         F: FnMut((usize, &LogEntry)),
     {
         assert!(n > 0);
+        let mut game_log = self.game_log.lock().unwrap();
         {
             // We are not able to use VecDeque::truncate as it drops elements
             // from the back.
-            let mut msgs = self.game_log.borrow_mut();
-            while msgs.len() > n {
-                assert!(msgs.pop_front().is_some());
+            while game_log.len() > n {
+                assert!(game_log.pop_front().is_some());
             }
         }
-        self.game_log.borrow().iter().enumerate().for_each(f);
+        game_log.iter().enumerate().for_each(f);
     }
 
     /// Call `f` once for each location in `boundaries`, pass in the
@@ -46,40 +47,34 @@ impl SceneData {
     where
         F: FnMut(Location, &[VisibleObject]),
     {
-        let map_bounds =
-            Rectangle::centered_around(Location::new(0, 0), 64, 64);
-
-        match boundaries.intersect(map_bounds) {
-            Some(bounds) => {
-                for loc in bounds {
-                    f(
-                        loc,
-                        if (loc.x * loc.y) % 3 == 0 {
-                            &[VisibleObject::Soil]
-                        } else {
-                            &[VisibleObject::Grass]
-                        },
-                    );
-                }
-            }
-            None => {}
+        for loc in boundaries {
+            f(loc, self.objects.get(&loc).unwrap_or(&Vec::default()));
         }
     }
 
+    pub fn set_objects_for_location(
+        &mut self,
+        location: Location,
+        objects: Vec<VisibleObject>,
+    ) {
+        self.objects.insert(location, objects);
+    }
+
     pub fn t_millis(&self) -> u64 {
-        self.time.get().t_millis()
+        self.time.t_millis()
     }
 
     /// Since [`SceneData`] has interior mutability, calling update does not
     /// require a mutable reference to the instance.
     pub fn update(
-        &self,
+        &mut self,
         cursor_location: Location,
         new_entries: Vec<LogEntry>,
         time: Time,
     ) {
-        self.cursor_location.set(cursor_location);
-        self.game_log.borrow_mut().extend(new_entries);
-        self.time.set(time);
+        self.cursor_location = cursor_location;
+        let mut game_log = self.game_log.lock().unwrap();
+        game_log.extend(new_entries);
+        self.time = time;
     }
 }

@@ -4,36 +4,34 @@
 
 use crate::data::Time;
 use crate::game::{
-    Cursor, GameEvent, GameLog, InputSystem, LogEntry, Map, RenderingSystem,
-    SceneData,
+    Cursor, GameEvent, GameLog, InputSystem, LogEntry, MapSystem, MapTile,
+    RenderingSystem, SceneData,
 };
 use crate::stage::StageData;
 use specs::prelude::*;
 use std::fmt::{Debug, Error, Formatter};
-use std::rc::{Rc, Weak};
 use std::sync::mpsc::{self, Sender};
 
 pub struct Game {
     dispatcher: Dispatcher<'static, 'static>,
     event_sink: Sender<GameEvent>,
-    scene_data: Rc<SceneData>,
     world: World,
 }
 
 impl Game {
     pub fn new() -> Game {
-        let scene_data = Rc::new(SceneData::default());
         let (event_sink, event_source) = mpsc::channel::<GameEvent>();
 
         let mut world = World::new();
         world.add_resource(Cursor::default());
         world.add_resource(GameLog::default());
-        world.add_resource(Map::default());
+        world.add_resource(SceneData::default());
         world.add_resource(Time::default());
-        // TODO: Register components
+        world.register::<MapTile>();
         let mut dispatcher = DispatcherBuilder::new()
+            .with(MapSystem::new(), "map_system", &[])
             .with(InputSystem::new(event_source), "input_system", &[])
-            .with_thread_local(RenderingSystem::new(scene_data.clone()))
+            .with_thread_local(RenderingSystem::new())
             .build();
         dispatcher.setup(&mut world.res);
         world
@@ -43,7 +41,6 @@ impl Game {
         Game {
             dispatcher,
             event_sink,
-            scene_data,
             world,
         }
     }
@@ -53,8 +50,11 @@ impl Game {
         self.event_sink.send(event).unwrap();
     }
 
-    pub fn scene_data(&self) -> Weak<SceneData> {
-        Rc::downgrade(&self.scene_data)
+    pub fn with_scene_data<F>(&self, f: F)
+    where
+        F: FnOnce(&SceneData),
+    {
+        f(&self.world.read_resource())
     }
 
     pub fn update_world(&mut self, dt_millis: u32) {
