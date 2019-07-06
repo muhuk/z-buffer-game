@@ -1,10 +1,13 @@
-use crate::data::{Location, Rectangle, VisibleObject};
+use self::generator::generate_map;
+use crate::data::{Location, Rectangle};
 use crate::game::{Cursor, MapTile, Renderable};
 use log::debug;
 use specs::prelude::*;
 
-const MAP_WIDTH: i32 = 64;
-const MAP_HEIGHT: i32 = 64;
+mod generator;
+
+const MAP_WIDTH: u16 = 64;
+const MAP_HEIGHT: u16 = 64;
 
 #[derive(Debug, PartialEq)]
 pub enum MapStatus {
@@ -43,12 +46,7 @@ impl<'a> System<'a> for MapSystem {
                 MAP_WIDTH,
                 MAP_HEIGHT,
             );
-            for loc in boundaries.into_iter() {
-                let obj = if loc.x % 8 == 0 && loc.y % 8 == 0 {
-                    VisibleObject::Soil
-                } else {
-                    VisibleObject::Grass
-                };
+            generate_map(boundaries, |loc, obj| {
                 let entity = entities.create();
                 assert!(map_tiles
                     .insert(entity, MapTile::new(loc, obj))
@@ -58,7 +56,7 @@ impl<'a> System<'a> for MapSystem {
                     .insert(entity, Renderable {})
                     .unwrap()
                     .is_none());
-            }
+            });
             cursor.set_boundaries(boundaries).unwrap();
             self.status = MapStatus::Initialized
         }

@@ -1,5 +1,6 @@
 use crate::data::Location;
 use std::cmp::{max, min};
+use std::convert::TryFrom;
 use std::iter::{IntoIterator, Iterator};
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -13,14 +14,14 @@ pub struct Rectangle {
 impl Rectangle {
     pub fn centered_around(
         center: Location,
-        width: i32,
-        height: i32,
+        width: u16,
+        height: u16,
     ) -> Rectangle {
-        assert!(width > 0 && height > 0);
-        let half_width = width / 2;
-        let width_correction = 1 - width % 2;
-        let half_height = height / 2;
-        let height_correction = 1 - height % 2;
+        assert!(width != 0 && height != 0);
+        let half_width = i32::from(width / 2);
+        let width_correction = i32::from(1 - width % 2);
+        let half_height = i32::from(height / 2);
+        let height_correction = i32::from(1 - height % 2);
         Rectangle::new(
             center.move_by(-half_width + width_correction, -half_height),
             center.move_by(half_width, half_height - height_correction),
@@ -56,30 +57,32 @@ impl Rectangle {
         }
     }
 
-    fn area(self) -> i32 {
-        self.width() * self.height()
+    fn area(self) -> u32 {
+        u32::from(self.width()) * u32::from(self.height())
     }
 
     fn center(self) -> Location {
-        let width_correction = self.width() % 2 - 1;
+        let width_correction = i32::from(self.width()) % 2 - 1;
         Location::new(
-            self.min_x + self.width() / 2 + width_correction,
-            self.min_y + self.height() / 2,
+            self.min_x + i32::from(self.width()) / 2 + width_correction,
+            self.min_y + i32::from(self.height()) / 2,
         )
     }
 
-    fn height(self) -> i32 {
-        self.max_y - self.min_y + 1
+    fn height(self) -> u16 {
+        u16::try_from(self.max_y - self.min_y + 1)
+            .expect("Rectangle height does not fit into u16")
     }
 
-    fn width(self) -> i32 {
-        self.max_x - self.min_x + 1
+    fn width(self) -> u16 {
+        u16::try_from(self.max_x - self.min_x + 1)
+            .expect("Rectangle height does not fit into u16")
     }
 }
 
 pub struct RectangleIter {
     rect: Rectangle,
-    idx: i32,
+    idx: u32,
 }
 
 impl Iterator for RectangleIter {
@@ -89,8 +92,11 @@ impl Iterator for RectangleIter {
         if self.idx == self.rect.area() {
             None
         } else {
-            let x = self.rect.min_x + self.idx % self.rect.width();
-            let y = self.rect.min_y + self.idx / self.rect.width();
+            let width = i32::from(self.rect.width());
+            let idx = i32::try_from(self.idx)
+                .expect("Rectangle area does not fit into i32");
+            let x: i32 = self.rect.min_x + idx % width;
+            let y: i32 = self.rect.min_y + idx / width;
             self.idx += 1;
             Some(Location::new(x, y))
         }

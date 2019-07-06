@@ -6,6 +6,7 @@ use crate::ui::constants::{
 };
 use crate::ui::render::Render;
 use crate::ui::tile::{self, Tile};
+use std::convert::TryFrom;
 use std::fmt;
 use tcod::console::{blit, BackgroundFlag, Console, Offscreen, TextAlignment};
 
@@ -98,8 +99,10 @@ impl Render for GameRenderer {
     fn update(&mut self, stage: &Game) {
         stage.with_scene_data(|scene_data| {
             let mut map = &self.map;
-            let w = map.width();
-            let h = map.height();
+            let w = u16::try_from(map.width())
+                .expect("Map window does not fit into u16");
+            let h = u16::try_from(map.height())
+                .expect("Map window does not fit into u16");
 
             map.clear();
 
