@@ -42,6 +42,11 @@ impl Rectangle {
             && (self.min_y <= location.y && location.y <= self.max_y)
     }
 
+    pub fn height(self) -> u16 {
+        u16::try_from(self.max_y - self.min_y + 1)
+            .expect("Rectangle height does not fit into u16")
+    }
+
     pub fn intersect(self, other: Rectangle) -> Option<Rectangle> {
         let min_x = max(self.min_x, other.min_x);
         let min_y = max(self.min_y, other.min_y);
@@ -57,6 +62,11 @@ impl Rectangle {
         }
     }
 
+    pub fn width(self) -> u16 {
+        u16::try_from(self.max_x - self.min_x + 1)
+            .expect("Rectangle height does not fit into u16")
+    }
+
     fn area(self) -> u32 {
         u32::from(self.width()) * u32::from(self.height())
     }
@@ -67,16 +77,6 @@ impl Rectangle {
             self.min_x + i32::from(self.width()) / 2 + width_correction,
             self.min_y + i32::from(self.height()) / 2,
         )
-    }
-
-    fn height(self) -> u16 {
-        u16::try_from(self.max_y - self.min_y + 1)
-            .expect("Rectangle height does not fit into u16")
-    }
-
-    fn width(self) -> u16 {
-        u16::try_from(self.max_x - self.min_x + 1)
-            .expect("Rectangle height does not fit into u16")
     }
 }
 

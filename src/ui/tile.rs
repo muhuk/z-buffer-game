@@ -88,6 +88,18 @@ pub fn from_visible_object(v: VisibleObject) -> impl Tile {
             background: colors::LIGHT_SEPIA,
             background_flag: BackgroundFlag::Set,
         },
+        VisibleObject::TreeTrunk => StaticTile {
+            glyph: '\u{2e}',
+            foreground: colors::LIGHT_SEPIA,
+            background: colors::DARKER_BLUE,
+            background_flag: BackgroundFlag::Set,
+        },
+        VisibleObject::TreeFoilage => StaticTile {
+            glyph: '\u{2f}',
+            foreground: colors::DARK_SEPIA,
+            background: colors::DARKER_BLUE,
+            background_flag: BackgroundFlag::Set,
+        },
     }
 }
 
