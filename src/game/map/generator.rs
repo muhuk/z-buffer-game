@@ -4,12 +4,10 @@ use tcod::random::{Algo, Rng};
 
 const SCALE: f32 = 9.18325;
 
-pub fn generate_map<F>(boundaries: Rectangle, mut f: F)
+pub fn generate_map<F>(seed: u32, boundaries: Rectangle, mut f: F)
 where
     F: FnMut(Location, VisibleObject),
 {
-    // TODO: Get seed from the caller.
-    let seed: u32 = 987654;
     let rng = Rng::new_with_seed(Algo::MT, seed);
 
     let ground_noise = make_2d_noise(rng, NoiseType::Simplex);

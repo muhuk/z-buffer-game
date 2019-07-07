@@ -40,13 +40,14 @@ impl<'a> System<'a> for MapSystem {
         let (mut cursor, entities, mut map_tiles, mut renderables) = sys_data;
 
         if self.status == MapStatus::Unitialized {
-            debug!("Generating new map");
+            let seed: u32 = 987654;
+            debug!("Generating new map with seed {}", seed);
             let boundaries = Rectangle::centered_around(
                 Location::origin(),
                 MAP_WIDTH,
                 MAP_HEIGHT,
             );
-            generate_map(boundaries, |loc, obj| {
+            generate_map(seed, boundaries, |loc, obj| {
                 let entity = entities.create();
                 assert!(map_tiles
                     .insert(entity, MapTile::new(loc, obj))
