@@ -7,7 +7,6 @@ edition = "2018"
 [dependencies]
 dirs = "1.0.4"
 log = "0.4.6"
-rand = "0.6.5"
 serde = { version = "1.0", features = ["derive"] }
 shred = "0.7.1"
 shred-derive = "0.5.1"
@@ -15,4 +14,4 @@ specs = "0.14.3"
 specs-derive = "0.4.0"
 stderrlog = "0.4.1"
 tcod = "0.13"
-toml = "0.4"
+
