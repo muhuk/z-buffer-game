@@ -12,14 +12,10 @@ where
     let seed: u32 = 987654;
     let rng = Rng::new_with_seed(Algo::MT, seed);
 
-    let dimensions: u32 = 2;
-    let noise = Noise::init_with_dimensions(dimensions)
-        .random(rng)
-        .noise_type(NoiseType::Simplex)
-        .init();
+    let ground_noise = make_2d_noise(rng, NoiseType::Simplex);
 
     for loc in boundaries.into_iter() {
-        let noise_value = noise.get(location_to_noise_coordinate(loc));
+        let noise_value = ground_noise.get(location_to_noise_coordinate(loc));
         let obj = if noise_value > 0.5 {
             VisibleObject::Soil
         } else {
@@ -33,4 +29,12 @@ fn location_to_noise_coordinate(location: Location) -> [f32; 2] {
     let x: f32 = (location.x as f32) / SCALE;
     let y: f32 = (location.y as f32) / SCALE;
     [x, y]
+}
+
+fn make_2d_noise(rng: Rng, noise_type: NoiseType) -> Noise {
+    const DIMENSIONS: u32 = 2;
+    Noise::init_with_dimensions(DIMENSIONS)
+        .random(rng)
+        .noise_type(noise_type)
+        .init()
 }
