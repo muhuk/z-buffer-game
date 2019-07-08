@@ -30,7 +30,7 @@ where
     }
 
     const TREE_RADIUS: u16 = 6;
-    const TREE_COUNT: u16 = 5;
+    const TREE_COUNT: u16 = 30;
     let trees: Vec<(Location, u16)> = generate_trees(
         trees_mask_seed,
         trees_poisson_seed,
@@ -62,19 +62,30 @@ fn generate_trees(
             .collect();
 
     // Initialize active list and add the first point
-    let mut active: Vec<Location> = vec![Location::new(
-        poisson_rng.get_int(0, i32::from(w) - 1),
-        poisson_rng.get_int(0, i32::from(h) - 1),
+    let mut active: Vec<(usize, usize)> = vec![(
+        usize::try_from(poisson_rng.get_int(0, i32::from(w) - 1)).unwrap(),
+        usize::try_from(poisson_rng.get_int(0, i32::from(h) - 1)).unwrap(),
     )];
 
-    // Populate the grid
-    //
-    // TODO: Generate `count` many trees, give up
-    //       after pre-determinet number of tries.
-    generate_tree(&poisson_rng, &mut grid, &mut active, radius * 2);
-    generate_tree(&poisson_rng, &mut grid, &mut active, radius * 2);
-    generate_tree(&poisson_rng, &mut grid, &mut active, radius * 2);
-
+    {
+        let mut attempts: u16 = 10;
+        let mut found: u16 = 0;
+        while found < count && attempts > 0 {
+            let attempt2: u16 = 10;
+            if generate_tree(
+                &poisson_rng,
+                &mut grid,
+                &mut active,
+                radius,
+                attempt2,
+            ) {
+                found += 1
+            } else {
+                attempts -= 1;
+            }
+        }
+        println!("Added {} trees", found);
+    }
     // TODO: Filter trees by mask noise threshold.
 
     // Convert grid to final result
@@ -97,40 +108,65 @@ fn generate_trees(
 fn generate_tree(
     rng: &Rng,
     grid: &mut Vec<Vec<u16>>,
-    active: &mut Vec<Location>,
-    distance: u16,
+    active: &mut Vec<(usize, usize)>,
+    radius: u16,
+    mut attempts: u16,
 ) -> bool {
-    let d = f32::from(distance);
+    let distance = f32::from(radius * 2);
     if active.is_empty() {
         false
     } else {
-        let idx: usize = usize::try_from(
-            rng.get_int(0, i32::try_from(active.len()).unwrap() - 1),
-        )
-        .unwrap();
-        let p: Location = active.remove(idx);
-        let angle: f32 = rng.get_float(0.0, 2.0 * PI);
-        let dx: f32 = (angle.cos() * d).floor();
-        let dy: f32 = (angle.sin() * d).floor();
-
-        let x = usize::try_from(p.x + dx as i32).unwrap();
-        let y = usize::try_from(p.y + dy as i32).unwrap();
-
-        // TODO: Reject point if there are other trees nearby.
-        if let Some(Some(&v)) = grid.get(y).map(|row| row.get(x)) {
-            if v > 0 {
-                false
+        let mut found = false;
+        while found == false && attempts > 0 {
+            let idx: usize = usize::try_from(
+                rng.get_int(0, i32::try_from(active.len()).unwrap() - 1),
+            )
+            .unwrap();
+            let (origin_x, origin_y) = active.remove(idx);
+            if let Some((x, y)) = choose_point_at_a_distance(
+                &rng,
+                grid.len(),
+                grid[0].len(),
+                origin_x,
+                origin_y,
+                distance,
+            ) {
+                // TODO: Reject point if there are other trees nearby.
+                if grid[y][x] > 0 {
+                    found = false;
+                    attempts -= 1;
+                } else {
+                    grid[y][x] = 1;
+                    active.push((x, y));
+                    found = true;
+                }
             } else {
-                grid[y][x] = 1;
-                active.push(Location::new(
-                    i32::try_from(x).unwrap(),
-                    i32::try_from(y).unwrap(),
-                ));
-                true
+                found = false;
+                attempts -= 1;
             }
-        } else {
-            unreachable!();
         }
+        found
+    }
+}
+
+fn choose_point_at_a_distance(
+    rng: &Rng,
+    width: usize,
+    height: usize,
+    origin_x: usize,
+    origin_y: usize,
+    distance: f32,
+) -> Option<(usize, usize)> {
+    let angle: f32 = rng.get_float(0.0, 2.0 * PI);
+    let dx: f32 = (angle.cos() * distance).floor();
+    let dy: f32 = (angle.sin() * distance).floor();
+    // We need to do signed arithmetic below:
+    let x = (origin_x as f32 + dx) as usize;
+    let y = (origin_y as f32 + dy) as usize;
+    if x < width && y < height {
+        Some((x, y))
+    } else {
+        None
     }
 }
 
