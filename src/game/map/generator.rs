@@ -1,9 +1,8 @@
 use crate::data::{Location, Rectangle, VisibleObject};
+use crate::noise::poisson::poisson_discrete;
 use std::convert::TryFrom;
-use std::f32::consts::PI;
 use std::i32::MAX as I32_MAX;
-use std::iter;
-use tcod::noise::{Noise, NoiseInitializer, NoiseType};
+use tcod::noise::{Noise, NoiseType};
 use tcod::random::{Algo, Rng};
 
 const SCALE: f32 = 9.18325;
@@ -51,123 +50,37 @@ fn generate_trees(
     radius: u16,
     count: u16,
 ) -> Vec<(Location, u16)> {
+    // TODO: Try simplifiying types, miniming type conversion.
     let poisson_rng = Rng::new_with_seed(NOISE_ALGO, poisson_seed);
 
-    // Initialize grid
-    let w: u16 = boundaries.width();
-    let h: u16 = boundaries.height();
-    let mut grid: Vec<Vec<u16>> =
-        iter::repeat_with(|| iter::repeat(0).take(usize::from(w)).collect())
-            .take(usize::from(h))
-            .collect();
-
-    // Initialize active list and add the first point
-    let mut active: Vec<(usize, usize)> = vec![(
-        usize::try_from(poisson_rng.get_int(0, i32::from(w) - 1)).unwrap(),
-        usize::try_from(poisson_rng.get_int(0, i32::from(h) - 1)).unwrap(),
-    )];
-
-    {
-        let mut attempts: u16 = 10;
-        let mut found: u16 = 0;
-        while found < count && attempts > 0 {
-            let attempt2: u16 = 10;
-            if generate_tree(
-                &poisson_rng,
-                &mut grid,
-                &mut active,
-                radius,
-                attempt2,
-            ) {
-                found += 1
-            } else {
-                attempts -= 1;
-            }
-        }
-        println!("Added {} trees", found);
-    }
-    // TODO: Filter trees by mask noise threshold.
-
-    // Convert grid to final result
-    let mut result: Vec<(Location, u16)> = vec![];
-    let offset: Location = boundaries.into_iter().next().unwrap();
-    for (y, row) in grid.iter().enumerate() {
-        for (x, &r) in row.iter().enumerate() {
-            if r > 0 {
-                let loc: Location = offset.move_by(
-                    i32::try_from(x).unwrap(),
-                    i32::try_from(y).unwrap(),
-                );
-                result.push((loc, r));
-            }
-        }
-    }
-    result
-}
-
-fn generate_tree(
-    rng: &Rng,
-    grid: &mut Vec<Vec<u16>>,
-    active: &mut Vec<(usize, usize)>,
-    radius: u16,
-    mut attempts: u16,
-) -> bool {
-    let distance = f32::from(radius * 2);
-    if active.is_empty() {
-        false
-    } else {
-        let mut found = false;
-        while found == false && attempts > 0 {
-            let idx: usize = usize::try_from(
-                rng.get_int(0, i32::try_from(active.len()).unwrap() - 1),
+    let max_retries: u32 = 100;
+    let samples: Vec<(u32, u32)> = poisson_discrete(
+        |l| {
+            u32::try_from(
+                poisson_rng.get_int(0, i32::try_from(l).unwrap() - 1),
             )
-            .unwrap();
-            let (origin_x, origin_y) = active.remove(idx);
-            if let Some((x, y)) = choose_point_at_a_distance(
-                &rng,
-                grid.len(),
-                grid[0].len(),
-                origin_x,
-                origin_y,
-                distance,
-            ) {
-                // TODO: Reject point if there are other trees nearby.
-                if grid[y][x] > 0 {
-                    found = false;
-                    attempts -= 1;
-                } else {
-                    grid[y][x] = 1;
-                    active.push((x, y));
-                    found = true;
-                }
-            } else {
-                found = false;
-                attempts -= 1;
-            }
-        }
-        found
-    }
-}
-
-fn choose_point_at_a_distance(
-    rng: &Rng,
-    width: usize,
-    height: usize,
-    origin_x: usize,
-    origin_y: usize,
-    distance: f32,
-) -> Option<(usize, usize)> {
-    let angle: f32 = rng.get_float(0.0, 2.0 * PI);
-    let dx: f32 = (angle.cos() * distance).floor();
-    let dy: f32 = (angle.sin() * distance).floor();
-    // We need to do signed arithmetic below:
-    let x = (origin_x as f32 + dx) as usize;
-    let y = (origin_y as f32 + dy) as usize;
-    if x < width && y < height {
-        Some((x, y))
-    } else {
-        None
-    }
+            .unwrap()
+        },
+        u32::from(boundaries.width()),
+        u32::from(boundaries.height()),
+        u32::from(count),
+        u32::from(radius),
+        max_retries,
+    );
+    // TODO: Filter trees by mask noise threshold.
+    // TODO: Use variable tree radius.
+    samples
+        .iter()
+        .map(|(x, y)| {
+            (
+                Location::new(
+                    boundaries.min_x + i32::try_from(*x).unwrap(),
+                    boundaries.min_y + i32::try_from(*y).unwrap(),
+                ),
+                radius,
+            )
+        })
+        .collect()
 }
 
 fn location_to_noise_coordinate(location: Location) -> [f32; 2] {

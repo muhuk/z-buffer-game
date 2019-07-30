@@ -8,14 +8,15 @@ use std::time::Duration;
 use stderrlog;
 use tcod::system::get_elapsed_time;
 
-pub mod asset;
-pub mod conf;
-pub mod data;
-pub mod game;
-pub mod input;
-pub mod menu;
-pub mod stage;
-pub mod ui;
+mod asset;
+mod conf;
+mod data;
+mod game;
+mod input;
+mod menu;
+mod noise;
+mod stage;
+mod ui;
 
 // 4 is log everything, 3 is DEBUG.
 const LOG_VERBOSITY: usize = 4;
