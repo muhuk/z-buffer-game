@@ -19,12 +19,15 @@ impl Rectangle {
     ) -> Rectangle {
         assert!(width != 0 && height != 0);
         let half_width = i32::from(width / 2);
-        let width_correction = i32::from(1 - width % 2);
+        let width_correction = 1 - i32::from(width % 2);
         let half_height = i32::from(height / 2);
-        let height_correction = i32::from(1 - height % 2);
+        let height_correction = 1 - i32::from(height % 2);
         Rectangle::new(
-            center.move_by(-half_width + width_correction, -half_height),
-            center.move_by(half_width, half_height - height_correction),
+            center.move_by(
+                -half_width + width_correction,
+                -half_height + height_correction,
+            ),
+            center.move_by(half_width, half_height),
         )
     }
 
@@ -73,9 +76,10 @@ impl Rectangle {
 
     fn center(self) -> Location {
         let width_correction = i32::from(self.width()) % 2 - 1;
+        let height_correction = i32::from(self.height()) % 2 - 1;
         Location::new(
             self.min_x + i32::from(self.width()) / 2 + width_correction,
-            self.min_y + i32::from(self.height()) / 2,
+            self.min_y + i32::from(self.height()) / 2 + height_correction,
         )
     }
 }
@@ -202,12 +206,29 @@ mod tests {
     fn centering_around_with_even_dimensions_place_the_center_on_top_left_coordinate(
     ) {
         assert_eq!(
-            Rectangle::new(Location::new(-1, -2), Location::new(2, 1)),
+            Rectangle::new(Location::new(-1, -1), Location::new(2, 2)),
             Rectangle::centered_around(Location::origin(), 4, 4)
         );
         assert_eq!(
             Location::origin(),
             Rectangle::centered_around(Location::origin(), 4, 4).center()
+        );
+        assert_eq!(
+            Rectangle::new(Location::new(-1, -2), Location::new(4, 3)),
+            Rectangle::centered_around(Location::new(1, 0), 6, 6)
+        );
+        assert_eq!(
+            Location::new(1, 0),
+            Rectangle::centered_around(Location::new(1, 0), 6, 6).center()
+        );
+
+        assert_eq!(
+            Rectangle::new(Location::new(-2, -1), Location::new(3, 4)),
+            Rectangle::centered_around(Location::new(0, 1), 6, 6)
+        );
+        assert_eq!(
+            Location::new(0, 1),
+            Rectangle::centered_around(Location::new(0, 1), 6, 6).center()
         );
     }
 

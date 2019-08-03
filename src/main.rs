@@ -14,7 +14,6 @@ mod data;
 mod game;
 mod input;
 mod menu;
-mod noise;
 mod stage;
 mod ui;
 

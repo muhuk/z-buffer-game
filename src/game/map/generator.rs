@@ -1,6 +1,5 @@
 use crate::data::{Location, Rectangle, VisibleObject};
-use crate::noise::poisson::poisson_discrete;
-use std::convert::TryFrom;
+use bluenoisers::blue_noise_iter;
 use std::i32::MAX as I32_MAX;
 use tcod::noise::{Noise, NoiseType};
 use tcod::random::{Algo, Rng};
@@ -15,7 +14,7 @@ where
     let rng = Rng::new_with_seed(NOISE_ALGO, seed);
     let ground_noise_seed: u32 = rng.get_int(0, I32_MAX) as u32;
     let trees_mask_seed: u32 = rng.get_int(0, I32_MAX) as u32;
-    let trees_poisson_seed: u32 = rng.get_int(0, I32_MAX) as u32;
+    let trees_radius_seed: u32 = rng.get_int(0, I32_MAX) as u32;
 
     let ground_noise = make_2d_noise(ground_noise_seed, NoiseType::Simplex);
     for loc in boundaries.into_iter() {
@@ -28,14 +27,12 @@ where
         f(loc, obj);
     }
 
-    const TREE_RADIUS: u16 = 6;
-    const TREE_COUNT: u16 = 30;
+    const TREE_RADIUS: u16 = 2;
     let trees: Vec<(Location, u16)> = generate_trees(
         trees_mask_seed,
-        trees_poisson_seed,
+        trees_radius_seed,
         boundaries,
         TREE_RADIUS,
-        TREE_COUNT,
     );
     for (loc, radius) in trees {
         // TODO: Render foilage too.
@@ -45,42 +42,31 @@ where
 
 fn generate_trees(
     mask_seed: u32,
-    poisson_seed: u32,
+    radius_seed: u32,
     boundaries: Rectangle,
     radius: u16,
-    count: u16,
 ) -> Vec<(Location, u16)> {
-    // TODO: Try simplifiying types, miniming type conversion.
-    let poisson_rng = Rng::new_with_seed(NOISE_ALGO, poisson_seed);
-
-    let max_retries: u32 = 100;
-    let samples: Vec<(u32, u32)> = poisson_discrete(
-        |l| {
-            u32::try_from(
-                poisson_rng.get_int(0, i32::try_from(l).unwrap() - 1),
-            )
-            .unwrap()
-        },
-        u32::from(boundaries.width()),
-        u32::from(boundaries.height()),
-        u32::from(count),
-        u32::from(radius),
-        max_retries,
-    );
-    // TODO: Filter trees by mask noise threshold.
-    // TODO: Use variable tree radius.
-    samples
-        .iter()
-        .map(|(x, y)| {
-            (
-                Location::new(
-                    boundaries.min_x + i32::try_from(*x).unwrap(),
-                    boundaries.min_y + i32::try_from(*y).unwrap(),
-                ),
-                radius,
-            )
-        })
-        .collect()
+    let radius_rng = Rng::new_with_seed(NOISE_ALGO, radius_seed);
+    let k_abort: usize = 30;
+    let w: i32 = i32::from(boundaries.width());
+    let h: i32 = i32::from(boundaries.height());
+    let mut result: Vec<(Location, u16)> = Vec::new();
+    for pos in blue_noise_iter(
+        vec![f64::from(w), f64::from(h)],
+        f64::from(radius * 2 + 1),
+        k_abort,
+    ) {
+        debug_assert!(pos.len() == 2, "Blue noise dimensions is not 2");
+        let x = pos[0] as i32 + boundaries.min_x;
+        let y = pos[1] as i32 + boundaries.min_y;
+        // TODO: Vary radius
+        // TODO: Apply the mask
+        result.push((
+            Location::new(x, y),
+            radius_rng.get_int(1, i32::from(radius)) as u16,
+        ));
+    }
+    result
 }
 
 fn location_to_noise_coordinate(location: Location) -> [f32; 2] {

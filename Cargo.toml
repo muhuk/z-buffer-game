@@ -5,6 +5,7 @@ authors = ["Atamert Ölçgen <muhuk@muhuk.com>"]
 edition = "2018"
 
 [dependencies]
+bluenoisers = "1.1.1"
 dirs = "1.0.4"
 log = "0.4.6"
 serde = { version = "1.0", features = ["derive"] }
