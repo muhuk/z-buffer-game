@@ -7,21 +7,6 @@ pub struct Cursor {
 }
 
 impl Cursor {
-    pub fn new(location: Location, boundaries: Option<Rectangle>) -> Cursor {
-        Cursor {
-            location,
-            boundaries,
-        }
-    }
-
-    pub fn boundaries(&self) -> Option<Rectangle> {
-        self.boundaries
-    }
-
-    pub fn clear_boundaries(&mut self) -> Option<Rectangle> {
-        self.boundaries.take()
-    }
-
     pub fn location(&self) -> Location {
         self.location
     }
@@ -46,6 +31,12 @@ impl Cursor {
         {
             self.location = new_location
         }
+    }
+
+    // This method is for testing only
+    #[allow(dead_code)]
+    fn boundaries(&self) -> Option<Rectangle> {
+        self.boundaries
     }
 }
 
@@ -81,15 +72,6 @@ mod tests {
             Err(CursorError::LocationIsOutOfBounds),
             cursor.set_boundaries(bounds)
         );
-        assert_eq!(None, cursor.boundaries());
-    }
-
-    #[test]
-    fn clear_boundaries_removes_and_returns_current_boundaries() {
-        let mut cursor = Cursor::default();
-        let bounds = Rectangle::centered_around(Location::origin(), 5, 5);
-        assert!(cursor.set_boundaries(bounds).is_ok());
-        assert_eq!(Some(bounds), cursor.clear_boundaries());
         assert_eq!(None, cursor.boundaries());
     }
 
