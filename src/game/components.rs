@@ -6,12 +6,12 @@ use specs_derive::*;
 #[derive(Component, Debug)]
 #[storage(HashMapStorage)]
 pub struct Tree {
-    pub radius: u16,
+    pub size: u16,
 }
 
 impl Tree {
-    pub fn new(radius: u16) -> Self {
-        Self { radius }
+    pub fn new(size: u16) -> Self {
+        Self { size }
     }
 }
 

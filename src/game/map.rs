@@ -14,8 +14,12 @@ const MAP_HEIGHT: u16 = 64;
 const NOISE_ALGO: Algo = Algo::MT;
 const NOISE_SCALE: f32 = 9.18325;
 
-const MAX_TREE_RADIUS: u16 = 5;
-const MIN_TREE_RADIUS: u16 = 2;
+const TREE_DISTANCE: u16 = 3;
+// There is no science to the threshold value
+// noise seems to have a non-uniform histogram.
+const TREE_MASK_THRESHOLD: f32 = 0.55;
+const TREE_SIZE_MIN: i32 = 2;
+const TREE_SIZE_MAX: i32 = 5;
 
 #[derive(Debug, PartialEq)]
 pub enum MapStatus {
@@ -49,14 +53,16 @@ impl MapSystem {
         let rng = Rng::new_with_seed(NOISE_ALGO, seed);
         let ground_noise_seed: u32 = generate_seed(&rng);
         let trees_mask_seed: u32 = generate_seed(&rng);
-        let trees_radius_seed: u32 = generate_seed(&rng);
+        let trees_size_seed: u32 = generate_seed(&rng);
 
         generate_map_tiles(ground_noise_seed, boundaries, add_tile);
         generate_trees(
             trees_mask_seed,
-            trees_radius_seed,
-            MIN_TREE_RADIUS,
-            MAX_TREE_RADIUS,
+            TREE_MASK_THRESHOLD,
+            trees_size_seed,
+            TREE_DISTANCE,
+            TREE_SIZE_MIN,
+            TREE_SIZE_MAX,
             boundaries,
             add_tree,
         );
@@ -131,32 +137,41 @@ fn generate_seed(rng: &Rng) -> u32 {
 
 fn generate_trees<F>(
     mask_seed: u32,
-    radius_seed: u32,
-    min_tree_radius: u16,
-    max_tree_radius: u16,
+    mask_threshold: f32,
+    size_seed: u32,
+    distance: u16,
+    size_min: i32,
+    size_max: i32,
     boundaries: Rectangle,
     mut add_tree: F,
 ) where
     F: FnMut(Location, u16),
 {
-    let radius_rng = Rng::new_with_seed(NOISE_ALGO, radius_seed);
+    let size_rng = Rng::new_with_seed(NOISE_ALGO, size_seed);
+    let mask: Noise = make_2d_noise(mask_seed, NoiseType::Perlin);
     let k_abort: usize = 30;
     let w: i32 = i32::from(boundaries.width());
     let h: i32 = i32::from(boundaries.height());
     for pos in blue_noise_iter(
         vec![f64::from(w), f64::from(h)],
-        f64::from(max_tree_radius * 2 + 1),
+        f64::from(distance),
         k_abort,
     ) {
         debug_assert!(pos.len() == 2, "Blue noise dimensions is not 2");
-        let x = pos[0] as i32 + boundaries.min_x;
-        let y = pos[1] as i32 + boundaries.min_y;
-        let radius: u16 = radius_rng
-            .get_int(i32::from(min_tree_radius), i32::from(max_tree_radius))
-            as u16;
-        // TODO: Apply the mask
-        debug!("Planting tree of radius {} at {}:{}", &radius, &x, &y);
-        add_tree(Location::new(x, y), radius);
+        let location = {
+            let x = pos[0] as i32 + boundaries.min_x;
+            let y = pos[1] as i32 + boundaries.min_y;
+            Location::new(x, y)
+        };
+        if (mask.get(location_to_noise_coordinate(location)) + 1.0) * 0.5
+            > mask_threshold
+        {
+            let radius: u16 = size_rng.get_int(size_min, size_max) as u16;
+            debug!("Planting tree of size {} at {:?}", radius, location);
+            add_tree(location, radius);
+        } else {
+            debug!("Passing up {:?} as a candidate tree location.", location);
+        }
     }
 }
 
