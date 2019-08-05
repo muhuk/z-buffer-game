@@ -1,5 +1,5 @@
 use crate::data::{Location, Rectangle, VisibleObject};
-use crate::game::{Cursor, MapTile, Renderable, Tree};
+use crate::game::{components, Cursor};
 use bluenoisers::blue_noise_iter;
 use log::debug;
 use specs::prelude::*;
@@ -14,7 +14,7 @@ const MAP_HEIGHT: u16 = 64;
 const NOISE_ALGO: Algo = Algo::MT;
 const NOISE_SCALE: f32 = 9.18325;
 
-const MAX_TREE_RADIUS: u16 = 6;
+const MAX_TREE_RADIUS: u16 = 5;
 const MIN_TREE_RADIUS: u16 = 2;
 
 #[derive(Debug, PartialEq)]
@@ -83,15 +83,18 @@ impl<'a> System<'a> for MapSystem {
                 |loc, obj| {
                     lazy_update
                         .create_entity(&entities)
-                        .with(MapTile::new(loc, obj))
-                        .with(Renderable::default())
+                        .with(components::Location::new(loc, 0))
+                        .with(components::Renderable::new(obj))
                         .build();
                 },
                 |loc, r| {
                     lazy_update
                         .create_entity(&entities)
-                        .with(Tree::new(loc, r))
-                        .with(Renderable::default())
+                        .with(components::Tree::new(r))
+                        .with(components::Location::new(loc, 1))
+                        .with(components::Renderable::new(
+                            VisibleObject::TreeTrunk,
+                        ))
                         .build();
                 },
             );

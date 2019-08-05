@@ -4,7 +4,7 @@
 
 use crate::data::Time;
 use crate::game::{
-    Cursor, GameEvent, GameLog, InputSystem, LogEntry, MapSystem, MapTile,
+    components, Cursor, GameEvent, GameLog, InputSystem, LogEntry, MapSystem,
     RenderingSystem, SceneData,
 };
 use crate::stage::StageData;
@@ -23,11 +23,12 @@ impl Game {
         let (event_sink, event_source) = mpsc::channel::<GameEvent>();
 
         let mut world = World::new();
+        // TODO: Register resources like components::register
         world.add_resource(Cursor::default());
         world.add_resource(GameLog::default());
         world.add_resource(SceneData::default());
         world.add_resource(Time::default());
-        world.register::<MapTile>();
+        components::register_with(&mut world);
         let mut dispatcher = DispatcherBuilder::new()
             .with(MapSystem::new(), "map_system", &[])
             .with(InputSystem::new(event_source), "input_system", &[])

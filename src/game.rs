@@ -1,4 +1,3 @@
-pub use self::components::{MapTile, Renderable, Tree};
 pub use self::cursor::Cursor;
 pub use self::game_event::GameEvent;
 pub use self::input::InputSystem;
@@ -7,7 +6,8 @@ pub use self::map::MapSystem;
 pub use self::rendering::RenderingSystem;
 pub use self::scene_data::SceneData;
 
-mod components;
+pub mod components;
+
 mod cursor;
 mod game_event;
 mod input;
