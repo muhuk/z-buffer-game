@@ -151,9 +151,12 @@ fn generate_trees<F>(
         debug_assert!(pos.len() == 2, "Blue noise dimensions is not 2");
         let x = pos[0] as i32 + boundaries.min_x;
         let y = pos[1] as i32 + boundaries.min_y;
-        // TODO: Vary radius
+        let radius: u16 = radius_rng
+            .get_int(i32::from(min_tree_radius), i32::from(max_tree_radius))
+            as u16;
         // TODO: Apply the mask
-        add_tree(Location::new(x, y), max_tree_radius);
+        debug!("Planting tree of radius {} at {}:{}", &radius, &x, &y);
+        add_tree(Location::new(x, y), radius);
     }
 }
 
