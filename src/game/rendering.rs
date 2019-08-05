@@ -20,6 +20,7 @@ impl<'a> System<'a> for RenderingSystem {
         for (loc, rend) in (&sys_data.locations, &sys_data.renderables).join()
         {
             scene_data
+                // TODO: Respect z-index (in Renderable)
                 .set_objects_for_location(loc.location, vec![rend.object]);
         }
         scene_data.update(

@@ -83,17 +83,18 @@ impl<'a> System<'a> for MapSystem {
                 |loc, obj| {
                     lazy_update
                         .create_entity(&entities)
-                        .with(components::Location::new(loc, 0))
-                        .with(components::Renderable::new(obj))
+                        .with(components::Location::new(loc))
+                        .with(components::Renderable::new(obj, 0))
                         .build();
                 },
                 |loc, r| {
                     lazy_update
                         .create_entity(&entities)
                         .with(components::Tree::new(r))
-                        .with(components::Location::new(loc, 1))
+                        .with(components::Location::new(loc))
                         .with(components::Renderable::new(
                             VisibleObject::TreeTrunk,
+                            1,
                         ))
                         .build();
                 },

@@ -19,12 +19,11 @@ impl Tree {
 #[storage(DenseVecStorage)]
 pub struct Location {
     pub location: Loc,
-    pub z_index: u16,
 }
 
 impl Location {
-    pub fn new(location: Loc, z_index: u16) -> Self {
-        Self { location, z_index }
+    pub fn new(location: Loc) -> Self {
+        Self { location }
     }
 }
 
@@ -32,11 +31,12 @@ impl Location {
 #[storage(DenseVecStorage)]
 pub struct Renderable {
     pub object: VisibleObject,
+    pub z_index: u16,
 }
 
 impl Renderable {
-    pub fn new(object: VisibleObject) -> Self {
-        Self { object }
+    pub fn new(object: VisibleObject, z_index: u16) -> Self {
+        Self { object, z_index }
     }
 }
 
