@@ -60,6 +60,7 @@ impl Game {
     pub fn update_world(&mut self, dt_millis: u32) {
         self.world.write_resource::<Time>().advance_dt(dt_millis);
         self.dispatcher.dispatch(&self.world.res);
+        self.world.maintain();
     }
 }
 

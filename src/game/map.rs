@@ -34,71 +34,65 @@ impl MapSystem {
             status: MapStatus::Unitialized,
         }
     }
+
+    fn generate_map<F, G>(
+        seed: u32,
+        boundaries: Rectangle,
+        add_tile: F,
+        add_tree: G,
+    ) where
+        F: FnMut(Location, VisibleObject),
+        G: FnMut(Location, u16),
+    {
+        debug!("Generating new map with seed {}", seed);
+
+        let rng = Rng::new_with_seed(NOISE_ALGO, seed);
+        let ground_noise_seed: u32 = generate_seed(&rng);
+        let trees_mask_seed: u32 = generate_seed(&rng);
+        let trees_radius_seed: u32 = generate_seed(&rng);
+
+        generate_map_tiles(ground_noise_seed, boundaries, add_tile);
+        generate_trees(
+            trees_mask_seed,
+            trees_radius_seed,
+            MIN_TREE_RADIUS,
+            MAX_TREE_RADIUS,
+            boundaries,
+            add_tree,
+        );
+    }
 }
 
 impl<'a> System<'a> for MapSystem {
-    type SystemData = (
-        Write<'a, Cursor>,
-        Entities<'a>,
-        WriteStorage<'a, MapTile>,
-        WriteStorage<'a, Renderable>,
-        WriteStorage<'a, Tree>,
-    );
+    type SystemData = (Write<'a, Cursor>, Entities<'a>, Read<'a, LazyUpdate>);
 
     fn run(&mut self, sys_data: Self::SystemData) {
-        let (mut cursor, entities, mut map_tiles, mut renderables, mut trees) =
-            sys_data;
+        let (mut cursor, entities, lazy_update) = sys_data;
 
         if self.status == MapStatus::Unitialized {
             let seed: u32 = 987654;
-            debug!("Generating new map with seed {}", seed);
-
-            let rng = Rng::new_with_seed(NOISE_ALGO, seed);
-            let ground_noise_seed: u32 = generate_seed(&rng);
-            let trees_mask_seed: u32 = generate_seed(&rng);
-            let trees_radius_seed: u32 = generate_seed(&rng);
-
             let boundaries = Rectangle::centered_around(
                 Location::origin(),
                 MAP_WIDTH,
                 MAP_HEIGHT,
             );
 
-            generate_map_tiles(ground_noise_seed, boundaries, |loc, obj| {
-                let entity = entities.create();
-                assert!(map_tiles
-                    .insert(entity, MapTile::new(loc, obj))
-                    .unwrap()
-                    .is_none());
-                assert!(renderables
-                    .insert(entity, Renderable {})
-                    .unwrap()
-                    .is_none());
-            });
-
-            generate_trees(
-                trees_mask_seed,
-                trees_radius_seed,
-                MIN_TREE_RADIUS,
-                MAX_TREE_RADIUS,
+            Self::generate_map(
+                seed,
                 boundaries,
+                |loc, obj| {
+                    lazy_update
+                        .create_entity(&entities)
+                        .with(MapTile::new(loc, obj))
+                        .with(Renderable::default())
+                        .build();
+                },
                 |loc, r| {
-                    let entity = entities.create();
-                    // TODO: Render foilage too.
-                    assert!(trees
-                        .insert(
-                            entity,
-                            Tree {
-                                location: loc,
-                                radius: r
-                            }
-                        )
-                        .unwrap()
-                        .is_none());
-                    assert!(renderables
-                        .insert(entity, Renderable {})
-                        .unwrap()
-                        .is_none());
+                    lazy_update
+                        .create_entity(&entities)
+                        .with(Tree::new(loc, r))
+                        .with(Renderable::default())
+                        .build();
                 },
             );
             cursor.set_boundaries(boundaries).unwrap();

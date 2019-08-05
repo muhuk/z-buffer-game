@@ -26,3 +26,9 @@ pub struct Tree {
     pub location: Location,
     pub radius: u16,
 }
+
+impl Tree {
+    pub fn new(location: Location, radius: u16) -> Self {
+        Self { location, radius }
+    }
+}
