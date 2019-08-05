@@ -3,7 +3,8 @@ use crate::game::{Cursor, MapTile, Renderable, Tree};
 use bluenoisers::blue_noise_iter;
 use log::debug;
 use specs::prelude::*;
-use std::i32::MAX as I32_MAX;
+use std::i32;
+use std::mem::transmute;
 use tcod::noise::{Noise, NoiseType};
 use tcod::random::{Algo, Rng};
 
@@ -53,9 +54,9 @@ impl<'a> System<'a> for MapSystem {
             debug!("Generating new map with seed {}", seed);
 
             let rng = Rng::new_with_seed(NOISE_ALGO, seed);
-            let ground_noise_seed: u32 = rng.get_int(0, I32_MAX) as u32;
-            let trees_mask_seed: u32 = rng.get_int(0, I32_MAX) as u32;
-            let trees_radius_seed: u32 = rng.get_int(0, I32_MAX) as u32;
+            let ground_noise_seed: u32 = generate_seed(&rng);
+            let trees_mask_seed: u32 = generate_seed(&rng);
+            let trees_radius_seed: u32 = generate_seed(&rng);
 
             let boundaries = Rectangle::centered_around(
                 Location::origin(),
@@ -119,6 +120,14 @@ where
             VisibleObject::Grass
         };
         add_tile(loc, obj);
+    }
+}
+
+fn generate_seed(rng: &Rng) -> u32 {
+    unsafe {
+        // Seed 0 causes problems during
+        // transmute, hence i32::MIN+1.
+        transmute::<i32, u32>(rng.get_int(i32::MIN + 1, i32::MAX))
     }
 }
 
