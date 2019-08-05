@@ -16,6 +16,13 @@ impl MapTile {
     }
 }
 
-#[derive(Component, Default)]
+#[derive(Component, Debug, Default)]
 #[storage(NullStorage)]
 pub struct Renderable {}
+
+#[derive(Component, Debug)]
+#[storage(BTreeStorage)]
+pub struct Tree {
+    pub location: Location,
+    pub radius: u16,
+}

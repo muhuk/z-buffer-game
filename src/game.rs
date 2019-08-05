@@ -1,4 +1,4 @@
-pub use self::components::{MapTile, Renderable};
+pub use self::components::{MapTile, Renderable, Tree};
 pub use self::cursor::Cursor;
 pub use self::game_event::GameEvent;
 pub use self::input::InputSystem;
