@@ -1,12 +1,32 @@
 #+STARTUP: inlineimages
 
+* What Is This?
+~z-buffer-game~ is a survival/strategy game with ascii-art graphics.  It is
+built using [[https://www.rust-lang.org/][Rust language]], [[https://github.com/tomassedovic/tcod-rs][tcod-rs]] as UI library and [[https://github.com/slide-rs/specs][specs]] as the
+entity-component system.  It is licensed with the free license GNU GPL v3.
+
+** Is It Any Fun at All?
+Probably, not.  At this point the main goal is to practise game development
+with Rust.
+
+** How Can I Help?
+You can help by doing the following:
+
+- Playing the game and providing feedback.
+- Sharing it online to get others to play it too.
+
+At this point there are no gamedev tasks waiting for volunteers.
+
+* How to Play?
+
+Currently there are no pre-compiled binaries or packages.  See [[*Development Setup][Development
+Setup]] for instruction to compile and run locally.
+
 * Screenshots
 ** 11 August 2019
-
 [[./screenshots/20190811.gif]]
 
 ** 28 April 2019
-
 [[./screenshots/20190428.gif]]
 
 * Development Setup
