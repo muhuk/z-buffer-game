@@ -3,6 +3,13 @@ name = "z-buffer-game"
 version = "0.1.0"
 authors = ["Atamert Ölçgen <muhuk@muhuk.com>"]
 edition = "2018"
+description = "Survival/strategy game with ascii-art graphics."
+repository = "https://github.com/muhuk/z-buffer-game"
+readme = "README.org"
+keywords = ["game", "gamedev", "2d", "specs", "tcod"]
+categories = ["games"]
+license = "GPL-3.0-or-later"
+license-file = "LICENSE.txt"
 
 [dependencies]
 bluenoisers = "1.1.1"
