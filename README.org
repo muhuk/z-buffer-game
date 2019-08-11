@@ -1,5 +1,14 @@
 #+STARTUP: inlineimages
 
+#+BEGIN_HTML
+  <a href="https://img.shields.io/crates/l/z-buffer-game">
+    <img src="https://img.shields.io/crates/l/z-buffer-game" />
+  </a>
+  <a href="https://img.shields.io/github/commit-activity/m/muhuk/z-buffer-game">
+    <img src="https://img.shields.io/github/commit-activity/m/muhuk/z-buffer-game" />
+  </a>
+#+END_HTML
+
 * What Is This?
 ~z-buffer-game~ is a survival/strategy game with ascii-art graphics.  It is
 built using [[https://www.rust-lang.org/][Rust language]], [[https://github.com/tomassedovic/tcod-rs][tcod-rs]] as UI library and [[https://github.com/slide-rs/specs][specs]] as the
