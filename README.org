@@ -3,7 +3,7 @@
 * What Is This?
 ~z-buffer-game~ is a survival/strategy game with ascii-art graphics.  It is
 built using [[https://www.rust-lang.org/][Rust language]], [[https://github.com/tomassedovic/tcod-rs][tcod-rs]] as UI library and [[https://github.com/slide-rs/specs][specs]] as the
-entity-component system.  It is licensed with the free license GNU GPL v3.
+entity-component system.  It is licensed with the free license [[./LICENSE.txt][GNU GPL v3]].
 
 ** Is It Any Fun at All?
 Probably, not.  At this point the main goal is to practise game development
