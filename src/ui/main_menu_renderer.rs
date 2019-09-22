@@ -3,7 +3,7 @@ use crate::stage::main_menu::{Choice, MainMenu};
 use crate::ui::render::Render;
 use std::fmt;
 use tcod::colors;
-use tcod::console::{blit, BackgroundFlag, Console, Offscreen};
+use tcod::console::{blit, BackgroundFlag, Console, Offscreen, TextAlignment};
 
 pub struct MainMenuRenderer {
     root: Offscreen,
@@ -50,6 +50,16 @@ impl MainMenuRenderer {
             ((sw - w) / 2, (sh - h) / 2),
             1.0,
             1.0,
+        );
+        // TODO: Put this in an offscreen or make it part of the background.
+        self.root.print_rect_ex(
+            sw / 2,
+            sh - 2,
+            0,
+            1,
+            BackgroundFlag::Set,
+            TextAlignment::Center,
+            "Press <alt> + <enter> to toggle full-screen.",
         );
     }
 }

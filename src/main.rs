@@ -1,11 +1,13 @@
 //! z-buffer game
 
-use crate::input::Input;
+use crate::input::{Event, Input, Modifiers};
 use crate::stage::{Stage, StageTransition};
 use crate::ui::UI;
 use log::info;
+use std::collections::VecDeque;
 use std::time::Duration;
 use stderrlog;
+use tcod::input::KeyCode;
 use tcod::system::get_elapsed_time;
 
 mod asset;
@@ -49,12 +51,32 @@ impl Application {
         }
     }
 
+    /// Filter application events and return remaining events.
+    fn game_events(&mut self) -> VecDeque<Event> {
+        let mut result = VecDeque::new();
+        for e in self.input.events() {
+            match e {
+                Event::KeyPress(
+                    KeyCode::Enter,
+                    _,
+                    Modifiers {
+                        shift: false,
+                        alt: true,
+                        ctrl: false,
+                    },
+                ) => self.ui.toggle_fullscreen(),
+                _ => result.push_back(e),
+            }
+        }
+        result
+    }
+
     /// Application main loop, blocks until UI terminates.
     fn main_loop(&mut self) {
         while self.ui.is_running() && self.stage.is_running() {
             self.update_time();
-            let events = self.input.events();
-            match self.stage.tick(self.dt, events) {
+            let events: VecDeque<Event> = self.game_events();
+            match self.stage.tick(self.dt, events.into_iter()) {
                 StageTransition::Continue => (),
                 StageTransition::SwitchTo(new_stage) => self.stage = new_stage,
             }

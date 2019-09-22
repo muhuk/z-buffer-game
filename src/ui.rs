@@ -7,7 +7,9 @@ use crate::ui::renderer::Renderer;
 use log::debug;
 use tcod::console::Offscreen;
 use tcod::console::{self, Console};
-use tcod::system::get_fps;
+use tcod::system::{
+    force_fullscreen_resolution, get_current_resolution, get_fps,
+};
 
 mod constants;
 mod game_renderer;
@@ -43,6 +45,19 @@ impl UI {
             root_console: root,
             fps: 0,
             renderer: None,
+        }
+    }
+
+    pub fn toggle_fullscreen(&mut self) {
+        if self.root_console.is_fullscreen() {
+            debug!("Turning full-screen off.");
+            self.root_console.set_fullscreen(false);
+        } else {
+            let resolution: (i32, i32) = get_current_resolution();
+            debug!("Screen resolution is {}x{}", resolution.0, resolution.1);
+            force_fullscreen_resolution(resolution.0, resolution.1);
+            debug!("Turning full-screen on.");
+            self.root_console.set_fullscreen(true);
         }
     }
 
@@ -104,5 +119,11 @@ impl UI {
 impl Default for UI {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+impl Drop for UI {
+    fn drop(&mut self) {
+        self.root_console.set_fullscreen(false);
     }
 }

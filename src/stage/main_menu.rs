@@ -2,7 +2,7 @@
 //!
 //! [MainMenu] is the entry point.
 
-use crate::input::{Event, EventIterator, KeyCode};
+use crate::input::{Event, KeyCode};
 use crate::menu::Menu;
 use crate::stage::StageData;
 use std::fmt::{Display, Formatter, Result};
@@ -58,7 +58,10 @@ impl MainMenu {
         }
     }
 
-    pub fn handle_events(&mut self, events: EventIterator) -> Option<Choice> {
+    pub fn handle_events<E>(&mut self, events: E) -> Option<Choice>
+    where
+        E: Iterator<Item = Event>,
+    {
         let mut selected: Option<Choice> = None;
         for e in events {
             match e {

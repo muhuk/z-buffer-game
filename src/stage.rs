@@ -2,7 +2,7 @@
 
 use crate::data::Direction;
 use crate::game::GameEvent;
-use crate::input::{Event, EventIterator, KeyCode};
+use crate::input::{Event, KeyCode};
 use crate::stage::game::Game;
 use crate::stage::main_menu::MainMenu;
 use log::info;
@@ -24,11 +24,10 @@ impl Stage {
 
     /// Update the status within the stage and signal the container if a stage
     /// transition is necessary.
-    pub fn tick(
-        &mut self,
-        dt_millis: u32,
-        events: EventIterator,
-    ) -> StageTransition {
+    pub fn tick<E>(&mut self, dt_millis: u32, events: E) -> StageTransition
+    where
+        E: Iterator<Item = Event>,
+    {
         match self {
             Stage::MainMenu(menu) => {
                 Stage::tick_main_menu(menu, dt_millis, events)
@@ -44,11 +43,14 @@ impl Stage {
         }
     }
 
-    fn tick_game(
+    fn tick_game<E>(
         game: &mut Game,
         dt_millis: u32,
-        events: EventIterator,
-    ) -> StageTransition {
+        events: E,
+    ) -> StageTransition
+    where
+        E: Iterator<Item = Event>,
+    {
         for e in events {
             match e {
                 Event::KeyPress(KeyCode::Up, ..) => {
@@ -70,11 +72,14 @@ impl Stage {
         StageTransition::Continue
     }
 
-    fn tick_main_menu(
+    fn tick_main_menu<E>(
         menu: &mut MainMenu,
         _dt_millis: u32,
-        events: EventIterator,
-    ) -> StageTransition {
+        events: E,
+    ) -> StageTransition
+    where
+        E: Iterator<Item = Event>,
+    {
         match menu.handle_events(events) {
             Some(main_menu::Choice::NewGame) => {
                 info!("Starting new game.");
