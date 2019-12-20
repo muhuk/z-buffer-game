@@ -16,12 +16,12 @@ impl<'a> System<'a> for RenderingSystem {
 
     fn run(&mut self, mut sys_data: Self::SystemData) {
         let mut scene_data = sys_data.scene_data;
-        // TODO: Add other renderable object to scene data.
+        scene_data.clear_objects();
         for (loc, rend) in (&sys_data.locations, &sys_data.renderables).join()
         {
             scene_data
                 // TODO: Respect z-index (in Renderable)
-                .set_objects_for_location(loc.location, vec![rend.object]);
+                .add_object_to_location(loc.location, rend.object);
         }
         scene_data.update(
             sys_data.cursor.location(),

@@ -21,6 +21,10 @@ impl SceneData {
         self.cursor_location
     }
 
+    pub fn clear_objects(&mut self) {
+        self.objects.clear();
+    }
+
     pub fn for_each_game_log<F>(&self, n: usize, f: F)
     where
         F: FnMut((usize, &LogEntry)),
@@ -52,19 +56,24 @@ impl SceneData {
         }
     }
 
+    pub fn add_object_to_location(
+        &mut self,
+        location: Location,
+        object: VisibleObject,
+    ) {
+        if self.objects.get(&location).is_none() {
+            self.set_objects_for_location(location, vec![]);
+        }
+        self.objects
+            .get_mut(&location)
+            .map(|objects| objects.push(object));
+    }
+
     pub fn get_objects_for_location(
         &self,
         location: &Location,
     ) -> Vec<VisibleObject> {
         self.objects.get(location).unwrap_or(&Vec::new()).to_vec()
-    }
-
-    pub fn set_objects_for_location(
-        &mut self,
-        location: Location,
-        objects: Vec<VisibleObject>,
-    ) {
-        self.objects.insert(location, objects);
     }
 
     pub fn t_millis(&self) -> u64 {
@@ -83,5 +92,13 @@ impl SceneData {
         let mut game_log = self.game_log.lock().unwrap();
         game_log.extend(new_entries);
         self.time = time;
+    }
+
+    fn set_objects_for_location(
+        &mut self,
+        location: Location,
+        objects: Vec<VisibleObject>,
+    ) {
+        self.objects.insert(location, objects);
     }
 }
