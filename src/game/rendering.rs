@@ -19,13 +19,11 @@ impl<'a> System<'a> for RenderingSystem {
         scene_data.clear_objects();
         for (loc, rend) in (&sys_data.locations, &sys_data.renderables).join()
         {
-            scene_data
-                // TODO: Respect z-index (in Renderable)
-                .add_object_to_location(
-                    loc.location,
-                    rend.object,
-                    rend.z_index,
-                );
+            scene_data.add_object_to_location(
+                loc.location,
+                rend.object,
+                rend.z_index,
+            );
         }
         scene_data.update(
             sys_data.cursor.location(),

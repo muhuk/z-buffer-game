@@ -17,6 +17,35 @@ pub struct SceneData {
 }
 
 impl SceneData {
+    pub fn add_object_to_location(
+        &mut self,
+        location: Location,
+        object: VisibleObject,
+        z_index: u16,
+    ) {
+        if self.objects.get(&location).is_none() {
+            self.set_objects_for_location(location, vec![]);
+        }
+        {
+            let mut idx: usize = 0;
+            for z in self
+                .objects
+                .get(&location)
+                .unwrap()
+                .iter()
+                .map(|(z_index, _)| z_index)
+            {
+                if *z > z_index {
+                    break;
+                }
+                idx += 1
+            }
+            self.objects
+                .get_mut(&location)
+                .map(|objects| objects.insert(idx, (z_index, object)));
+        }
+    }
+
     pub fn cursor_location(&self) -> Location {
         self.cursor_location
     }
@@ -56,37 +85,15 @@ impl SceneData {
         }
     }
 
-    pub fn add_object_to_location(
-        &mut self,
-        location: Location,
-        object: VisibleObject,
-        z_index: u16,
-    ) {
-        if self.objects.get(&location).is_none() {
-            self.set_objects_for_location(location, vec![]);
-        }
-        self.objects
-            .get_mut(&location)
-            .map(|objects| objects.push((z_index, object)));
-    }
-
     pub fn get_objects_for_location(
         &self,
         location: &Location,
     ) -> Vec<VisibleObject> {
-        // TODO: Consider z-sorting when we add object.
-        let mut objects_with_z_index: Vec<(u16, VisibleObject)> = self
-            .objects
+        self.objects
             .get(location)
             .unwrap_or(&Vec::new())
             .iter()
-            .cloned()
-            .collect();
-        objects_with_z_index.sort_by_key(|tuple| tuple.0);
-        objects_with_z_index
-            .iter()
-            .map(|(_, obj)| obj)
-            .cloned()
+            .map(|(_, obj)| *obj)
             .collect()
     }
 
