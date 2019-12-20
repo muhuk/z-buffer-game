@@ -12,7 +12,7 @@ use std::sync::Mutex;
 pub struct SceneData {
     cursor_location: Location,
     game_log: Mutex<VecDeque<LogEntry>>,
-    objects: BTreeMap<Location, Vec<VisibleObject>>,
+    objects: BTreeMap<Location, Vec<(u16, VisibleObject)>>,
     time: Time,
 }
 
@@ -52,7 +52,7 @@ impl SceneData {
         F: FnMut(Location, &[VisibleObject]),
     {
         for loc in boundaries {
-            f(loc, self.objects.get(&loc).unwrap_or(&Vec::default()));
+            f(loc, &self.get_objects_for_location(&loc));
         }
     }
 
@@ -60,20 +60,34 @@ impl SceneData {
         &mut self,
         location: Location,
         object: VisibleObject,
+        z_index: u16,
     ) {
         if self.objects.get(&location).is_none() {
             self.set_objects_for_location(location, vec![]);
         }
         self.objects
             .get_mut(&location)
-            .map(|objects| objects.push(object));
+            .map(|objects| objects.push((z_index, object)));
     }
 
     pub fn get_objects_for_location(
         &self,
         location: &Location,
     ) -> Vec<VisibleObject> {
-        self.objects.get(location).unwrap_or(&Vec::new()).to_vec()
+        // TODO: Consider z-sorting when we add object.
+        let mut objects_with_z_index: Vec<(u16, VisibleObject)> = self
+            .objects
+            .get(location)
+            .unwrap_or(&Vec::new())
+            .iter()
+            .cloned()
+            .collect();
+        objects_with_z_index.sort_by_key(|tuple| tuple.0);
+        objects_with_z_index
+            .iter()
+            .map(|(_, obj)| obj)
+            .cloned()
+            .collect()
     }
 
     pub fn t_millis(&self) -> u64 {
@@ -97,7 +111,7 @@ impl SceneData {
     fn set_objects_for_location(
         &mut self,
         location: Location,
-        objects: Vec<VisibleObject>,
+        objects: Vec<(u16, VisibleObject)>,
     ) {
         self.objects.insert(location, objects);
     }
