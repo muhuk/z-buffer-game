@@ -52,6 +52,13 @@ impl SceneData {
         }
     }
 
+    pub fn get_objects_for_location(
+        &self,
+        location: &Location,
+    ) -> Vec<VisibleObject> {
+        self.objects.get(location).unwrap_or(&Vec::new()).to_vec()
+    }
+
     pub fn set_objects_for_location(
         &mut self,
         location: Location,

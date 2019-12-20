@@ -1,4 +1,4 @@
-use crate::data::{Location, Rectangle};
+use crate::data::{Location, Rectangle, VisibleObject};
 use crate::stage::game::Game;
 use crate::ui::constants::{
     BOTTOM_PANEL_BACKGROUND_GLYPH, BOTTOM_PANEL_HEIGHT, MAP_MIN_SIZE,
@@ -166,11 +166,21 @@ impl Render for GameRenderer {
                 }
             }
 
-            let Location { x, y } = scene_data.cursor_location();
+            let cursor_location = scene_data.cursor_location();
 
             side_panel.set_alignment(TextAlignment::Center);
-            let s: String = format!("[{: >4}:{: >4}]", x, y);
+            let s: String = format!(
+                "[{: >4}:{: >4}]",
+                cursor_location.x, cursor_location.y
+            );
             side_panel.print_rect(w / 2, 0, w, 1, &s);
+
+            let objects: Vec<VisibleObject> =
+                scene_data.get_objects_for_location(&cursor_location);
+            for (i, obj) in objects.iter().enumerate() {
+                let s: String = format!("{:?}", obj);
+                side_panel.print_rect(w / 2, h - i as i32 - 3, w, 1, &s);
+            }
         });
 
         self.blit();
