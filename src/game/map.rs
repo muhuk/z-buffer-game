@@ -129,8 +129,7 @@ where
 
 fn generate_seed(rng: &Rng) -> u32 {
     unsafe {
-        // Seed 0 causes problems during
-        // transmute, hence i32::MIN+1.
+        // i31::MIN doesn't work so we're using i32::MIN+1.
         transmute::<i32, u32>(rng.get_int(i32::MIN + 1, i32::MAX))
     }
 }
