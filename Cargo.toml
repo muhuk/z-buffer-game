@@ -8,7 +8,7 @@ repository = "https://github.com/muhuk/z-buffer-game"
 readme = "README.org"
 keywords = ["game", "gamedev", "2d", "specs", "tcod"]
 categories = ["games"]
-license = "GPL-3.0-or-later"
+license = "LGPL-3.0-or-later"
 license-file = "LICENSE.txt"
 
 [dependencies]
