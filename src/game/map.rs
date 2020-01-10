@@ -38,6 +38,24 @@ const TREE_MASK_THRESHOLD: f32 = 0.55;
 const TREE_SIZE_MIN: i32 = 2;
 const TREE_SIZE_MAX: i32 = 5;
 
+enum ObjectChoice {
+    Rock,
+    Tree(u16),
+}
+
+impl ObjectChoice {
+    fn choose(x: f64) -> Option<ObjectChoice> {
+        assert!(x >= 0.0 && x <= 1.0, "x must be between 0.0 and 1.0");
+        if x < 0.2 {
+            Some(ObjectChoice::Rock)
+        } else if x < 0.35 {
+            Some(ObjectChoice::Tree(2))
+        } else {
+            None
+        }
+    }
+}
+
 #[derive(Debug, PartialEq)]
 pub enum MapStatus {
     Unitialized,
@@ -56,14 +74,16 @@ impl MapSystem {
         }
     }
 
-    fn generate_map<F, G>(
+    fn generate_map<F, G, H>(
         seed: u32,
         boundaries: Rectangle,
         mut add_ground_tile: F,
         mut add_tree: G,
+        mut add_rock: H,
     ) where
         F: FnMut(Location, VisibleObject),
         G: FnMut(Location, u16),
+        H: FnMut(Location),
     {
         debug!("Generating new map with seed {}", seed);
 
@@ -71,6 +91,7 @@ impl MapSystem {
         let ground_noise_seed: u32 = generate_seed(&rng);
         let trees_mask_seed: u32 = generate_seed(&rng);
         let trees_size_seed: u32 = generate_seed(&rng);
+        let object_rng_seed: u32 = generate_seed(&rng);
 
         {
             let threshold = 0.5;
@@ -89,42 +110,33 @@ impl MapSystem {
         }
 
         {
-            let size_rng = Rng::new_with_seed(NOISE_ALGO, trees_size_seed);
-            let mask: Noise =
-                make_2d_noise(trees_mask_seed, NoiseType::Perlin);
-            let k_abort: usize = 30;
-            let w: i32 = i32::from(boundaries.width());
-            let h: i32 = i32::from(boundaries.height());
+            let object_rng = Rng::new_with_seed(NOISE_ALGO, object_rng_seed);
+            let k_abort = 30;
             for pos in blue_noise_iter(
-                vec![f64::from(w), f64::from(h)],
+                vec![
+                    f64::from(boundaries.width()),
+                    f64::from(boundaries.height()),
+                ],
                 f64::from(TREE_DISTANCE),
                 k_abort,
             ) {
                 debug_assert!(
                     pos.len() == 2,
-                    "Blue noise dimensions is not 2"
+                    "Blue noise is not 2-dimensional"
                 );
                 let location = {
                     let x = pos[0] as i32 + boundaries.min_x;
                     let y = pos[1] as i32 + boundaries.min_y;
                     Location::new(x, y)
                 };
-                if (mask.get(location_to_noise_coordinate(location)) + 1.0)
-                    * 0.5
-                    > TREE_MASK_THRESHOLD
-                {
-                    let radius: u16 =
-                        size_rng.get_int(TREE_SIZE_MIN, TREE_SIZE_MAX) as u16;
-                    debug!(
-                        "Planting tree of size {} at {:?}",
-                        radius, location
-                    );
-                    add_tree(location, radius);
-                } else {
-                    debug!(
-                        "Passing up {:?} as a candidate tree location.",
-                        location
-                    );
+                let object_choice =
+                    ObjectChoice::choose(object_rng.get_double(0.0, 1.0));
+                match object_choice {
+                    Some(ObjectChoice::Rock) => add_rock(location),
+                    Some(ObjectChoice::Tree(radius)) => {
+                        add_tree(location, radius)
+                    }
+                    None => (),
                 }
             }
         }
@@ -162,6 +174,16 @@ impl<'a> System<'a> for MapSystem {
                         .with(components::Location::new(loc))
                         .with(components::Renderable::new(
                             VisibleObject::TreeTrunk,
+                            1,
+                        ))
+                        .build();
+                },
+                |loc| {
+                    lazy_update
+                        .create_entity(&entities)
+                        .with(components::Location::new(loc))
+                        .with(components::Renderable::new(
+                            VisibleObject::Rock,
                             1,
                         ))
                         .build();
