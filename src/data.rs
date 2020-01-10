@@ -18,11 +18,13 @@
 pub use direction::Direction;
 pub use location::Location;
 pub use object::VisibleObject;
+pub use probability::ProbabilityTable;
 pub use rectangle::Rectangle;
 pub use time::Time;
 
 mod direction;
 mod location;
 mod object;
+mod probability;
 mod rectangle;
 mod time;

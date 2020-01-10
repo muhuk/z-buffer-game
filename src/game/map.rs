@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with z-buffer-game.  If not, see <https://www.gnu.org/licenses/>.
 
-use crate::data::{Location, Rectangle, VisibleObject};
+use crate::data::{Location, ProbabilityTable, Rectangle, VisibleObject};
 use crate::game::{components, Cursor};
 use bluenoisers::blue_noise_iter;
 use log::debug;
@@ -37,41 +37,6 @@ const OBJECT_DISTANCE: u16 = 3;
 enum ObjectChoice {
     Rock,
     Tree(u16),
-}
-
-impl ObjectChoice {
-    fn choose(
-        x: f64,
-        distribution: Vec<(f64, Option<ObjectChoice>)>,
-    ) -> Option<ObjectChoice> {
-        assert!(x >= 0.0 && x <= 1.0, "x must be between 0.0 and 1.0");
-        assert!(
-            distribution
-                .iter()
-                .map(|(k, _)| k)
-                .all(|&k| k >= 0.0 && x <= 1.0),
-            "all weights must be between 0.0 and 1.0"
-        );
-        {
-            let sum_of_weights: f64 = distribution
-                .iter()
-                .map(|&(k, _): &(f64, Option<ObjectChoice>)| -> f64 { k })
-                .sum();
-            assert!(
-                (1.0 - sum_of_weights).abs() < 0.01,
-                "sum of all weights must be 1.0"
-            );
-        }
-        let mut idx: usize = 0;
-        let mut k: f64 = distribution[idx].0;
-        while k < x {
-            idx += 1;
-            k += distribution[idx].0;
-        }
-        // k is equal or greater than x, so
-        // we to go back to previous bracket.
-        distribution[idx].1
-    }
 }
 
 #[derive(Debug, PartialEq)]
@@ -126,6 +91,14 @@ impl MapSystem {
         }
 
         {
+            let probability_table = ProbabilityTable::new(vec![
+                (0.2, Some(ObjectChoice::Rock)),
+                (0.10, Some(ObjectChoice::Tree(2))),
+                (0.10, Some(ObjectChoice::Tree(3))),
+                (0.05, Some(ObjectChoice::Tree(4))),
+                (0.05, Some(ObjectChoice::Tree(5))),
+                (0.50, None),
+            ]);
             let object_rng = Rng::new_with_seed(NOISE_ALGO, object_rng_seed);
             let k_abort = 30;
             for pos in blue_noise_iter(
@@ -145,18 +118,8 @@ impl MapSystem {
                     let y = pos[1] as i32 + boundaries.min_y;
                     Location::new(x, y)
                 };
-                let object_choice = ObjectChoice::choose(
-                    object_rng.get_double(0.0, 1.0),
-                    vec![
-                        (0.2, Some(ObjectChoice::Rock)),
-                        (0.10, Some(ObjectChoice::Tree(2))),
-                        (0.10, Some(ObjectChoice::Tree(3))),
-                        (0.05, Some(ObjectChoice::Tree(4))),
-                        (0.05, Some(ObjectChoice::Tree(5))),
-                        (0.50, None),
-                    ],
-                );
-                match object_choice {
+                match probability_table.choose(object_rng.get_double(0.0, 1.0))
+                {
                     Some(ObjectChoice::Rock) => add_rock(location),
                     Some(ObjectChoice::Tree(radius)) => {
                         debug!(
