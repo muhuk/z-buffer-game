@@ -99,6 +99,12 @@ pub fn from_visible_object(v: VisibleObject) -> impl Tile {
             background: colors::DARKEST_GREEN,
             background_flag: BackgroundFlag::Set,
         },
+        VisibleObject::Rock => StaticTile {
+            glyph: '\u{2e}',
+            foreground: colors::BRASS,
+            background: colors::BLACK,
+            background_flag: BackgroundFlag::Set,
+        },
         VisibleObject::Soil => StaticTile {
             glyph: '\u{2e}',
             foreground: colors::DARK_SEPIA,

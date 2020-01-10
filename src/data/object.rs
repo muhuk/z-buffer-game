@@ -20,6 +20,7 @@ use std::str::FromStr;
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd)]
 pub enum VisibleObject {
     Grass,
+    Rock,
     Soil,
     TreeTrunk,
     TreeFoilage,
@@ -37,6 +38,7 @@ impl FromStr for VisibleObject {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
             "Grass" => Ok(VisibleObject::Grass),
+            "Rock" => Ok(VisibleObject::Rock),
             "Soil" => Ok(VisibleObject::Soil),
             "TreeTrunk" => Ok(VisibleObject::TreeTrunk),
             "TreeFoilage" => Ok(VisibleObject::TreeFoilage),

@@ -15,11 +15,11 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with z-buffer-game.  If not, see <https://www.gnu.org/licenses/>.
 
-pub use self::time::Time;
 pub use direction::Direction;
 pub use location::Location;
 pub use object::VisibleObject;
 pub use rectangle::Rectangle;
+pub use time::Time;
 
 mod direction;
 mod location;

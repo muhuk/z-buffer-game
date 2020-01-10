@@ -59,8 +59,8 @@ impl MapSystem {
     fn generate_map<F, G>(
         seed: u32,
         boundaries: Rectangle,
-        add_tile: F,
-        add_tree: G,
+        mut add_ground_tile: F,
+        mut add_tree: G,
     ) where
         F: FnMut(Location, VisibleObject),
         G: FnMut(Location, u16),
@@ -72,17 +72,62 @@ impl MapSystem {
         let trees_mask_seed: u32 = generate_seed(&rng);
         let trees_size_seed: u32 = generate_seed(&rng);
 
-        generate_map_tiles(ground_noise_seed, boundaries, add_tile);
-        generate_trees(
-            trees_mask_seed,
-            TREE_MASK_THRESHOLD,
-            trees_size_seed,
-            TREE_DISTANCE,
-            TREE_SIZE_MIN,
-            TREE_SIZE_MAX,
-            boundaries,
-            add_tree,
-        );
+        {
+            let threshold = 0.5;
+            let ground_noise =
+                make_2d_noise(ground_noise_seed, NoiseType::Simplex);
+            for loc in boundaries.into_iter() {
+                let noise_value =
+                    ground_noise.get(location_to_noise_coordinate(loc));
+                let obj = if noise_value > threshold {
+                    VisibleObject::Soil
+                } else {
+                    VisibleObject::Grass
+                };
+                add_ground_tile(loc, obj);
+            }
+        }
+
+        {
+            let size_rng = Rng::new_with_seed(NOISE_ALGO, trees_size_seed);
+            let mask: Noise =
+                make_2d_noise(trees_mask_seed, NoiseType::Perlin);
+            let k_abort: usize = 30;
+            let w: i32 = i32::from(boundaries.width());
+            let h: i32 = i32::from(boundaries.height());
+            for pos in blue_noise_iter(
+                vec![f64::from(w), f64::from(h)],
+                f64::from(TREE_DISTANCE),
+                k_abort,
+            ) {
+                debug_assert!(
+                    pos.len() == 2,
+                    "Blue noise dimensions is not 2"
+                );
+                let location = {
+                    let x = pos[0] as i32 + boundaries.min_x;
+                    let y = pos[1] as i32 + boundaries.min_y;
+                    Location::new(x, y)
+                };
+                if (mask.get(location_to_noise_coordinate(location)) + 1.0)
+                    * 0.5
+                    > TREE_MASK_THRESHOLD
+                {
+                    let radius: u16 =
+                        size_rng.get_int(TREE_SIZE_MIN, TREE_SIZE_MAX) as u16;
+                    debug!(
+                        "Planting tree of size {} at {:?}",
+                        radius, location
+                    );
+                    add_tree(location, radius);
+                } else {
+                    debug!(
+                        "Passing up {:?} as a candidate tree location.",
+                        location
+                    );
+                }
+            }
+        }
     }
 }
 
@@ -128,66 +173,10 @@ impl<'a> System<'a> for MapSystem {
     }
 }
 
-fn generate_map_tiles<F>(seed: u32, boundaries: Rectangle, mut add_tile: F)
-where
-    F: FnMut(Location, VisibleObject),
-{
-    let ground_noise = make_2d_noise(seed, NoiseType::Simplex);
-    for loc in boundaries.into_iter() {
-        let noise_value = ground_noise.get(location_to_noise_coordinate(loc));
-        let obj = if noise_value > 0.5 {
-            VisibleObject::Soil
-        } else {
-            VisibleObject::Grass
-        };
-        add_tile(loc, obj);
-    }
-}
-
 fn generate_seed(rng: &Rng) -> u32 {
     unsafe {
         // i31::MIN doesn't work so we're using i32::MIN+1.
         transmute::<i32, u32>(rng.get_int(i32::MIN + 1, i32::MAX))
-    }
-}
-
-fn generate_trees<F>(
-    mask_seed: u32,
-    mask_threshold: f32,
-    size_seed: u32,
-    distance: u16,
-    size_min: i32,
-    size_max: i32,
-    boundaries: Rectangle,
-    mut add_tree: F,
-) where
-    F: FnMut(Location, u16),
-{
-    let size_rng = Rng::new_with_seed(NOISE_ALGO, size_seed);
-    let mask: Noise = make_2d_noise(mask_seed, NoiseType::Perlin);
-    let k_abort: usize = 30;
-    let w: i32 = i32::from(boundaries.width());
-    let h: i32 = i32::from(boundaries.height());
-    for pos in blue_noise_iter(
-        vec![f64::from(w), f64::from(h)],
-        f64::from(distance),
-        k_abort,
-    ) {
-        debug_assert!(pos.len() == 2, "Blue noise dimensions is not 2");
-        let location = {
-            let x = pos[0] as i32 + boundaries.min_x;
-            let y = pos[1] as i32 + boundaries.min_y;
-            Location::new(x, y)
-        };
-        if (mask.get(location_to_noise_coordinate(location)) + 1.0) * 0.5
-            > mask_threshold
-        {
-            let radius: u16 = size_rng.get_int(size_min, size_max) as u16;
-            debug!("Planting tree of size {} at {:?}", radius, location);
-            add_tree(location, radius);
-        } else {
-            debug!("Passing up {:?} as a candidate tree location.", location);
-        }
     }
 }
 
