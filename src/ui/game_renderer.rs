@@ -18,14 +18,14 @@
 use crate::data::{Location, Rectangle, VisibleObject};
 use crate::stage::game::Game;
 use crate::ui::constants::{
-    BOTTOM_PANEL_BACKGROUND_GLYPH, BOTTOM_PANEL_HEIGHT, MAP_MIN_SIZE,
-    SIDE_PANEL_WIDTH,
+    BOTTOM_PANEL_HEIGHT, MAP_MIN_SIZE, SIDE_PANEL_WIDTH,
 };
 use crate::ui::render::Render;
 use crate::ui::tile::{self, Tile};
 use std::convert::TryFrom;
 use std::fmt;
-use tcod::console::{blit, BackgroundFlag, Console, Offscreen, TextAlignment};
+use tcod::colors;
+use tcod::console::{blit, Console, Offscreen, TextAlignment};
 
 pub struct GameRenderer {
     bottom_panel: Offscreen,
@@ -121,7 +121,12 @@ impl Render for GameRenderer {
             let h = u16::try_from(map.height())
                 .expect("Map window does not fit into u16");
 
-            map.clear();
+            // Fill the map with some glyph.
+            for y in 0..map.height() {
+                for x in 0..map.width() {
+                    tile::MAP_BACKGROUND.put(&mut map, x, y, 0);
+                }
+            }
 
             let t: u64 = scene_data.t_millis();
             let boundaries =
@@ -157,15 +162,12 @@ impl Render for GameRenderer {
 
             for y in 0..h {
                 for x in 0..w {
-                    bottom_panel.put_char(
-                        x,
-                        y,
-                        BOTTOM_PANEL_BACKGROUND_GLYPH,
-                        BackgroundFlag::None,
-                    );
+                    tile::UI_BACKGROUND.put(&mut bottom_panel, x, y, 0);
                 }
             }
 
+            // TODO: Put the color in constants
+            bottom_panel.set_default_foreground(colors::DARKEST_SEPIA);
             scene_data.for_each_game_log(5, |(idx, msg)| {
                 bottom_panel.print_rect(0, idx as i32, w, 1, msg.contents());
             });
@@ -176,15 +178,16 @@ impl Render for GameRenderer {
             let w = side_panel.width();
             let h = side_panel.height();
 
-            // Fill the map with some glyph.
             for y in 0..h {
                 for x in 0..w {
-                    side_panel.put_char(x, y, '\u{e6}', BackgroundFlag::None);
+                    tile::UI_BACKGROUND.put(&mut side_panel, x, y, 0);
                 }
             }
 
             let cursor_location = scene_data.cursor_location();
 
+            // TODO: Put the color in constants
+            side_panel.set_default_foreground(colors::DARKEST_SEPIA);
             side_panel.set_alignment(TextAlignment::Center);
             let s: String = format!(
                 "[{: >4}:{: >4}]",

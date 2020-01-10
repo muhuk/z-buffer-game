@@ -77,6 +77,19 @@ pub struct StaticTile {
     background_flag: BackgroundFlag,
 }
 
+pub const UI_BACKGROUND: StaticTile = StaticTile {
+    glyph: '\u{00}',
+    foreground: colors::BLACK,
+    background: colors::LIGHTER_SEPIA,
+    background_flag: BackgroundFlag::Set,
+};
+pub const MAP_BACKGROUND: StaticTile = StaticTile {
+    glyph: '\u{b0}',
+    foreground: colors::DESATURATED_GREEN,
+    background: colors::LIGHT_SEPIA,
+    background_flag: BackgroundFlag::Set,
+};
+
 impl Tile for StaticTile {
     fn put<T: Console>(self, console: &mut T, x: i32, y: i32, _: u64) {
         put(
