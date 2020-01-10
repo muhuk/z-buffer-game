@@ -100,9 +100,9 @@ pub fn from_visible_object(v: VisibleObject) -> impl Tile {
             background_flag: BackgroundFlag::Set,
         },
         VisibleObject::Rock => StaticTile {
-            glyph: '\u{2e}',
-            foreground: colors::BRASS,
-            background: colors::BLACK,
+            glyph: '\u{0f}',
+            foreground: colors::DARKER_GREY,
+            background: colors::LIGHTER_SEPIA,
             background_flag: BackgroundFlag::Set,
         },
         VisibleObject::Soil => StaticTile {
@@ -112,9 +112,9 @@ pub fn from_visible_object(v: VisibleObject) -> impl Tile {
             background_flag: BackgroundFlag::Set,
         },
         VisibleObject::TreeTrunk => StaticTile {
-            glyph: '\u{2e}',
-            foreground: colors::LIGHT_SEPIA,
-            background: colors::DARKER_BLUE,
+            glyph: '\u{05}',
+            foreground: colors::DARK_GREEN,
+            background: colors::DARKEST_GREEN,
             background_flag: BackgroundFlag::Set,
         },
         VisibleObject::TreeFoilage => StaticTile {
