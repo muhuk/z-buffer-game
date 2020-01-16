@@ -29,9 +29,18 @@ const NAME: &str = "z-buffer-game";
 const SCREEN_WIDTH_CHAR: u32 = 80;
 const SCREEN_HEIGHT_CHAR: u32 = 50;
 
+#[cfg(any(target_os = "linux", target_os = "macos"))]
 pub fn data_directory() -> PathBuf {
     let mut dir = dirs::home_dir().unwrap();
     dir.push(format!(".{}", NAME));
+    dir
+}
+
+#[cfg(target_os = "windows")]
+pub fn data_directory() -> PathBuf {
+    let mut dir = dirs::home_dir().unwrap();
+    dir.push("My Documents");
+    dir.push(NAME);
     dir
 }
 
