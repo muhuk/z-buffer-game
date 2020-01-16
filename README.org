@@ -33,10 +33,10 @@ Setup]] for instruction to compile and run locally.
 
 * Screenshots
 ** 11 August 2019
-[[./screenshots/20190811.gif]]
+[[./doc/screenshots/20190811.gif]]
 
 ** 28 April 2019
-[[./screenshots/20190428.gif]]
+[[./doc/screenshots/20190428.gif]]
 
 * Development Setup
 1. Checkout [[https://github.com/muhuk/z-buffer-game/][git repository]].
