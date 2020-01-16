@@ -1,0 +1,38 @@
+@startuml ECS_Component_Diagram
+!include ../c4/C4_Component.puml
+LAYOUT_LEFT_RIGHT
+
+Boundary(ecsComponents, "ECS Components") {
+  Component(tree, "Tree", "ECS Component")
+  Component(location, "Location", "ECS Component")
+  Component(renderable, "Renderable", "ECS Component")
+}
+
+Boundary(ecsResources, "ECS Resources") {
+  Component(cursor, "Cursor", "ECS Resource")
+  Component(gameLog, "GameLog", "ECS Resource.  Note that writing to GameLog requires <b>Read</b> and reading GameLog requires <b>Write</b>.  It provides concurrent writes via a Mutex.  Gamelog.take flushes the messages read, hence <b>Write</b> requirement.")
+  Component(sceneData, "SceneData", "ECS Resource")
+  Component(time, "Time", "ECS Resource")
+}
+
+Boundary(ecsSystems, "ECS Systems") {
+  Component(inputSystem, "Input System", "ECS System")
+  Component(mapSystem, "Map System", "ECS System")
+  Component(renderingSystem, "Rendering System", "ECS System.  Set as <b>thread local system</b> to ensure it runs at the end of each update loop")
+}
+
+Rel(inputSystem, cursor, "Write")
+Rel(inputSystem, gameLog, "Read")
+
+Rel(mapSystem, cursor, "Write", "set boundaries during map generation")
+Rel(mapSystem, location, "Entities & LazyUpdate")
+Rel(mapSystem, renderable, "Entities & LazyUpdate")
+Rel(mapSystem, tree, "Entities & LazyUpdate")
+
+Rel(renderingSystem, cursor, "Read")
+Rel(renderingSystem, gameLog, "Write")
+Rel(renderingSystem, sceneData, "Write")
+Rel(renderingSystem, time, "Read")
+Rel(renderingSystem, location, "ReadStorage")
+Rel(renderingSystem, renderable, "ReadStorage")
+@enduml
