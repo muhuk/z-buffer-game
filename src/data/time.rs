@@ -22,6 +22,7 @@ pub struct Time {
     game_time_days: u16,
     game_time_hours: u8,
     game_time_minutes: u8,
+    game_time_millis: u32,
 }
 
 impl Time {
@@ -42,14 +43,25 @@ impl Time {
         self.game_time_hours
     }
 
+    pub fn game_time_millis(self) -> u32 {
+        self.game_time_millis
+    }
+
     pub fn game_time_minutes(self) -> u8 {
         self.game_time_minutes
     }
 
-    pub fn set_game_time(&mut self, days: u16, hours: u8, minutes: u8) {
+    pub fn set_game_time(
+        &mut self,
+        days: u16,
+        hours: u8,
+        minutes: u8,
+        millis: u32,
+    ) {
         self.game_time_days = days;
         self.game_time_hours = hours;
         self.game_time_minutes = minutes;
+        self.game_time_millis = millis;
     }
 
     pub fn t_millis(self) -> u64 {

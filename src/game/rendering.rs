@@ -50,10 +50,10 @@ impl<'a> System<'a> for RenderingSystem {
 
         let time = sys_data.time;
         let game_time_str = format!(
-            "{}|{}:{}",
+            "Day {} - {:>2}:{:0>2}",
             time.game_time_days(),
             time.game_time_hours(),
-            time.game_time_days()
+            time.game_time_minutes()
         );
         scene_data.set_game_time_str(game_time_str);
     }

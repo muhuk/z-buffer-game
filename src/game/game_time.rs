@@ -18,11 +18,17 @@
 use crate::data::{Pause, Time};
 use specs::prelude::*;
 
-pub struct GameTimeSystem {}
+const DEFAULT_TIME_SCALE: u32 = 100;
+
+pub struct GameTimeSystem {
+    time_scale: u32, // game_time / time_scale = real_time
+}
 
 impl GameTimeSystem {
     pub fn new() -> GameTimeSystem {
-        GameTimeSystem {}
+        GameTimeSystem {
+            time_scale: DEFAULT_TIME_SCALE,
+        }
     }
 }
 
@@ -32,7 +38,25 @@ impl<'a> System<'a> for GameTimeSystem {
     fn run(&mut self, sys_data: Self::SystemData) {
         let (pause, mut time) = sys_data;
         if !pause.is_paused {
-            time.set_game_time(1, 1, 1);
+            let mut days = time.game_time_days();
+            let mut hours = time.game_time_hours();
+            let mut minutes = time.game_time_minutes();
+            let mut millis: u32 =
+                time.game_time_millis() + time.dt_millis() * self.time_scale;
+            // 1 minute is 60000 milliseconds.
+            if millis >= 60000 {
+                millis -= 60000;
+                minutes += 1;
+            }
+            if minutes >= 60 {
+                minutes -= 60;
+                hours += 1;
+            }
+            if hours >= 24 {
+                hours -= 24;
+                days += 1;
+            }
+            time.set_game_time(days, hours, minutes, millis);
         }
     }
 }
