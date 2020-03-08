@@ -47,6 +47,15 @@ impl<'a> System<'a> for RenderingSystem {
             sys_data.game_log.take(),
             sys_data.time.clone(),
         );
+
+        let time = sys_data.time;
+        let game_time_str = format!(
+            "{}|{}:{}",
+            time.game_time_days(),
+            time.game_time_hours(),
+            time.game_time_days()
+        );
+        scene_data.set_game_time_str(game_time_str);
     }
 }
 

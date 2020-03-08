@@ -28,6 +28,7 @@ use std::sync::Mutex;
 #[derive(Debug, Default)]
 pub struct SceneData {
     cursor_location: Location,
+    game_time_str: String,
     game_log: Mutex<VecDeque<LogEntry>>,
     objects: BTreeMap<Location, Vec<(u16, VisibleObject)>>,
     time: Time,
@@ -102,6 +103,10 @@ impl SceneData {
         }
     }
 
+    pub fn get_game_time_str(&self) -> &str {
+        &self.game_time_str
+    }
+
     pub fn get_objects_for_location(
         &self,
         location: &Location,
@@ -130,6 +135,10 @@ impl SceneData {
         let mut game_log = self.game_log.lock().unwrap();
         game_log.extend(new_entries);
         self.time = time;
+    }
+
+    pub fn set_game_time_str(&mut self, game_time_str: String) {
+        self.game_time_str = game_time_str;
     }
 
     fn set_objects_for_location(

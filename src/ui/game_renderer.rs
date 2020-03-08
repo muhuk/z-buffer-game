@@ -184,6 +184,14 @@ impl Render for GameRenderer {
                 }
             }
 
+            side_panel.print_rect(
+                w / 2,
+                0,
+                w,
+                1,
+                scene_data.get_game_time_str(),
+            );
+
             let cursor_location = scene_data.cursor_location();
 
             // TODO: Put the color in constants
@@ -193,7 +201,7 @@ impl Render for GameRenderer {
                 "[{: >4}:{: >4}]",
                 cursor_location.x, cursor_location.y
             );
-            side_panel.print_rect(w / 2, 0, w, 1, &s);
+            side_panel.print_rect(w / 2, 1, w, 1, &s);
 
             let objects: Vec<VisibleObject> =
                 scene_data.get_objects_for_location(&cursor_location);

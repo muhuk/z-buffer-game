@@ -16,7 +16,6 @@
 // along with z-buffer-game.  If not, see <https://www.gnu.org/licenses/>.
 
 use crate::data::{Pause, Time};
-use log::debug;
 use specs::prelude::*;
 
 pub struct GameTimeSystem {}
@@ -30,14 +29,10 @@ impl GameTimeSystem {
 impl<'a> System<'a> for GameTimeSystem {
     type SystemData = (Read<'a, Pause>, Write<'a, Time>);
 
-    fn run(&mut self, mut sys_data: Self::SystemData) {
-        let (pause, time) = sys_data;
-        debug!(
-            "Pause = {}, time is {}|{}:{}",
-            pause.is_paused,
-            time.game_time_days(),
-            time.game_time_hours(),
-            time.game_time_days()
-        );
+    fn run(&mut self, sys_data: Self::SystemData) {
+        let (pause, mut time) = sys_data;
+        if !pause.is_paused {
+            time.set_game_time(1, 1, 1);
+        }
     }
 }
