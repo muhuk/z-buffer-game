@@ -15,18 +15,29 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with z-buffer-game.  If not, see <https://www.gnu.org/licenses/>.
 
-pub use direction::Direction;
-pub use location::Location;
-pub use object::VisibleObject;
-pub use pause::Pause;
-pub use probability::ProbabilityTable;
-pub use rectangle::Rectangle;
-pub use time::Time;
+use crate::data::{Pause, Time};
+use log::debug;
+use specs::prelude::*;
 
-mod direction;
-mod location;
-mod object;
-mod pause;
-mod probability;
-mod rectangle;
-mod time;
+pub struct GameTimeSystem {}
+
+impl GameTimeSystem {
+    pub fn new() -> GameTimeSystem {
+        GameTimeSystem {}
+    }
+}
+
+impl<'a> System<'a> for GameTimeSystem {
+    type SystemData = (Read<'a, Pause>, Write<'a, Time>);
+
+    fn run(&mut self, mut sys_data: Self::SystemData) {
+        let (pause, time) = sys_data;
+        debug!(
+            "Pause = {}, time is {}|{}:{}",
+            pause.is_paused,
+            time.game_time_days(),
+            time.game_time_hours(),
+            time.game_time_days()
+        );
+    }
+}

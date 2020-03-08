@@ -19,10 +19,10 @@
 //!
 //! [Game] is the entry point.
 
-use crate::data::Time;
+use crate::data::{Pause, Time};
 use crate::game::{
-    components, Cursor, GameEvent, GameLog, InputSystem, LogEntry, MapSystem,
-    RenderingSystem, SceneData,
+    components, Cursor, GameEvent, GameLog, GameTimeSystem, InputSystem,
+    LogEntry, MapSystem, RenderingSystem, SceneData,
 };
 use crate::stage::StageData;
 use specs::prelude::*;
@@ -44,9 +44,11 @@ impl Game {
         world.add_resource(Cursor::default());
         world.add_resource(GameLog::default());
         world.add_resource(SceneData::default());
+        world.add_resource(Pause::default());
         world.add_resource(Time::default());
         components::register_with(&mut world);
         let mut dispatcher = DispatcherBuilder::new()
+            .with(GameTimeSystem::new(), "game_time_system", &[])
             .with(MapSystem::new(), "map_system", &[])
             .with(InputSystem::new(event_source), "input_system", &[])
             .with_thread_local(RenderingSystem::new())

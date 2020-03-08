@@ -17,6 +17,7 @@
 
 pub use self::cursor::Cursor;
 pub use self::game_event::GameEvent;
+pub use self::game_time::GameTimeSystem;
 pub use self::input::InputSystem;
 pub use self::log::{GameLog, LogEntry};
 pub use self::map::MapSystem;
@@ -27,6 +28,7 @@ pub mod components;
 
 mod cursor;
 mod game_event;
+mod game_time;
 mod input;
 mod log;
 mod map;
