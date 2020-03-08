@@ -12,13 +12,14 @@ Boundary(ecsResources, "ECS Resources") {
   Component(cursor, "Cursor", "ECS Resource")
   Component(gameLog, "GameLog", "ECS Resource.  Note that writing to GameLog requires <b>Read</b> and reading GameLog requires <b>Write</b>.  It provides concurrent writes via a Mutex.  Gamelog.take flushes the messages read, hence <b>Write</b> requirement.")
   Component(sceneData, "SceneData", "ECS Resource")
-  Component(time, "Time", "ECS Resource", "This resource keeps the time that has passed since the ECS world is created.  It is not the game time visible to the player.")
+  Component(time, "Time", "ECS Resource", "This resource keeps the time that has passed since the ECS world is created.  It is not in-game time visible to the player.")
 }
 
 Boundary(ecsSystems, "ECS Systems") {
   Component(inputSystem, "Input System", "ECS System")
   Component(mapSystem, "Map System", "ECS System")
   Component(renderingSystem, "Rendering System", "ECS System.  Set as <b>thread local system</b> to ensure it runs at the end of each update loop")
+  Component(gameTimeSystem, "Game Time System", "ECS System.  Keeps track of in-game time visible to the player.")
 }
 
 Rel(inputSystem, cursor, "Write")
