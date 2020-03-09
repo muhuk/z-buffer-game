@@ -47,7 +47,10 @@ impl<'a> System<'a> for InputSystem {
                             cursor.location()
                         )
                         .as_str(),
-                    ))
+                    ));
+                }
+                GameEvent::Spacebar => {
+                    game_log.push(LogEntry::new("Spacebar pressed"));
                 }
             }
         }

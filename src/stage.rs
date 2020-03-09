@@ -71,16 +71,19 @@ impl Stage {
         for e in events {
             match e {
                 Event::KeyPress(KeyCode::Up, ..) => {
-                    game.publish_event(GameEvent::Move(Direction::North))
+                    game.publish_event(GameEvent::Move(Direction::North));
                 }
                 Event::KeyPress(KeyCode::Right, ..) => {
-                    game.publish_event(GameEvent::Move(Direction::East))
+                    game.publish_event(GameEvent::Move(Direction::East));
                 }
                 Event::KeyPress(KeyCode::Down, ..) => {
-                    game.publish_event(GameEvent::Move(Direction::South))
+                    game.publish_event(GameEvent::Move(Direction::South));
                 }
                 Event::KeyPress(KeyCode::Left, ..) => {
-                    game.publish_event(GameEvent::Move(Direction::West))
+                    game.publish_event(GameEvent::Move(Direction::West));
+                }
+                Event::KeyPress(KeyCode::Spacebar, ..) => {
+                    game.publish_event(GameEvent::Spacebar);
                 }
                 _ => (),
             }
