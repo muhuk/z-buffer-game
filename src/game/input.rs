@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with z-buffer-game.  If not, see <https://www.gnu.org/licenses/>.
 
+use crate::data::Pause;
 use crate::game::{Cursor, GameEvent, GameLog, LogEntry};
 use log::debug;
 use specs::prelude::*;
@@ -31,10 +32,10 @@ impl InputSystem {
 }
 
 impl<'a> System<'a> for InputSystem {
-    type SystemData = (Write<'a, Cursor>, Read<'a, GameLog>);
+    type SystemData = (Write<'a, Cursor>, Read<'a, GameLog>, Write<'a, Pause>);
 
     fn run(&mut self, system_data: Self::SystemData) {
-        let (mut cursor, game_log) = system_data;
+        let (mut cursor, game_log, mut pause) = system_data;
         for e in self.event_source.try_iter() {
             debug!("Received game event {:?}", e);
             match e {
@@ -50,6 +51,7 @@ impl<'a> System<'a> for InputSystem {
                     ));
                 }
                 GameEvent::Spacebar => {
+                    pause.is_paused = !pause.is_paused;
                     game_log.push(LogEntry::new("Spacebar pressed"));
                 }
             }
